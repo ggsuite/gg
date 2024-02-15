@@ -10,7 +10,7 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg_check.dart",
-      "args": ["ggCheck", "--param", "value"],
+      "args": ["tests"],
       "console": "debugConsole"
     },
     {

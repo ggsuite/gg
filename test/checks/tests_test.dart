@@ -9,13 +9,13 @@ import 'package:test/test.dart';
 
 void main() {
   final messages = <String>[];
-  final tests = Tests.example(log: (msg) => messages.add(msg));
 
   group('Tests', () {
     // #########################################################################
 
     // .....................................................................
     test('should run dart tests', () async {
+      final tests = Tests.example(log: (msg) => messages.add(msg));
       await tests.run(isTest: true);
     });
   });
