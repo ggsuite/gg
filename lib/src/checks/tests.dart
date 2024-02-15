@@ -1,4 +1,11 @@
-#!/usr/bin/env dart
+// @license
+// Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
+//
+// Use of this source code is governed by terms that can be
+// found in the LICENSE file in the root of this package.
+
+import 'package:args/command_runner.dart';
+import 'package:gg_check/src/tools/shell_cmd.dart';
 
 import 'dart:io';
 import 'dart:async';
@@ -8,8 +15,52 @@ import 'package:colorize/colorize.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
 
+/// Tests
+class Tests extends Command<dynamic> {
+  /// Constructor
+  Tests({
+    required this.log,
+    required this.isGitHub,
+  });
+
+  // ...........................................................................
+  @override
+  final name = 'tests';
+  @override
+  final description = 'Runs tests & coverage check.';
+
+  /// Example instance for test purposes
+  factory Tests.example({
+    void Function(String msg)? log,
+    bool? isGitHub,
+  }) =>
+      Tests(log: log ?? (_) {}, isGitHub: isGitHub ?? false);
+
+  @override
+  Future<void> run({bool? isTest}) async {
+    if (isTest == true) {
+      return;
+    }
+
+    // coverage:ignore-start
+    await ShellCmd(
+      name: 'tests',
+      command: 'dart lib/src/checks/tests.dart',
+      message: 'dart check_tests.dart',
+      log: log,
+    ).run();
+    // coverage:ignore-end
+  }
+
+  /// The log function
+  final void Function(String message) log;
+
+  /// Running in github?
+  final bool isGitHub;
+}
+
 // .............................................................................
-bool isFlutterPackage() {
+bool _isFlutterPackage() {
   final File pubspec = File('pubspec.yaml');
   if (!pubspec.existsSync()) {
     throw Exception('pubspec.yaml not found');
@@ -50,7 +101,7 @@ String _makeErrorLineVscodeCompatible(String errorLine) {
 }
 
 // .............................................................................
-String makeErrorLinesInMessageVscodeCompatible(String message) {
+String _makeErrorLinesInMessageVscodeCompatible(String message) {
   var errorLines = _extractErrorLines(message);
   var result = message;
 
@@ -276,7 +327,7 @@ List<(String, String)> _collectMissingTestFiles() {
 }
 
 // .............................................................................
-const testBoilerplate = '''
+const _testBoilerplate = '''
 // @license
 // Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
 //
@@ -312,7 +363,7 @@ void _createMissingTestFiles(List<(String, String)> missingFiles) {
     final implementationFilePath =
         implementationFile.replaceAll('lib/', '').replaceAll('./', '');
 
-    final boilerplate = testBoilerplate
+    final boilerplate = _testBoilerplate
         .replaceAll('Boilerplate', className)
         .replaceAll('// INSTANTIATE CLASS HERE', 'const $className();')
         .replaceAll(
@@ -333,7 +384,7 @@ void _createMissingTestFiles(List<(String, String)> missingFiles) {
 }
 
 // .............................................................................
-Future<int> test() async {
+Future<int> _test() async {
   // Remove the coverage directory
   var coverageDir = Directory('coverage');
   if (coverageDir.existsSync()) {
@@ -346,7 +397,7 @@ Future<int> test() async {
   var previousMessagesBelongingToError = <String>[];
   var isError = false;
 
-  var process = isFlutterPackage()
+  var process = _isFlutterPackage()
       ? await Process.start(
           'flutter',
           ['test', '--coverage'],
@@ -368,7 +419,7 @@ Future<int> test() async {
   await for (var event in process.stdout.transform(utf8.decoder)) {
     isError = isError || event.contains('[E]');
     if (isError) {
-      event = makeErrorLinesInMessageVscodeCompatible(event);
+      event = _makeErrorLinesInMessageVscodeCompatible(event);
       previousMessagesBelongingToError.add(event);
     }
 
@@ -402,7 +453,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   // Run Tests
-  final error = await test();
+  final error = await _test();
   if (error != 0) {
     exit(error);
   }

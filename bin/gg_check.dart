@@ -8,21 +8,32 @@
 import 'package:args/command_runner.dart';
 import 'package:colorize/colorize.dart';
 import 'package:gg_check/gg_check.dart';
+import 'package:gg_check/src/tools/is_github.dart';
 
 // .............................................................................
 Future<void> runGgCheck({
   required List<String> args,
   required void Function(String msg) log,
 }) async {
+  final ggCheck = GgCheck(log: log, isGitHub: isGitHub);
+
   try {
     // Create a command runner
     final CommandRunner<void> runner = CommandRunner<void>(
       'GgCheck',
       'Offers pre-commit checks like analyzing, linting, tests and coverage. ',
-    )..addCommand(GgCheckCmd(log: log));
+    );
+
+    for (final cmd in ggCheck.subcommands.values) {
+      runner.addCommand(cmd);
+    }
 
     // Run the command
-    await runner.run(args);
+    if (args.isNotEmpty) {
+      await runner.run(args);
+    } else {
+      await ggCheck.run();
+    }
   }
 
   // Print errors in red

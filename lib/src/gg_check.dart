@@ -5,34 +5,27 @@
 // found in the LICENSE file in the root of this package.
 
 // #############################################################################
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
-
-/// Gg Check
-class GgCheck {
-  /// Constructor
-  GgCheck({
-    required this.param,
-    required this.log,
-  });
-
-  /// The param to work with
-  final String param;
-
-  /// The log function
-  final void Function(String msg) log;
-
-  /// The function to be executed
-  Future<void> exec() async {
-    log('Executing GgCheck with param $param');
-  }
-}
+import 'package:dart_ping/dart_ping.dart';
+import 'package:gg_check/src/checks/analyze.dart';
+import 'package:gg_check/src/checks/format.dart';
+import 'package:gg_check/src/checks/pana.dart';
+import 'package:gg_check/src/checks/tests.dart';
+import 'package:gg_check/src/tools/is_github.dart';
+import 'package:yaml/yaml.dart';
 
 // #############################################################################
 /// The command line interface for GgCheck
-class GgCheckCmd extends Command<dynamic> {
+class GgCheck extends Command<dynamic> {
   /// Constructor
-  GgCheckCmd({required this.log}) {
-    _addArgs();
+  GgCheck({required this.log, bool isGitHub = false}) {
+    // Add more subcommands here
+    addSubcommand(Analyze(log: log, isGitHub: false));
+    addSubcommand(Format(log: log, isGitHub: false));
+    addSubcommand(Tests(log: log, isGitHub: false));
+    addSubcommand(Pana(log: log, isGitHub: false));
   }
 
   /// The log function
@@ -40,33 +33,67 @@ class GgCheckCmd extends Command<dynamic> {
 
   // ...........................................................................
   @override
-  final name = 'ggCheck';
+  final name = 'check';
   @override
-  final description = 'Add your description here.';
-
-  // ...........................................................................
+  final description = 'Performs various checks on code.';
   @override
   Future<void> run() async {
-    var param = argResults?['param'] as String;
-    GgCheck(
-      param: param,
-      log: log,
-    );
+    _loadConfig();
+    _checkInternet();
 
-    await GgCheck(
-      param: param,
-      log: log,
-    ).exec();
+    for (final cmd in subcommands.values) {
+      if (_shouldExecute(name: cmd.name)) {
+        await cmd.run();
+      }
+    }
   }
 
   // ...........................................................................
-  void _addArgs() {
-    argParser.addOption(
-      'param',
-      abbr: 'p',
-      help: 'The param to work with',
-      valueHelp: 'param',
-      defaultsTo: '.',
-    );
+  late dynamic _yaml;
+  void _loadConfig() {
+    var file = File('check.yaml');
+    if (!file.existsSync()) {
+      print('❌ check.yaml not found');
+      exit(1);
+    }
+
+    _yaml = loadYaml(file.readAsStringSync());
+  }
+
+  // ...........................................................................
+  bool _shouldExecute({required String name}) {
+    if (_yaml[name] == null) {
+      print('❌ $name not found in check.yaml. '
+          'Please add configuration for it.');
+      exit(1);
+    }
+
+    if (_yaml[name]['execute'] == null) {
+      print('❌ $name does not have an "execute:" section. '
+          'Please open check.yaml and add it to the "$name" section.');
+      exit(1);
+    }
+
+    return _yaml[name]['execute'] == null || _yaml[name]['execute'] == true;
+  }
+
+  // ...........................................................................
+  Future<void> _checkInternet() async {
+    if (_yaml['needsInternet'] == true) {
+      if (!await _hasInternet()) {
+        print('❌ This package needs internet. Abort.');
+        exit(1);
+      }
+    }
+  }
+
+  // .........................................................................
+  /// Returns true if the internet is available
+  Future<bool> _hasInternet() async {
+    // If GitHub is not available, skip test.
+    final isGitHubAvailable =
+        isGitHub || (await Ping('github.com').stream.first).error == null;
+
+    return isGitHubAvailable;
   }
 }

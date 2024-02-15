@@ -4,4 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-void main() {}
+import 'dart:io';
+
+/// Is true when running in GitHub
+bool get isGitHub => Platform.environment.containsKey('GITHUB_ACTIONS');

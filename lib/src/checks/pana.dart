@@ -1,4 +1,3 @@
-#!/usr/bin/env dart
 // @license
 // Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
 //
@@ -7,6 +6,57 @@
 
 import 'dart:convert';
 import 'dart:io';
+
+import 'package:args/command_runner.dart';
+import 'package:gg_check/src/tools/shell_cmd.dart';
+
+/// Pana
+class Pana extends Command<dynamic> {
+  /// Constructor
+  Pana({
+    required this.log,
+    required this.isGitHub,
+  });
+
+  // ...........................................................................
+  @override
+  final name = 'pana';
+  @override
+  final description = 'Runs pana.';
+
+  /// Example instance for test purposes
+  factory Pana.example({
+    void Function(String msg)? log,
+    bool? isGitHub,
+  }) =>
+      Pana(log: log ?? (_) {}, isGitHub: isGitHub ?? false);
+
+  @override
+  Future<void> run({bool? isTest}) async {
+    if (isTest == true) {
+      return;
+    }
+
+    // coverage:ignore-start
+    await ShellCmd(
+      name: 'pana',
+      command: 'dart ./lib/src/checks/pana.dart',
+      message: 'dart run pana',
+      log: log,
+    ).run();
+    // coverage:ignore-end
+  }
+
+  /// The log function
+  final void Function(String message) log;
+
+  /// Running in github?
+  final bool isGitHub;
+}
+
+// #############################################################################
+
+// coverage:ignore-start
 
 Future<void> main() async {
   // Run 'pana' and capture the output
@@ -40,3 +90,5 @@ Future<void> main() async {
     exit(1);
   }
 }
+
+// coverage:ignore-end

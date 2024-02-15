@@ -67,11 +67,9 @@ jobs:
             dart pub get
           fi
 
-      - name: Install lcov
-        run: sudo apt-get install lcov
-
       - name: Make Script Executable
-        run: chmod +x ./check.dart
+        run: chmod +x ./check
+        shell: bash
 
       - name: Run Script
-        run: ./check.dart --verbose
+        run: ./check --verbose
