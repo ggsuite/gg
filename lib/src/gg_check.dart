@@ -5,6 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 // #############################################################################
+import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -20,12 +21,16 @@ import 'package:yaml/yaml.dart';
 /// The command line interface for GgCheck
 class GgCheck extends Command<dynamic> {
   /// Constructor
-  GgCheck({required this.log, bool isGitHub = false}) {
+  GgCheck({
+    required this.log,
+    bool isGitHub = false,
+  }) {
     // Add more subcommands here
     addSubcommand(Analyze(log: log, isGitHub: false));
     addSubcommand(Format(log: log, isGitHub: false));
     addSubcommand(Tests(log: log, isGitHub: false));
     addSubcommand(Pana(log: log, isGitHub: false));
+    addSubcommand(_All(this));
   }
 
   /// The log function
@@ -62,6 +67,8 @@ class GgCheck extends Command<dynamic> {
 
   // ...........................................................................
   bool _shouldExecute({required String name}) {
+    if (name == 'all') return false;
+
     if (_yaml[name] == null) {
       print('❌ $name not found in check.yaml. '
           'Please add configuration for it.');
@@ -96,4 +103,21 @@ class GgCheck extends Command<dynamic> {
 
     return isGitHubAvailable;
   }
+}
+
+// #############################################################################
+/// The command line interface for GgCheck
+class _All extends Command<dynamic> {
+  _All(this.ggCheck);
+  @override
+  final name = 'all';
+  @override
+  final description = 'Runs all tests.';
+
+  @override
+  Future<void> run() async {
+    return ggCheck.run();
+  }
+
+  GgCheck ggCheck;
 }

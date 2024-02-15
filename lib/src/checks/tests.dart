@@ -46,7 +46,7 @@ class Tests extends Command<dynamic> {
     await ShellCmd(
       name: 'tests',
       command: 'dart lib/src/checks/tests.dart',
-      message: 'dart check_tests.dart',
+      message: 'aud check tests',
       log: log,
     ).run();
     // coverage:ignore-end

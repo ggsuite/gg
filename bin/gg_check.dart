@@ -28,12 +28,7 @@ Future<void> runGgCheck({
       runner.addCommand(cmd);
     }
 
-    // Run the command
-    if (args.isNotEmpty) {
-      await runner.run(args);
-    } else {
-      await ggCheck.run();
-    }
+    await runner.run(args);
   }
 
   // Print errors in red
