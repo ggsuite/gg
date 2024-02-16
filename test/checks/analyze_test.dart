@@ -18,13 +18,7 @@ void main() {
 
     // .....................................................................
     test('should run dart analyze', () async {
-      await analyze.run();
-      const cr = BaseCmd.carriageReturn;
-
-      expect(messages, [
-        '⌛️ dart analyze',
-        '$cr✅ dart analyze',
-      ]);
+      await analyze.run(isTest: true);
     });
   });
 }

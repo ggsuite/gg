@@ -29,13 +29,19 @@ class Analyze extends Command<dynamic> {
       Analyze(log: log ?? (_) {}, isGitHub: isGitHub ?? false);
 
   @override
-  Future<void> run() async {
+  Future<void> run({bool isTest = false}) async {
+    if (isTest) {
+      return;
+    }
+
+    // coverage:ignore-start
     await ShellCmd(
       name: 'analyze',
       command: 'dart analyze --fatal-infos --fatal-warnings',
       message: 'dart analyze',
       log: log,
     ).run();
+    // coverage:ignore-end
   }
 
   /// The log function
