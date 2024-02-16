@@ -24,7 +24,6 @@ class Tests extends Command<dynamic> {
   /// Constructor
   Tests({
     required this.log,
-    required this.isGitHub,
   });
 
   // ...........................................................................
@@ -36,9 +35,8 @@ class Tests extends Command<dynamic> {
   /// Example instance for test purposes
   factory Tests.example({
     void Function(String msg)? log,
-    bool? isGitHub,
   }) =>
-      Tests(log: log ?? (_) {}, isGitHub: isGitHub ?? false);
+      Tests(log: log ?? (_) {});
 
   @override
   Future<void> run({bool? isTest}) async {
@@ -58,9 +56,6 @@ class Tests extends Command<dynamic> {
 
   /// The log function
   final void Function(String message) log;
-
-  /// Running in github?
-  final bool isGitHub;
 
   // ######################
   // Private
@@ -222,8 +217,6 @@ class Tests extends Command<dynamic> {
       return cachedResult;
     }
 
-    // Return when line is in between coverag:ignore-start and
-    // coverage:ignore-end
     final lines = File(script).readAsLinesSync();
     final ignoredLines = List<bool>.filled(lines.length + 1, false);
 
@@ -477,7 +470,7 @@ void main() {
           !errorLines.contains(newErrorLines.first)) {
         // Print error line
 
-        final newErrorLinesString = newErrorLines.join(',\n   ');
+        final newErrorLinesString = _addDotSlash(newErrorLines.join(',\n   '));
         _messages.add(Colorize(' - $newErrorLinesString').red().toString());
 
         // Print messages belonging to this error

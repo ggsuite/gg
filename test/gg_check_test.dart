@@ -7,12 +7,12 @@
 import 'package:gg_check/src/gg_check.dart';
 import 'package:test/test.dart';
 
-
 void main() {
   group('GgCheck', () {
     test('should work fine', () {
-      // const GgCheck();
-      expect(true, isNotNull);
+      final logMessages = <String>[];
+      final ggCheck = GgCheck(log: logMessages.add);
+      expect(ggCheck.subcommands.length, 5);
     });
   });
 }

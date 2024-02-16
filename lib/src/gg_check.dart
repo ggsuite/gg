@@ -23,13 +23,12 @@ class GgCheck extends Command<dynamic> {
   /// Constructor
   GgCheck({
     required this.log,
-    bool isGitHub = false,
   }) {
     // Add more subcommands here
-    addSubcommand(Analyze(log: log, isGitHub: false));
-    addSubcommand(Format(log: log, isGitHub: false));
-    addSubcommand(Tests(log: log, isGitHub: false));
-    addSubcommand(Pana(log: log, isGitHub: false));
+    addSubcommand(Analyze(log: log));
+    addSubcommand(Format(log: log));
+    addSubcommand(Tests(log: log));
+    addSubcommand(Pana(log: log));
     addSubcommand(_All(this));
   }
 
@@ -37,6 +36,7 @@ class GgCheck extends Command<dynamic> {
   final void Function(String message) log;
 
   // ...........................................................................
+  // coverage:ignore-start
   @override
   final name = 'check';
   @override
@@ -103,6 +103,8 @@ class GgCheck extends Command<dynamic> {
 
     return isGitHubAvailable;
   }
+
+  // coverage:ignore-end
 }
 
 // #############################################################################
@@ -114,10 +116,12 @@ class _All extends Command<dynamic> {
   @override
   final description = 'Runs all tests.';
 
+  // coverage:ignore-start
   @override
   Future<void> run() async {
     return ggCheck.run();
   }
+  // coverage:ignore-end
 
   GgCheck ggCheck;
 }

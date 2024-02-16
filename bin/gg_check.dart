@@ -8,14 +8,13 @@
 import 'package:args/command_runner.dart';
 import 'package:colorize/colorize.dart';
 import 'package:gg_check/gg_check.dart';
-import 'package:gg_check/src/tools/is_github.dart';
 
 // .............................................................................
 Future<void> runGgCheck({
   required List<String> args,
   required void Function(String msg) log,
 }) async {
-  final ggCheck = GgCheck(log: log, isGitHub: isGitHub);
+  final ggCheck = GgCheck(log: log);
 
   try {
     // Create a command runner

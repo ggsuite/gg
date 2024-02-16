@@ -15,7 +15,6 @@ class Pana extends Command<dynamic> {
   /// Constructor
   Pana({
     required this.log,
-    required this.isGitHub,
   });
 
   // ...........................................................................
@@ -27,9 +26,10 @@ class Pana extends Command<dynamic> {
   /// Example instance for test purposes
   factory Pana.example({
     void Function(String msg)? log,
-    bool? isGitHub,
   }) =>
-      Pana(log: log ?? (_) {}, isGitHub: isGitHub ?? false);
+      Pana(
+        log: log ?? (_) {}, // coverage:ignore-line
+      );
 
   @override
   Future<void> run({bool? isTest}) async {
@@ -49,9 +49,6 @@ class Pana extends Command<dynamic> {
 
   /// The log function
   final void Function(String message) log;
-
-  /// Running in github?
-  final bool isGitHub;
 }
 
 // #############################################################################

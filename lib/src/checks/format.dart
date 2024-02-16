@@ -12,7 +12,6 @@ class Format extends Command<dynamic> {
   /// Constructor
   Format({
     required this.log,
-    required this.isGitHub,
   });
 
   // ...........................................................................
@@ -24,9 +23,10 @@ class Format extends Command<dynamic> {
   /// Example instance for test purposes
   factory Format.example({
     void Function(String msg)? log,
-    bool? isGitHub,
   }) =>
-      Format(log: log ?? (_) {}, isGitHub: isGitHub ?? false);
+      Format(
+        log: log ?? (_) {}, // coverage:ignore-line
+      );
 
   @override
   Future<void> run() async {
@@ -40,7 +40,4 @@ class Format extends Command<dynamic> {
 
   /// The log function
   final void Function(String message) log;
-
-  /// Running in github?
-  final bool isGitHub;
 }

@@ -58,7 +58,7 @@ void main() {
         // On GitHub we are not allowed to use carriage returns
         // Also no clock icon is written
         expect(logs, [
-          'Example command',
+          '⌛️ Example command',
           '✅ Example command',
         ]);
 

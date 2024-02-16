@@ -12,7 +12,6 @@ class Analyze extends Command<dynamic> {
   /// Constructor
   Analyze({
     required this.log,
-    required this.isGitHub,
   });
 
   // ...........................................................................
@@ -26,7 +25,7 @@ class Analyze extends Command<dynamic> {
     void Function(String msg)? log,
     bool? isGitHub,
   }) =>
-      Analyze(log: log ?? (_) {}, isGitHub: isGitHub ?? false);
+      Analyze(log: log ?? (_) {});
 
   @override
   Future<void> run({bool isTest = false}) async {
@@ -46,7 +45,4 @@ class Analyze extends Command<dynamic> {
 
   /// The log function
   final void Function(String message) log;
-
-  /// Running in github?
-  final bool isGitHub;
 }
