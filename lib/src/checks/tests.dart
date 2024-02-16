@@ -101,11 +101,15 @@ class Tests extends Command<dynamic> {
 
 // .............................................................................
   String _makeErrorLineVscodeCompatible(String errorLine) {
+    errorLine = errorLine.replaceAll(':', ' ');
     var parts = errorLine.split(' ');
+    if (parts.length != 3) {
+      return errorLine;
+    }
+
     var filePath = parts[0];
-    var lineInfo = parts[1].split(':');
-    var lineNumber = lineInfo[0];
-    var columnNumber = lineInfo[1];
+    var lineNumber = parts[1];
+    var columnNumber = parts[2];
 
     return '$filePath:$lineNumber:$columnNumber';
   }
@@ -121,6 +125,14 @@ class Tests extends Command<dynamic> {
     }
 
     return result;
+  }
+
+// .............................................................................
+  String _addDotSlash(String relativeFile) {
+    if (!relativeFile.startsWith('./')) {
+      return './$relativeFile';
+    }
+    return relativeFile;
   }
 
 // .............................................................................
@@ -140,7 +152,7 @@ class Tests extends Command<dynamic> {
       final testFile = coverageFile.path
           .replaceAll('.vm.json', '')
           .replaceAll('./coverage/', '');
-      final implementationFile = testFile
+      var implementationFile = testFile
           .replaceAll('test/', 'lib/src/')
           .replaceAll('_test.dart', '.dart');
       final implementationFileWithoutLib =
@@ -159,6 +171,7 @@ class Tests extends Command<dynamic> {
         // Read script
 
         // Find or create summary for script
+        implementationFile = _addDotSlash(implementationFile);
         result[implementationFile] ??= {};
         late Map<int, int> summaryForScript = result[implementationFile]!;
         final ignoredLines = _ignoredLines(implementationFile);
@@ -265,22 +278,20 @@ class Tests extends Command<dynamic> {
 
 // .............................................................................
   void _printMissingLines(_MissingLines missingLines) {
-    var lastUncoveredLine = -1;
-
     for (final script in missingLines.keys) {
       final testFile = script
           .replaceFirst('lib/src', 'test')
           .replaceAll('.dart', '_test.dart');
+
+      const bool printFirstOnly = true;
       final lineNumbers = missingLines[script]!;
       for (final lineNumber in lineNumbers) {
         // Dont print too many lines
-        if (lineNumber - lastUncoveredLine >= 2) {
-          final message = '$script:$lineNumber';
-          _messages.add('- ${Colorize(message).red()}');
-          _messages.add('  ${Colorize(testFile).blue()}\n');
-        }
 
-        lastUncoveredLine = lineNumber;
+        final message = '$script:$lineNumber';
+        _messages.add('- ${Colorize(message).red()}');
+        _messages.add('  ${Colorize(testFile).blue()}\n');
+        if (printFirstOnly) break;
       }
     }
   }
@@ -303,31 +314,39 @@ class Tests extends Command<dynamic> {
   }
 
 // .............................................................................
-  List<(String, String)> _collectMissingTestFiles() {
-    // Collect implementation files without test files
-    final missingFiles = <(String, String)>[];
-
+  Iterable<(File, File)> _implementationAndTestFiles() {
     // Get all implementation files
     final implementationFiles = Directory('./lib/src')
         .listSync(recursive: true)
         .whereType<File>()
         .where((file) {
       return file.path.endsWith('.dart');
+    }).map((file) {
+      // Make sure file path starts with ./
+      if (!file.path.startsWith('./')) {
+        return File('./${file.path}');
+      }
+      return file;
     });
 
-    // Find missing test files
-    for (final implementationFile in implementationFiles) {
+    final result = implementationFiles.map((implementationFile) {
       final testFile = implementationFile.path
           .replaceAll('lib/src/', 'test/')
           .replaceAll('.dart', '_test.dart');
 
-      if (!File(testFile).existsSync()) {
-        missingFiles.add((implementationFile.path, testFile));
-      }
-    }
+      return (implementationFile, File(testFile));
+    });
 
-    return missingFiles;
+    return result;
   }
+
+// .............................................................................
+  Iterable<(File, File)> _collectMissingTestFiles(
+    Iterable<(File, File)> files,
+  ) =>
+      files.where(
+        (e) => !e.$2.existsSync(),
+      );
 
 // .............................................................................
   static const _testBoilerplate = '''
@@ -350,7 +369,7 @@ void main() {
 ''';
 
 // .............................................................................
-  void _createMissingTestFiles(List<(String, String)> missingFiles) {
+  void _createMissingTestFiles(Iterable<(File, File)> missingFiles) {
     // Create missing test files and ask user to edit it
     _messages.add(
       Colorize('Tests were created. Please revise:').yellow().toString(),
@@ -359,18 +378,19 @@ void main() {
 
     for (final (implementationFile, testFile) in missingFiles) {
       // Create test file with intermediate directories
-      final testFileDir = dirname(testFile);
+      final testFileDir = dirname(testFile.path);
       Directory(testFileDir).createSync(recursive: true);
 
       // Write boilerplate
-      final className = basenameWithoutExtension(implementationFile).pascalCase;
+      final className =
+          basenameWithoutExtension(implementationFile.path).pascalCase;
 
       final implementationFilePath =
-          implementationFile.replaceAll('lib/', '').replaceAll('./', '');
+          implementationFile.path.replaceAll('lib/', '').replaceAll('./', '');
 
       final boilerplate = _testBoilerplate
           .replaceAll('Boilerplate', className)
-          .replaceAll('// INSTANTIATE CLASS HERE', 'const $className();')
+          .replaceAll('// INSTANTIATE CLASS HERE', '// const $className();')
           .replaceAll(
             'import \'package:test/test.dart\';',
             'import \'package:$packageName/'
@@ -380,15 +400,38 @@ void main() {
           );
 
       // Create boilerplate file
-      File(testFile).writeAsStringSync(boilerplate);
+      testFile.writeAsStringSync(boilerplate);
 
       // Print message
-      _messages.add('- ${Colorize(implementationFile).red()}');
-      _messages.add('- ${Colorize(testFile).blue()}');
+      _messages.add('- ${Colorize(testFile.path).red()}');
+      _messages.add('  ${Colorize(implementationFile.path).darkGray()}');
     }
   }
 
-// .............................................................................
+  // ...........................................................................
+  Iterable<(File, File)> _findUntestedFiles(
+    _Report report,
+    Iterable<(File, File)> files,
+  ) {
+    final result = files.where(
+      (e) {
+        return !report.containsKey(e.$1.path);
+      },
+    ).toList();
+
+    return result;
+  }
+
+  // ...........................................................................
+  void _printUntestedFiles(Iterable<(File, File)> files) {
+    for (final tuple in files) {
+      final (implementation, test) = tuple;
+      _messages.add('- ${Colorize(test.path).red()}');
+      _messages.add('  ${Colorize(implementation.path).darkGray()}');
+    }
+  }
+
+  // ...........................................................................
   Future<int> _test() async {
     // Remove the coverage directory
     var coverageDir = Directory('coverage');
@@ -418,6 +461,7 @@ void main() {
               '--chain-stack-traces',
               '--no-color',
             ],
+            // workingDirectory: '/Users/gatzsche/dev/gg_cli_cc',
           );
 
     // Iterate over stdout and print output using a for loop
@@ -451,8 +495,12 @@ void main() {
 
 // .............................................................................
   Future<TaskResult> _task() async {
+    // Get implementation files
+    final files = _implementationAndTestFiles();
+
     // Check if test files are missing for implemenation files
-    final missingTestFiles = _collectMissingTestFiles();
+    // Directory.current = '/Users/gatzsche/dev/gg_cli_cc';
+    final missingTestFiles = _collectMissingTestFiles(files);
     if (missingTestFiles.isNotEmpty) {
       _createMissingTestFiles(missingTestFiles);
       return (1, _messages, _errors);
@@ -466,6 +514,19 @@ void main() {
 
     // Generate coverage reports
     final report = _generateReport();
+
+    // Estimate untested files
+    final untestedFiles = _findUntestedFiles(report, files);
+    if (untestedFiles.isNotEmpty) {
+      _messages.add(
+        Colorize('Please add valid tests to the following files:')
+            .yellow()
+            .toString(),
+      );
+      _printUntestedFiles(untestedFiles);
+      return (1, _messages, _errors);
+    }
+
     var percentage = _calculateCoverage(report);
     _writeLcovReport(report);
 

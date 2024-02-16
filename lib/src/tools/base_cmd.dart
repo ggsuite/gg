@@ -120,7 +120,7 @@ class BaseCmd {
     final msg = switch (state) {
       _State.success => '$cr✅ $message',
       _State.error => '$cr❌ $message',
-      _ => gitHub ? message : '⌛️ $message',
+      _ => '⌛️ $message',
     };
 
     log(msg);
