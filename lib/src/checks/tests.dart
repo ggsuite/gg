@@ -48,7 +48,7 @@ class Tests extends Command<dynamic> {
     await BaseCmd(
       name: 'tests',
       task: _task,
-      message: 'aud check tests',
+      message: 'gg check tests',
       log: log,
     ).run();
     // coverage:ignore-end

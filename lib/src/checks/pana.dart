@@ -8,13 +8,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:gg_check/src/tools/shell_cmd.dart';
+import 'package:gg_check/src/tools/base_cmd.dart';
+import 'package:gg_test_helpers/gg_test_helpers.dart';
 
 /// Pana
 class Pana extends Command<dynamic> {
   /// Constructor
   Pana({
     required this.log,
+    this.runProcess = Process.run,
   });
 
   // ...........................................................................
@@ -26,22 +28,21 @@ class Pana extends Command<dynamic> {
   /// Example instance for test purposes
   factory Pana.example({
     void Function(String msg)? log,
+    bool exitOnError = false,
+    RunProcess? runProcess,
   }) =>
       Pana(
         log: log ?? (_) {}, // coverage:ignore-line
+        runProcess: runProcess ?? Process.run,
       );
 
   @override
-  Future<void> run({bool? isTest}) async {
-    if (isTest == true) {
-      return;
-    }
-
+  Future<void> run() async {
     // coverage:ignore-start
-    await ShellCmd(
+    await BaseCmd(
       name: 'pana',
-      command: 'dart ./lib/src/checks/pana.dart',
-      message: 'dart run pana',
+      task: _task,
+      message: 'gg check pana',
       log: log,
     ).run();
     // coverage:ignore-end
@@ -49,43 +50,45 @@ class Pana extends Command<dynamic> {
 
   /// The log function
   final void Function(String message) log;
-}
 
-// #############################################################################
+  /// The process run method
+  final RunProcess runProcess;
 
-// coverage:ignore-start
+  // ...........................................................................
+  Future<TaskResult> _task() async {
+    // Run 'pana' and capture the output
+    final result = await runProcess('dart', [
+      'run',
+      'pana',
+      '--no-warning',
+      '--json',
+    ]);
 
-Future<void> main() async {
-  // Run 'pana' and capture the output
-  var process = await Process.start('dart', [
-    'run',
-    'pana',
-    '--no-warning',
-    '--json',
-  ]);
-  var output = await utf8.decoder.bind(process.stdout).join();
-  await process.exitCode;
+    try {
+      // Parse the JSON output to get the score
+      final jsonOutput =
+          jsonDecode(result.stdout.toString()) as Map<String, dynamic>;
+      final grantedPoints = jsonOutput['scores']['grantedPoints'];
+      final maxPoints = jsonOutput['scores']['maxPoints'];
+      final complete = grantedPoints == maxPoints;
+      final points = '$grantedPoints/$maxPoints';
 
-  try {
-    // Parse the JSON output to get the score
-    final jsonOutput = jsonDecode(output) as Map<String, dynamic>;
-    final grantedPoints = jsonOutput['scores']['grantedPoints'];
-    final maxPoints = jsonOutput['scores']['maxPoints'];
-    final complete = grantedPoints == maxPoints;
-    final result = '$grantedPoints/$maxPoints';
+      // Check if the score is less than 140
+      if (!complete) {
+        final errors = [
+          'Not all pub points achieved: $points',
+          'run "dart run pana" for more details',
+        ];
 
-    // Check if the score is less than 140
-    if (!complete) {
-      print('❌ Not all pub points achieved: $result');
-      print('run "dart run pana" for more details');
-      exit(1);
-    } else {
-      print('✅ All pub points achieved: $result');
+        return (1, <String>[], errors);
+      } else {
+        final messages = [
+          'All pub points achieved: $points',
+        ];
+        return (0, <String>[], messages);
+      }
+    } catch (e) {
+      return (1, ['Error parsing pana output: $e'], <String>[]);
     }
-  } catch (e) {
-    print('Error parsing pana output: $e');
-    exit(1);
   }
 }
-
-// coverage:ignore-end

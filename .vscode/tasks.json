@@ -15,11 +15,14 @@
       "label": "generate_lcov",
       "type": "shell",
       "command": "dart",
-      "args": ["run", "coverage:test_with_coverage", "${file}"],
+      "args": ["run", "bin/gg_check.dart", "${file}", "tests"],
       "problemMatcher": [],
       "group": {
         "kind": "build",
         "isDefault": true
+      },
+      "options": {
+        "cwd": "/Users/gatzsche/dev/gg_cli_cc"
       }
     }
   ]

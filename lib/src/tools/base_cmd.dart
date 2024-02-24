@@ -31,11 +31,8 @@ class BaseCmd {
     required this.name,
     required this.message,
     required this.log,
-    this.exitOnError = true,
-    void Function(int)? exit,
     Task? task,
-  })  : _exit = exit,
-        _task = task;
+  }) : _task = task;
 
   // ...........................................................................
   /// The name of the command
@@ -54,14 +51,8 @@ class BaseCmd {
   /// The message to be printed when the command is executed
   final String message;
 
-  /// If true, the command will exit on error
-  final bool exitOnError;
-
   /// The method used to log the output
   final void Function(String) log;
-
-  /// The method used to exit
-  final void Function(int)? _exit;
 
   // ...........................................................................
   /// Example instance for test purposes
@@ -69,7 +60,6 @@ class BaseCmd {
     String? name,
     String? message,
     void Function(String)? log,
-    bool? exitOnError,
     void Function(int)? exit,
     Task? task,
   }) =>
@@ -77,7 +67,6 @@ class BaseCmd {
         name: name ?? 'showDir',
         message: message ?? 'Example command',
         log: log ?? (p0) {},
-        exitOnError: exitOnError ?? false,
         task: task ?? () async => (0, ['outputs'], ['errors']),
       );
 
@@ -87,8 +76,8 @@ class BaseCmd {
     // Announce the command
     _updateConsoleOutput(state: _State.running);
     final result = await task();
-    final (exitCode, messages, errors) = result;
-    final success = exitCode == 0;
+    final (code, messages, errors) = result;
+    final success = code == 0;
 
     _updateConsoleOutput(
       state: success ? _State.success : _State.error,
@@ -96,6 +85,10 @@ class BaseCmd {
 
     if (!success) {
       _logErrors(messages, errors);
+    }
+
+    if (code != 0) {
+      exitCode = code;
     }
 
     return result;
@@ -136,11 +129,6 @@ class BaseCmd {
     }
     if (stdoutMsg.isNotEmpty) {
       log(stdoutMsg); // coverage:ignore-line
-    }
-
-    if (exitOnError) {
-      final ex = _exit ?? exit; // coverage:ignore-line
-      ex(1); // coverage:ignore-line
     }
   }
 

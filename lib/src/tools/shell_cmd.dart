@@ -18,8 +18,6 @@ class ShellCmd extends BaseCmd {
     required this.command,
     required super.message,
     required super.log,
-    super.exitOnError = true,
-    super.exit,
   });
 
   // ...........................................................................
@@ -42,7 +40,6 @@ class ShellCmd extends BaseCmd {
         command: command ?? 'echo hallo',
         message: message ?? 'Example command',
         log: log ?? (p0) {},
-        exitOnError: exitOnError ?? false,
       );
 
   // ...........................................................................

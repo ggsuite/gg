@@ -11,7 +11,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg_check.dart",
       "args": ["tests"],
-      "console": "debugConsole"
+      "console": "debugConsole",
+      "cwd": "/Users/gatzsche/dev/gg_cli_cc"
     },
     {
       "name": "Test Current File",

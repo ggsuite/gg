@@ -49,6 +49,11 @@ class GgCheck extends Command<dynamic> {
     for (final cmd in subcommands.values) {
       if (_shouldExecute(name: cmd.name)) {
         await cmd.run();
+
+        // Stop, if an error happend
+        if (exitCode != 0) {
+          exit(exitCode);
+        }
       }
     }
   }
@@ -119,7 +124,7 @@ class _All extends Command<dynamic> {
   // coverage:ignore-start
   @override
   Future<void> run() async {
-    return ggCheck.run();
+    await ggCheck.run();
   }
   // coverage:ignore-end
 
