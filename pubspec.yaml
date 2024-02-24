@@ -1,6 +1,6 @@
 name: gg_check
 description: Offers pre-commit checks like analyzing, linting, tests and coverage.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/inlavigo/gg_check.git
 
 environment:
