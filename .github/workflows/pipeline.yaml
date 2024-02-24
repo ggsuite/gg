@@ -67,9 +67,5 @@ jobs:
             dart pub get
           fi
 
-      - name: Make Script Executable
-        run: chmod +x ./check
-        shell: bash
-
       - name: Run Script
-        run: ./check --verbose
+        run: dart run gg_check all

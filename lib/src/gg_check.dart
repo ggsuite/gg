@@ -9,6 +9,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:colorize/colorize.dart';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:gg_check/src/checks/analyze.dart';
 import 'package:gg_check/src/checks/format.dart';
@@ -16,6 +17,19 @@ import 'package:gg_check/src/checks/pana.dart';
 import 'package:gg_check/src/checks/tests.dart';
 import 'package:gg_check/src/tools/is_github.dart';
 import 'package:yaml/yaml.dart';
+
+// #############################################################################
+const _checkYamlTemplate = '''
+needsInternet: false
+analyze:
+  execute: true
+format:
+  execute: true
+tests:
+  execute: true
+pana:
+  execute: true
+''';
 
 // #############################################################################
 /// The command line interface for GgCheck
@@ -63,7 +77,12 @@ class GgCheck extends Command<dynamic> {
   void _loadConfig() {
     var file = File('check.yaml');
     if (!file.existsSync()) {
-      print('❌ check.yaml not found');
+      file.writeAsStringSync(_checkYamlTemplate);
+      print(
+        Colorize(
+          '"./check.yaml" has been created. Please edit and try again.',
+        ).yellow(),
+      );
       exit(1);
     }
 
