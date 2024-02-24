@@ -6,6 +6,7 @@
 
 import 'dart:io';
 
+import 'package:colorize/colorize.dart';
 import 'package:gg_check/src/checks/pana.dart';
 import 'package:test/test.dart';
 
@@ -48,13 +49,11 @@ void main() {
 
     // .........................................................................
     test('should succeed when 140 pubpoints are reached', () async {
+      final successReport =
+          File('test/data/pana_success_report.json').readAsStringSync();
+
       fakeProcess = FakeProcess(
-        processResult: ProcessResult(
-          0,
-          0,
-          '{"scores": {"grantedPoints": 140,"maxPoints": 140}}',
-          '',
-        ),
+        processResult: ProcessResult(0, 0, successReport, ''),
       );
 
       pana = Pana.example(
@@ -68,13 +67,11 @@ void main() {
 
     // .........................................................................
     test('should fail when 140 pubpoints are not reached', () async {
+      final notSuccessReport =
+          File('test/data/pana_not_success_report.json').readAsStringSync();
+
       fakeProcess = FakeProcess(
-        processResult: ProcessResult(
-          0,
-          0,
-          '{"scores": {"grantedPoints": 130,"maxPoints": 140}}',
-          '',
-        ),
+        processResult: ProcessResult(0, 0, notSuccessReport, ''),
       );
 
       pana = Pana.example(
@@ -82,9 +79,39 @@ void main() {
         runProcess: fakeProcess.run,
       );
 
-      await runCommand(cmd: pana, args: ['pana']);
-      expect(hasLog('Not all pub points achieved: 130/140', messages), isTrue);
-      expect(hasLog('run "dart run pana" for more details', messages), isTrue);
+      // Did print red message?
+      await pana.run();
+      expect(
+        hasLog(
+          Colorize('[x] 0/10 points: Provide a valid `pubspec.yaml`')
+              .red()
+              .toString(),
+          messages,
+        ),
+        isTrue,
+      );
+
+      // Did print gray details?
+      expect(
+        hasLog(
+          Colorize(
+            '* `pubspec.yaml` doesn\'t have a `homepage` entry.',
+          ).darkGray().toString(),
+          messages,
+        ),
+        isTrue,
+      );
+
+      // Did print gray details?
+      expect(
+        hasLog(
+          Colorize(
+            '* `pubspec.yaml` doesn\'t have a `repository` entry.',
+          ).darkGray().toString(),
+          messages,
+        ),
+        isTrue,
+      );
     });
   });
 }

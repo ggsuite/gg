@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:colorize/colorize.dart';
 import 'package:gg_check/src/tools/base_cmd.dart';
 import 'package:gg_check/src/tools/run_process.dart';
 
@@ -55,6 +56,39 @@ class Pana extends Command<dynamic> {
   final RunProcess runProcess;
 
   // ...........................................................................
+  List<String> _readProblems(Map<String, dynamic> jsonOutput) {
+    final problems = <String>[];
+    final sections = jsonOutput['report']['sections'] as List<dynamic>;
+    final failedSections =
+        sections.where((section) => section['status'] == 'failed');
+
+    for (final section in failedSections) {
+      final summary = section['summary'] as String;
+      final errorPoints = summary.split('###').where(
+            (element) => element.contains('[x]'),
+          );
+
+      for (final errorPoint in errorPoints) {
+        final parts = errorPoint.split('\n').map(
+              (e) => e.trim(),
+            );
+
+        final title = parts.first;
+        final details = parts.skip(1);
+
+        final titleRed = Colorize(title).red().toString();
+        final detailsGray = details
+            .map(
+              (e) => Colorize(e).darkGray().toString(),
+            )
+            .join('\n');
+        problems.add('\n$titleRed$detailsGray');
+      }
+    }
+    return problems;
+  }
+
+// ...........................................................................
   Future<TaskResult> _task() async {
     // Run 'pana' and capture the output
     final result = await runProcess('dart', [
@@ -62,6 +96,7 @@ class Pana extends Command<dynamic> {
       'pana',
       '--no-warning',
       '--json',
+      '--no-dartdoc', // dartdoc is enforced using analysis_options.yaml
     ]);
 
     try {
@@ -75,10 +110,7 @@ class Pana extends Command<dynamic> {
 
       // Check if the score is less than 140
       if (!complete) {
-        final errors = [
-          'Not all pub points achieved: $points',
-          'run "dart run pana" for more details',
-        ];
+        final errors = _readProblems(jsonOutput);
 
         return (1, <String>[], errors);
       } else {

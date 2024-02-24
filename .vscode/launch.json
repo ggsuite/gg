@@ -10,9 +10,9 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg_check.dart",
-      "args": ["tests"],
+      "args": ["pana"],
       "console": "debugConsole",
-      "cwd": "/Users/gatzsche/dev/gg_cli_cc"
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "Test Current File",
