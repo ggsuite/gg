@@ -9,7 +9,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg_check/src/tools/base_cmd.dart';
-import 'package:gg_test_helpers/gg_test_helpers.dart';
+import 'package:gg_check/src/tools/run_process.dart';
 
 /// Pana
 class Pana extends Command<dynamic> {

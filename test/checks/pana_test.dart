@@ -7,8 +7,11 @@
 import 'dart:io';
 
 import 'package:gg_check/src/checks/pana.dart';
-import 'package:gg_test_helpers/gg_test_helpers.dart';
 import 'package:test/test.dart';
+
+import '../helpers/fake_process.dart';
+import '../helpers/has_log.dart';
+import '../helpers/run_command.dart';
 
 void main() {
   final messages = <String>[];
