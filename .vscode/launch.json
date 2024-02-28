@@ -10,9 +10,10 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg_check.dart",
-      "args": ["pana"],
+      "args": ["tests"],
       "console": "debugConsole",
-      "cwd": "${workspaceFolder}"
+      "cwd": "/Users/gatzsche/tmp/hello_world"
+      // "cwd": "${workspaceFolder}/"
     },
     {
       "name": "Test Current File",

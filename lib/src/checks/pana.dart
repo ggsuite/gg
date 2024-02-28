@@ -43,7 +43,7 @@ class Pana extends Command<dynamic> {
     await BaseCmd(
       name: 'pana',
       task: _task,
-      message: 'gg check pana',
+      message: 'gg_check pana',
       log: log,
     ).run();
     // coverage:ignore-end

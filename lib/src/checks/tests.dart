@@ -48,7 +48,7 @@ class Tests extends Command<dynamic> {
     await BaseCmd(
       name: 'tests',
       task: _task,
-      message: 'gg check tests',
+      message: 'gg_check tests',
       log: log,
     ).run();
     // coverage:ignore-end
@@ -65,7 +65,8 @@ class Tests extends Command<dynamic> {
   final _messages = <String>[];
 
   // ...........................................................................
-  bool _isFlutterPackage() {
+  late bool _isFlutter;
+  bool _estimateFlutterOrDart() {
     final File pubspec = File('pubspec.yaml');
     if (!pubspec.existsSync()) {
       throw Exception('pubspec.yaml not found');
@@ -132,6 +133,11 @@ class Tests extends Command<dynamic> {
 
 // .............................................................................
   _Report _generateReport() {
+    return _isFlutter ? _generateFlutterReport() : _generateDartReport();
+  }
+
+  // ...........................................................................
+  _Report _generateDartReport() {
     // Iterate all 'dart.vm.json' files within coverage directory
     final coverageDir = Directory('./coverage');
     final coverageFiles =
@@ -188,7 +194,40 @@ class Tests extends Command<dynamic> {
     return result;
   }
 
-// .............................................................................
+  // ...........................................................................
+  _Report _generateFlutterReport() {
+    // Iterate all 'lcov' files within coverage directory
+    final coverageFile = File('./coverage/lcov.info');
+
+    // Prepare result
+    final result = _Report();
+
+    // Prepare report for file
+    late Map<int, int> summaryForScript;
+
+    final fileContent = coverageFile.readAsStringSync();
+    final lines = fileContent.split('\n');
+
+    for (final line in lines) {
+      // Read script
+      if (line.startsWith('SF:')) {
+        final script = './${line.replaceFirst('SF:', '')}';
+        result[script] = {};
+        summaryForScript = result[script]!;
+      }
+      // Read coverage
+      else if (line.startsWith('DA:')) {
+        final parts = line.replaceFirst('DA:', '').split(',');
+        final lineNumber = int.parse(parts[0]);
+        final hits = int.parse(parts[1]);
+        summaryForScript[lineNumber] = hits;
+      }
+    }
+
+    return result;
+  }
+
+  // ...........................................................................
   double _calculateCoverage(_Report report) {
     // Calculate coverage
     var totalLines = 0;
@@ -425,7 +464,10 @@ void main() {
   }
 
   // ...........................................................................
-  Future<int> _test() async {
+  Future<int> _test() => _isFlutter ? _testFlutter() : _testDart();
+
+  // ...........................................................................
+  Future<int> _testDart() async {
     // Remove the coverage directory
     var coverageDir = Directory('coverage');
     if (coverageDir.existsSync()) {
@@ -438,25 +480,38 @@ void main() {
     var previousMessagesBelongingToError = <String>[];
     var isError = false;
 
-    var process = _isFlutterPackage()
-        ? await Process.start(
-            'flutter',
-            ['test', '--coverage'],
-          )
-        : await Process.start(
-            'dart',
-            [
-              'test',
-              '-r',
-              'expanded',
-              '--coverage',
-              'coverage',
-              '--chain-stack-traces',
-              '--no-color',
-            ],
-            // workingDirectory: '/Users/gatzsche/dev/gg_cli_cc',
-          );
+    var process = await Process.start(
+      'dart',
+      [
+        'test',
+        '-r',
+        'expanded',
+        '--coverage',
+        'coverage',
+        '--chain-stack-traces',
+        '--no-color',
+      ],
+      // workingDirectory: '/Users/gatzsche/dev/gg_cli_cc',
+    );
 
+    // Iterate over stdout and print output using a for loop
+    await _processTestOutput(
+      process,
+      isError,
+      previousMessagesBelongingToError,
+      errorLines,
+    );
+
+    return process.exitCode;
+  }
+
+  // ...........................................................................
+  Future<void> _processTestOutput(
+    Process process,
+    bool isError,
+    List<String> previousMessagesBelongingToError,
+    Set<String> errorLines,
+  ) async {
     // Iterate over stdout and print output using a for loop
     await for (var event in process.stdout.transform(utf8.decoder)) {
       isError = isError || event.contains('[E]');
@@ -482,12 +537,42 @@ void main() {
       }
       errorLines.addAll(newErrorLines);
     }
-
-    return process.exitCode;
   }
 
-// .............................................................................
+  // ...........................................................................
+  Future<int> _testFlutter() async {
+    int exitCode = 0;
+
+    // Execute flutter tests
+    var process = await Process.start(
+      'flutter',
+      [
+        'test',
+        '--coverage',
+      ],
+    );
+
+    var errorLines = <String>{};
+    var previousMessagesBelongingToError = <String>[];
+    var isError = false;
+
+    // Iterate over stdout and print output using a for loop
+    await _processTestOutput(
+      process,
+      isError,
+      previousMessagesBelongingToError,
+      errorLines,
+    );
+
+    exitCode = await process.exitCode;
+
+    return exitCode;
+  }
+
+  // ...........................................................................
   Future<TaskResult> _task() async {
+    _isFlutter = _estimateFlutterOrDart();
+
     // Get implementation files
     final files = _implementationAndTestFiles();
 
@@ -501,6 +586,7 @@ void main() {
 
     // Run Tests
     final error = await _test();
+
     if (error != 0) {
       return (error, _messages, _errors);
     }

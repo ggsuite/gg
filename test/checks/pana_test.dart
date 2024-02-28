@@ -36,7 +36,7 @@ void main() {
     test('should throw an error when pana returns invalid JSON', () async {
       init();
       await runCommand(cmd: pana, args: ['pana']);
-      expect(hasLog('❌ gg check pana', messages), isTrue);
+      expect(hasLog('❌ gg_check pana', messages), isTrue);
       expect(
         hasLog(
           'Error parsing pana output: FormatException: '
@@ -62,7 +62,7 @@ void main() {
       );
 
       await runCommand(cmd: pana, args: ['pana']);
-      expect(hasLog('✅ gg check pana', messages), isTrue);
+      expect(hasLog('✅ gg_check pana', messages), isTrue);
     });
 
     // .........................................................................
