@@ -12,7 +12,6 @@ export 'src/gg_check.dart';
 export 'src/commands/check.dart';
 export 'src/commands/check/analyze.dart';
 export 'src/commands/check/format.dart';
-export 'src/commands/check/coverage.dart';
 export 'src/commands/check/pana.dart';
 
 // Tools

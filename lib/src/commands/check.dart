@@ -8,6 +8,7 @@ import 'package:args/command_runner.dart';
 import 'package:gg_check/gg_check.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_process/gg_process.dart';
+import 'package:gg_test/gg_test.dart';
 import 'package:gg_version/gg_version.dart';
 
 // #############################################################################
@@ -20,7 +21,7 @@ class Check extends Command<dynamic> {
   }) {
     addSubcommand(Analyze(log: log, processWrapper: processWrapper));
     addSubcommand(Format(log: log, processWrapper: processWrapper));
-    addSubcommand(Coverage(log: log, processWrapper: processWrapper));
+    addSubcommand(Tests(log: log, processWrapper: processWrapper));
     addSubcommand(Pana(log: log, processWrapper: processWrapper));
     addSubcommand(Pushed(log: log, processWrapper: processWrapper));
     addSubcommand(Commited(log: log, processWrapper: processWrapper));
