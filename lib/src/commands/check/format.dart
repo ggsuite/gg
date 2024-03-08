@@ -5,8 +5,8 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_check/gg_check.dart';
 import 'package:gg_is_github/gg_is_github.dart';
+import 'package:gg_parse_stdout/gg_parse_stdout.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
@@ -60,7 +60,7 @@ class Format extends GgDirCommand {
       final stdOut = result.stdout as String;
       final std = '$stdErr\n$stdOut';
 
-      final files = errorFiles(std);
+      final files = parseDartFilePathes(std);
 
       // When running on git hub, log the file that have been changed
       if (isGitHub && files.isNotEmpty) {
