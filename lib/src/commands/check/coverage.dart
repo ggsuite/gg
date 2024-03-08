@@ -418,8 +418,12 @@ void main() {
       final className =
           basenameWithoutExtension(implementationFile.path).pascalCase;
 
-      final implementationFilePath =
-          implementationFile.path.replaceAll('lib/', '').replaceAll('./', '');
+      final implementationFileRelative =
+          relative(implementationFile.path, from: inputDir.path);
+
+      final implementationFilePath = implementationFileRelative
+          .replaceAll('lib/', '')
+          .replaceAll('./', '');
 
       final boilerplate = _testBoilerplate
           .replaceAll('Boilerplate', className)

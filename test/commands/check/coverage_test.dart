@@ -124,6 +124,7 @@ void main() {
 
                 // Delete test file
                 testFile.deleteSync();
+                expect(await testFile.exists(), isFalse);
 
                 // Run tests
                 await expectLater(
@@ -145,12 +146,29 @@ void main() {
 
                 expect(
                   messages[2],
+                  contains('${yellow}Tests were created. Please revise:'),
+                );
+
+                expect(
+                  messages[2],
                   contains('${red}test/simple_base_test.dart$reset'),
                 );
 
                 expect(
                   messages[2],
                   contains('${brightBlack}lib/src/simple_base.dart$reset'),
+                );
+
+                // The test file should have been created
+                expect(await testFile.exists(), isTrue);
+
+                // The test file should include the implementation file
+                final fileContent = await testFile.readAsString();
+                expect(
+                  fileContent,
+                  contains(
+                    'import \'package:sample_project/src/simple_base.dart\';',
+                  ),
                 );
               },
             );
@@ -357,21 +375,3 @@ void main() {
     });
   });
 }
-
-const flutterLcovReport = '''
-SF:lib/src/simple_base.dart
-DA:5,1
-LF:1
-LH:1
-end_of_record
-SF:lib/src/ignore_line.dart
-DA:7,1
-LF:1
-LH:1
-end_of_record
-SF:lib/src/ignore_lines.dart
-DA:7,1
-LF:1
-LH:1
-end_of_record
-''';

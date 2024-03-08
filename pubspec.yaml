@@ -10,7 +10,7 @@ dependencies:
   args: ^2.4.2
   gg_args: ^1.0.3
   gg_console_colors: ^1.0.0
-  gg_git: ^1.0.0
+  gg_git: ^1.0.3
   gg_process: ^1.0.6
   gg_version: ^1.0.0
   mocktail: ^1.0.3

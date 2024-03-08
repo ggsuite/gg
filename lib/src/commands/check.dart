@@ -8,6 +8,7 @@ import 'package:args/command_runner.dart';
 import 'package:gg_check/gg_check.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_process/gg_process.dart';
+import 'package:gg_version/gg_version.dart';
 
 // #############################################################################
 /// Base class for all ggGit commands
@@ -23,6 +24,7 @@ class Check extends Command<dynamic> {
     addSubcommand(Pana(log: log, processWrapper: processWrapper));
     addSubcommand(Pushed(log: log, processWrapper: processWrapper));
     addSubcommand(Commited(log: log, processWrapper: processWrapper));
+    addSubcommand(Versioned(log: log, processWrapper: processWrapper));
   }
 
   /// The log function
