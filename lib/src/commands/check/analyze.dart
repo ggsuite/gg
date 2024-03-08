@@ -8,6 +8,7 @@ import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_status_printer/gg_status_printer.dart';
 
 // #############################################################################
 
@@ -34,7 +35,14 @@ class Analyze extends GgDirCommand {
     await super.run();
     await GgDirCommand.checkDir(directory: inputDir);
 
-    _logState(LogState.running);
+    // Init status printer
+    final statusPrinter = GgStatusPrinter<void>(
+      message: 'Running "dart analyze"',
+      printCallback: log,
+      useCarriageReturn: isGitHub,
+    );
+
+    statusPrinter.status = GgStatusPrinterStatus.running;
 
     final result = await processWrapper.run(
       'dart',
@@ -42,7 +50,9 @@ class Analyze extends GgDirCommand {
       workingDirectory: inputDir.path,
     );
 
-    _logState(result.exitCode == 0 ? LogState.success : LogState.error);
+    statusPrinter.status = result.exitCode == 0
+        ? GgStatusPrinterStatus.success
+        : GgStatusPrinterStatus.error;
 
     if (result.exitCode != 0) {
       final files = [
@@ -62,13 +72,6 @@ class Analyze extends GgDirCommand {
       );
     }
   }
-
-  // .........................................................................
-  void _logState(LogState state) => logState(
-        log: log,
-        state: state,
-        message: 'Running "dart analyze"',
-      );
 
   /// The process wrapper used to execute shell processes
   final GgProcessWrapper processWrapper;

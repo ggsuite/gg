@@ -19,4 +19,3 @@ export 'src/commands/check/pana.dart';
 export 'src/tools/error_files.dart';
 export 'src/tools/is_github.dart';
 export 'src/tools/carriage_return.dart';
-export 'src/tools/log_state.dart';

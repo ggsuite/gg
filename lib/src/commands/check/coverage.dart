@@ -12,6 +12,7 @@ import 'package:gg_check/gg_check.dart';
 import 'package:gg_check/src/tools/is_flutter.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_process/gg_process.dart';
+import 'package:gg_status_printer/gg_status_printer.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
 
@@ -48,15 +49,24 @@ class Coverage extends GgDirCommand {
     _coverageDir = Directory(join(inputDir.path, 'coverage'));
     _srcDir = Directory(join(inputDir.path, 'lib', 'src'));
 
+    // Init status printer
+    final statusPrinter = GgStatusPrinter<void>(
+      message: isFlutter
+          ? 'Running "flutter test --coverage"'
+          : 'Running "dart test"',
+      printCallback: log,
+      useCarriageReturn: isGitHub,
+    );
+
+    statusPrinter.status = GgStatusPrinterStatus.running;
+
     // Announce the command
-    _logState(LogState.running);
     final result = await _task();
     final (code, messages, errors) = result;
     final success = code == 0;
 
-    _logState(
-      success ? LogState.success : LogState.error,
-    );
+    statusPrinter.status =
+        success ? GgStatusPrinterStatus.success : GgStatusPrinterStatus.error;
 
     if (!success) {
       _logErrors(messages, errors);
@@ -67,18 +77,6 @@ class Coverage extends GgDirCommand {
         '"dart test" failed. See log for details.',
       );
     }
-  }
-
-  // .........................................................................
-  void _logState(LogState state) {
-    final message =
-        isFlutter ? 'Running "flutter test --coverage"' : 'Running "dart test"';
-
-    logState(
-      log: log,
-      state: state,
-      message: message,
-    );
   }
 
   /// The process wrapper used to execute shell processes
