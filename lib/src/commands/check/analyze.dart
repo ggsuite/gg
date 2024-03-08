@@ -40,7 +40,7 @@ class Analyze extends GgDirCommand {
     final statusPrinter = GgStatusPrinter<void>(
       message: 'Running "dart analyze"',
       printCallback: log,
-      useCarriageReturn: isGitHub,
+      useCarriageReturn: !isGitHub,
     );
 
     statusPrinter.status = GgStatusPrinterStatus.running;

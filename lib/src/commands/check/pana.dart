@@ -44,7 +44,7 @@ class Pana extends GgDirCommand {
     final statusPrinter = GgStatusPrinter<void>(
       message: 'Running "dart pana"',
       printCallback: log,
-      useCarriageReturn: isGitHub,
+      useCarriageReturn: !isGitHub,
     );
 
     statusPrinter.status = GgStatusPrinterStatus.running;

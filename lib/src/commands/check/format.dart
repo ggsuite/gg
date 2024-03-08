@@ -40,7 +40,7 @@ class Format extends GgDirCommand {
     final statusPrinter = GgStatusPrinter<void>(
       message: 'Running "dart format"',
       printCallback: log,
-      useCarriageReturn: isGitHub,
+      useCarriageReturn: !isGitHub,
     );
 
     statusPrinter.status = GgStatusPrinterStatus.running;
