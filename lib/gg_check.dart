@@ -16,5 +16,4 @@ export 'src/commands/check/pana.dart';
 
 // Tools
 export 'src/tools/error_files.dart';
-export 'src/tools/is_github.dart';
 export 'src/tools/carriage_return.dart';
