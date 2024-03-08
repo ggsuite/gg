@@ -7,7 +7,6 @@
 import 'dart:convert';
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_is_github/gg_is_github.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
@@ -43,8 +42,7 @@ class Pana extends GgDirCommand {
     // Init status printer
     final statusPrinter = GgStatusPrinter<void>(
       message: 'Running "dart pana"',
-      printCallback: log,
-      useCarriageReturn: !isGitHub,
+      log: log,
     );
 
     statusPrinter.status = GgStatusPrinterStatus.running;

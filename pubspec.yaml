@@ -16,7 +16,7 @@ dependencies:
   gg_process: ^1.0.6
   gg_status_printer: ^1.0.1
   gg_test: ^1.0.0
-  gg_version: ^1.0.0
+  gg_version: ^1.0.4
   mocktail: ^1.0.3
   path: ^1.8.0
   recase: any

@@ -5,7 +5,6 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_is_github/gg_is_github.dart';
 import 'package:gg_parse_stdout/gg_parse_stdout.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
@@ -39,8 +38,7 @@ class Analyze extends GgDirCommand {
     // Init status printer
     final statusPrinter = GgStatusPrinter<void>(
       message: 'Running "dart analyze"',
-      printCallback: log,
-      useCarriageReturn: !isGitHub,
+      log: log,
     );
 
     statusPrinter.status = GgStatusPrinterStatus.running;

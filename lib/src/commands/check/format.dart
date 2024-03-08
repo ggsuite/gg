@@ -39,8 +39,7 @@ class Format extends GgDirCommand {
     // Init status printer
     final statusPrinter = GgStatusPrinter<void>(
       message: 'Running "dart format"',
-      printCallback: log,
-      useCarriageReturn: !isGitHub,
+      log: log,
     );
 
     statusPrinter.status = GgStatusPrinterStatus.running;
@@ -62,7 +61,7 @@ class Format extends GgDirCommand {
 
       final files = parseDartFilePathes(std);
 
-      // When running on git hub, log the file that have been changed
+      // When running on GitHub, log the file that have been changed
       if (isGitHub && files.isNotEmpty) {
         statusPrinter.status = GgStatusPrinterStatus.error;
 
