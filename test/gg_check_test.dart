@@ -4,15 +4,86 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:gg_check/src/gg_check.dart';
+import 'dart:io';
+
+import 'package:args/command_runner.dart';
+import 'package:gg_capture_print/gg_capture_print.dart';
+import 'package:gg_check/gg_check.dart';
+import 'package:gg_process/gg_process.dart';
+import 'package:path/path.dart';
+import 'package:recase/recase.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('GgCheck', () {
-    test('should work fine', () {
-      final logMessages = <String>[];
-      final ggCheck = GgCheck(log: logMessages.add);
-      expect(ggCheck.subcommands.length, 5);
+  final messages = <String>[];
+  const processWrapper = GgProcessWrapper();
+
+  setUp(() {
+    messages.clear();
+  });
+
+  group('Ggcheck()', () {
+    // #########################################################################
+    group('Ggcheck', () {
+      final ggcheck = Ggcheck(
+        log: (msg) => messages.add(msg),
+        processWrapper: processWrapper,
+      );
+
+      final CommandRunner<void> runner = CommandRunner<void>(
+        'ggcheck',
+        'Description goes here.',
+      )..addCommand(ggcheck);
+
+      test('should allow to run the code from command line', () async {
+        final tmp = Directory.systemTemp.createTempSync();
+
+        await capturePrint(
+          log: messages.add,
+          code: () =>
+              runner.run(['ggcheck', 'check', 'analyze', '--input', tmp.path]),
+        );
+
+        await tmp.delete(recursive: true);
+        expect(messages.first, contains('⌛️ Running "dart analyze"'));
+        expect(messages.last, contains('✅ Running "dart analyze"'));
+      });
+
+      // .......................................................................
+      test('should show all sub commands', () async {
+        // Iterate all files in lib/src/commands
+        // and check if they are added to the command runner
+        // and if they are added to the help message
+        final subCommands = Directory('lib/src/commands')
+            .listSync(recursive: false)
+            .where(
+              (file) => file.path.endsWith('.dart'),
+            )
+            .map(
+              (e) => basename(e.path)
+                  .replaceAll('.dart', '')
+                  .replaceAll('_', '-')
+                  .replaceAll('gg-', ''),
+            )
+            .toList();
+
+        await capturePrint(
+          log: messages.add,
+          code: () async => await runner.run(['ggcheck', '--help']),
+        );
+
+        for (final subCommand in subCommands) {
+          final subCommandStr = subCommand.pascalCase;
+
+          expect(
+            hasLog(messages, subCommand),
+            isTrue,
+            reason: '\nMissing subcommand "$subCommandStr"\n'
+                'Please open  "lib/src/gg_check.dart" and add\n'
+                '"addSubcommand($subCommandStr(log: log));',
+          );
+        }
+      });
     });
   });
 }

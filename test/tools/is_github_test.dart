@@ -10,9 +10,11 @@ import 'package:gg_check/src/tools/is_github.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('IsGithub', () {
-    test('should work fine', () {
-      expect(isGitHub, Platform.environment.containsKey('GITHUB_ACTIONS'));
+  group('isGithub', () {
+    group('should return true', () {
+      test('when running on GitHub', () {
+        expect(isGitHub, Platform.environment.containsKey('GITHUB_ACTIONS'));
+      });
     });
   });
 }

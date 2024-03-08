@@ -7,3 +7,16 @@
 library;
 
 export 'src/gg_check.dart';
+
+// Checks
+export 'src/commands/check.dart';
+export 'src/commands/check/analyze.dart';
+export 'src/commands/check/format.dart';
+export 'src/commands/check/coverage.dart';
+export 'src/commands/check/pana.dart';
+
+// Tools
+export 'src/tools/error_files.dart';
+export 'src/tools/is_github.dart';
+export 'src/tools/carriage_return.dart';
+export 'src/tools/log_state.dart';

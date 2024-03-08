@@ -5,43 +5,29 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:args/command_runner.dart';
-import 'package:colorize/colorize.dart';
+import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
+import 'package:gg_process/gg_process.dart';
 
 // .............................................................................
-Future<void> runGgCheck({
+Future<void> run({
   required List<String> args,
   required void Function(String msg) log,
-}) async {
-  final ggCheck = GgCheck(log: log);
-
-  try {
-    // Create a command runner
-    final CommandRunner<void> runner = CommandRunner<void>(
-      'GgCheck',
-      'Offers pre-commit checks like analyzing, linting, tests and coverage. ',
-    );
-
-    for (final cmd in ggCheck.subcommands.values) {
-      runner.addCommand(cmd);
-    }
-
-    await runner.run(args);
-  }
-
-  // Print errors in red
-  catch (e) {
-    final msg = e.toString().replaceAll('Exception: ', '');
-    log(Colorize(msg).red().toString());
-    log('Error: $e');
-  }
-}
+  GgProcessWrapper processWrapper = const GgProcessWrapper(),
+}) =>
+    GgCommandRunner(
+      log: log,
+      command: Ggcheck(
+        log: log,
+        processWrapper: processWrapper,
+      ),
+    ).run(args: args);
 
 // .............................................................................
 Future<void> main(List<String> args) async {
-  await runGgCheck(
+  await run(
     args: args,
     log: (msg) => print(msg),
+    processWrapper: const GgProcessWrapper(),
   );
 }

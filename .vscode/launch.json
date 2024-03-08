@@ -6,17 +6,15 @@
 
   "configurations": [
     {
-      "name": "Run GgCheck",
+      "name": "gg_check.dart",
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg_check.dart",
-      "args": ["tests"],
-      "console": "debugConsole",
-      "cwd": "/Users/gatzsche/tmp/hello_world"
-      // "cwd": "${workspaceFolder}/"
+      "args": ["--help"],
+      "cwd": "${workspaceFolder}"
     },
     {
-      "name": "Test Current File",
+      "name": "Current File",
       "type": "dart",
       "request": "launch",
       "program": "${file}"

@@ -11,11 +11,11 @@ library;
 
 import 'dart:io';
 
-import 'package:colorize/colorize.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 
 // #############################################################################
 void main() {
-  const exe = 'ggCheck';
+  const exe = 'ggcheck';
   const src = 'bin/gg_check.dart';
   final installDir = '${Platform.environment['HOME']}/.pub-cache/bin';
 
@@ -30,7 +30,7 @@ void main() {
   final result = Process.runSync('dart', ['compile', 'exe', src, '-o', dest]);
 
   if (result.stderr.toString().trim().isNotEmpty) {
-    print('❌ ${Colorize(result.stderr.toString()).red()}');
+    print('❌ $red${result.stderr.toString()}$reset');
   }
-  print(Colorize('✅ Installed $exe in $dest').green());
+  print(('✅ ${green}Installed $exe in $dest$reset'));
 }
