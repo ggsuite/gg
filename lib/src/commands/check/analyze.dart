@@ -4,44 +4,32 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:io';
+
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_parse_stdout/gg_parse_stdout.dart';
+import 'package:gg_check/gg_check.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_status_printer/gg_status_printer.dart';
+import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
 
 /// Runs dart analyze on the source code
-class Analyze extends GgDirCommand {
+class Analyze extends DirCommand<void> {
   /// Constructor
   Analyze({
     required super.log,
     this.processWrapper = const GgProcessWrapper(),
-  });
-
-  /// Then name of the command
-  @override
-  final name = 'analyze';
-
-  /// The description of the command
-  @override
-  final description = 'Runs »dart analyze«.';
+  }) : super(name: 'analyze', description: 'Runs »dart analyze«.');
 
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> run() async {
-    await super.run();
-    await GgDirCommand.checkDir(directory: inputDir);
+  Future<void> run({Directory? directory}) async {
+    final inputDir = dir(directory);
+    await check(directory: inputDir);
 
-    // Init status printer
-    final statusPrinter = GgStatusPrinter<void>(
-      message: 'Running "dart analyze"',
-      log: log,
-    );
-
-    statusPrinter.status = GgStatusPrinterStatus.running;
+    _logState(LogState.running);
 
     final result = await processWrapper.run(
       'dart',
@@ -49,14 +37,12 @@ class Analyze extends GgDirCommand {
       workingDirectory: inputDir.path,
     );
 
-    statusPrinter.status = result.exitCode == 0
-        ? GgStatusPrinterStatus.success
-        : GgStatusPrinterStatus.error;
+    _logState(result.exitCode == 0 ? LogState.success : LogState.error);
 
     if (result.exitCode != 0) {
       final files = [
-        ...parseDartFilePathes(result.stderr as String),
-        ...parseDartFilePathes(result.stdout as String),
+        ...errorFiles(result.stderr as String),
+        ...errorFiles(result.stdout as String),
       ];
 
       // Log hint
@@ -72,6 +58,17 @@ class Analyze extends GgDirCommand {
     }
   }
 
+  // .........................................................................
+  void _logState(LogState state) => logState(
+        log: log,
+        state: state,
+        message: 'Running "dart analyze"',
+      );
+
   /// The process wrapper used to execute shell processes
   final GgProcessWrapper processWrapper;
 }
+
+// .............................................................................
+/// A mocktail mock
+class MockAnalyze extends mocktail.Mock implements Analyze {}

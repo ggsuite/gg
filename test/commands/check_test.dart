@@ -34,7 +34,12 @@ void main() {
       final (subCommands, errorMessage) = await missingSubCommands(
         directory: Directory('lib/src/commands/check'),
         command: check,
-        additionalSubCommands: ['pushed', 'commited', 'versioned'],
+        additionalSubCommands: [
+          'is-committed',
+          'is-pushed',
+          'is-versioned',
+          'is-published',
+        ],
       );
 
       expect(subCommands, isEmpty, reason: errorMessage);

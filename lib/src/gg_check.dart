@@ -5,6 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
+import 'package:gg_check/src/commands/can.dart';
 import 'package:gg_check/src/commands/check.dart';
 import 'package:gg_process/gg_process.dart';
 
@@ -15,12 +16,8 @@ class Ggcheck extends Command<dynamic> {
     required this.log,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
   }) {
-    addSubcommand(
-      Check(
-        log: log,
-        processWrapper: processWrapper,
-      ),
-    );
+    addSubcommand(Check(log: log));
+    addSubcommand(Can(log: log));
   }
 
   /// The log function

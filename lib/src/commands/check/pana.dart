@@ -5,11 +5,13 @@
 // found in the LICENSE file in the root of this package.
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_check/gg_check.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_status_printer/gg_status_printer.dart';
+import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
 typedef _TaskResult = (int, List<String>, List<String>);
@@ -17,43 +19,33 @@ typedef _TaskResult = (int, List<String>, List<String>);
 // #############################################################################
 
 /// Runs dart pana on the source code
-class Pana extends GgDirCommand {
+class Pana extends DirCommand<void> {
   /// Constructor
   Pana({
     required super.log,
     this.processWrapper = const GgProcessWrapper(),
-  });
-
-  /// Then name of the command
-  @override
-  final name = 'pana';
-
-  /// The description of the command
-  @override
-  final description = 'Runs »dart run pana«.';
+  }) : super(
+          name: 'pana',
+          description: 'Runs »dart run pana«.',
+        );
 
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> run() async {
-    await super.run();
-    await GgDirCommand.checkDir(directory: inputDir);
+  Future<void> run({Directory? directory}) async {
+    final inputDir = dir(directory);
 
-    // Init status printer
-    final statusPrinter = GgStatusPrinter<void>(
-      message: 'Running "dart pana"',
-      log: log,
-    );
-
-    statusPrinter.status = GgStatusPrinterStatus.running;
+    await check(directory: inputDir);
 
     // Announce the command
-    final result = await _task();
+    _logState(LogState.running);
+    final result = await _task(inputDir);
     final (code, messages, errors) = result;
     final success = code == 0;
 
-    statusPrinter.status =
-        success ? GgStatusPrinterStatus.success : GgStatusPrinterStatus.error;
+    _logState(
+      success ? LogState.success : LogState.error,
+    );
 
     if (!success) {
       _logErrors(messages, errors);
@@ -65,6 +57,13 @@ class Pana extends GgDirCommand {
       );
     }
   }
+
+  // ...........................................................................
+  void _logState(LogState state) => logState(
+        log: log,
+        state: state,
+        message: 'Running "dart pana"',
+      );
 
   /// The process wrapper used to execute shell processes
   final GgProcessWrapper processWrapper;
@@ -116,7 +115,7 @@ class Pana extends GgDirCommand {
   }
 
 // ...........................................................................
-  Future<_TaskResult> _task() async {
+  Future<_TaskResult> _task(Directory dir) async {
     // Run 'pana' and capture the output
     final result = await processWrapper.run(
       'dart',
@@ -127,7 +126,7 @@ class Pana extends GgDirCommand {
         '--json',
         '--no-dartdoc', // dartdoc is enforced using analysis_options.yaml
       ],
-      workingDirectory: inputDir.path,
+      workingDirectory: dir.path,
     );
 
     try {
@@ -155,3 +154,7 @@ class Pana extends GgDirCommand {
     }
   }
 }
+
+// .............................................................................
+/// A mocktail mock
+class MockPana extends mocktail.Mock implements Pana {}

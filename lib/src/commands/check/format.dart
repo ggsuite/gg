@@ -4,45 +4,32 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:io';
+
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_is_github/gg_is_github.dart';
-import 'package:gg_parse_stdout/gg_parse_stdout.dart';
+import 'package:gg_check/gg_check.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_status_printer/gg_status_printer.dart';
+import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
 
 /// Runs dart format on the source code
-class Format extends GgDirCommand {
+class Format extends DirCommand<void> {
   /// Constructor
   Format({
     required super.log,
     this.processWrapper = const GgProcessWrapper(),
-  });
-
-  /// Then name of the command
-  @override
-  final name = 'format';
-
-  /// The description of the command
-  @override
-  final description = 'Runs »dart format«.';
+  }) : super(name: 'format', description: 'Runs »dart format«.');
 
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> run() async {
-    await super.run();
-    await GgDirCommand.checkDir(directory: inputDir);
+  Future<void> run({Directory? directory}) async {
+    final inputDir = dir(directory);
+    await check(directory: inputDir);
 
-    // Init status printer
-    final statusPrinter = GgStatusPrinter<void>(
-      message: 'Running "dart format"',
-      log: log,
-    );
-
-    statusPrinter.status = GgStatusPrinterStatus.running;
+    _logState(LogState.running);
 
     final result = await processWrapper.run(
       'dart',
@@ -51,7 +38,7 @@ class Format extends GgDirCommand {
     );
 
     if (result.exitCode == 0) {
-      statusPrinter.status = GgStatusPrinterStatus.success;
+      _logState(LogState.success);
     }
 
     if (result.exitCode != 0) {
@@ -59,11 +46,11 @@ class Format extends GgDirCommand {
       final stdOut = result.stdout as String;
       final std = '$stdErr\n$stdOut';
 
-      final files = parseDartFilePathes(std);
+      final files = errorFiles(std);
 
-      // When running on GitHub, log the file that have been changed
+      // When running on git hub, log the file that have been changed
       if (isGitHub && files.isNotEmpty) {
-        statusPrinter.status = GgStatusPrinterStatus.error;
+        _logState(LogState.error);
 
         // Log hint
         log('${yellow}The following files were formatted:$reset');
@@ -77,17 +64,28 @@ class Format extends GgDirCommand {
 
       // When no files have changed, but an error occurred log the error
       if (files.isEmpty) {
-        statusPrinter.status = GgStatusPrinterStatus.error;
+        _logState(LogState.error);
         log('$brightBlack$std$reset');
         throw Exception(
           'dart format failed.',
         );
       }
 
-      statusPrinter.status = GgStatusPrinterStatus.success;
+      _logState(LogState.success);
     }
   }
+
+  // .........................................................................
+  void _logState(LogState state) => logState(
+        log: log,
+        state: state,
+        message: 'Running "dart format"',
+      );
 
   /// The process wrapper used to execute shell processes
   final GgProcessWrapper processWrapper;
 }
+
+// .............................................................................
+/// A mocktail mock
+class MockFormat extends mocktail.Mock implements Format {}

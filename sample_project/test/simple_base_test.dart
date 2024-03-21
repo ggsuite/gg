@@ -4,13 +4,17 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+// ignore_for_file: avoid_relative_lib_imports
+
+import 'package:sample_project/sample_project.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Pushed', () {
-    test('should work fine', () {
-      // const Pushed();
-      expect(true, isNotNull);
+  group('SimpleBase', () {
+    test('should have a class Awesome', () {
+      final awesome = Awesome();
+      expect(awesome.isAwesome, isTrue);
+      // PLACEHOLDER
     });
   });
 }
