@@ -7,8 +7,7 @@
 import 'dart:io';
 
 import 'package:gg_check/gg_check.dart';
-import 'package:gg_check/src/commands/can/push.dart';
-import 'package:gg_git/gg_git.dart';
+import 'package:gg_check/src/commands/can/celebrate.dart';
 import 'package:gg_publish/gg_publish.dart';
 
 import 'package:mocktail/mocktail.dart';
@@ -19,15 +18,12 @@ void main() {
   late Directory d;
   late CheckCommands commands;
   final messages = <String>[];
-  late Push push;
+  late Celebrate celebrate;
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.isCommitted.run(directory: d)).thenAnswer((_) async {
-      messages.add('did commit');
-    });
-    when(() => commands.isUpgraded.run(directory: d)).thenAnswer((_) async {
-      messages.add('did upgrade');
+    when(() => commands.isPublished.run(directory: d)).thenAnswer((_) async {
+      messages.add('isPublished');
     });
   }
 
@@ -35,11 +31,10 @@ void main() {
   setUp(() {
     commands = CheckCommands(
       log: messages.add,
-      isCommitted: MockIsCommited(),
-      isUpgraded: MockIsUpgraded(),
+      isPublished: MockIsPublished(),
     );
 
-    push = Push(log: messages.add, checkCommands: commands);
+    celebrate = Celebrate(log: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -51,19 +46,23 @@ void main() {
 
   // ...........................................................................
   group('Can', () {
-    group('Push', () {
+    group('Celebrate', () {
       group('constructor', () {
         test('with defaults', () {
-          final c = Push(log: messages.add);
-          expect(c.name, 'push');
-          expect(c.description, 'Checks if code is ready to push.');
+          final c = Celebrate(log: messages.add);
+          expect(c.name, 'celebrate');
+          expect(
+            c.description,
+            'Checks if everything is done and we can start the party.',
+          );
         });
       });
       group('run(directory)', () {
-        test('should check if everything is upgraded and commited', () async {
-          await push.run(directory: d);
-          expect(messages[0], 'did upgrade');
-          expect(messages[1], 'did commit');
+        test(
+            'should check if is done, '
+            'i.e. everything is checked, pushed and published', () async {
+          await celebrate.run(directory: d);
+          expect(messages[0], 'isPublished');
         });
       });
     });
