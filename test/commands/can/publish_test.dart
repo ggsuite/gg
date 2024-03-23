@@ -17,7 +17,7 @@ import 'package:test/test.dart';
 // .............................................................................
 void main() {
   late Directory d;
-  late CheckCommands commands;
+  late Checks commands;
   final messages = <String>[];
   late Publish publish;
 
@@ -39,14 +39,14 @@ void main() {
 
   // ...........................................................................
   setUp(() {
-    commands = CheckCommands(
+    commands = Checks(
       ggLog: messages.add,
       isPushed: MockIsPushed(),
       isVersioned: MockIsVersioned(),
       pana: MockPana(),
     );
 
-    publish = Publish(ggLog: messages.add, checkCommands: commands);
+    publish = Publish(ggLog: messages.add, checks: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });

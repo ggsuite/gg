@@ -7,18 +7,18 @@
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_check/gg_check.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
-import 'package:mocktail/mocktail.dart' as mocktail;
-import '../check.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Checks if the changes can be pushed.
 class Push extends DirCommand<void> {
   /// Constructor
   Push({
     required super.ggLog,
-    CheckCommands? checkCommands,
-  })  : _checkCommands = checkCommands ?? CheckCommands(ggLog: ggLog),
+    Checks? checkCommands,
+  })  : _checkCommands = checkCommands ?? Checks(ggLog: ggLog),
         super(
           name: 'push',
           description: 'Checks if code is ready to push.',
@@ -42,9 +42,9 @@ class Push extends DirCommand<void> {
   }
 
   // ...........................................................................
-  final CheckCommands _checkCommands;
+  final Checks _checkCommands;
 }
 
 // .............................................................................
 /// A mocktail mock
-class MockPush extends mocktail.Mock implements Push {}
+class MockPush extends Mock implements Push {}

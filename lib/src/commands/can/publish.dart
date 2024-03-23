@@ -7,18 +7,18 @@
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_check/gg_check.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
-import '../check.dart';
 
 /// Checks if the changes can be published.
 class Publish extends DirCommand<void> {
   /// Constructor
   Publish({
     required super.ggLog,
-    CheckCommands? checkCommands,
-  })  : _checkCommands = checkCommands ?? CheckCommands(ggLog: ggLog),
+    Checks? checks,
+  })  : _checkCommands = checks ?? Checks(ggLog: ggLog),
         super(
           name: 'publish',
           description: 'Checks if code is ready to be published.',
@@ -46,7 +46,7 @@ class Publish extends DirCommand<void> {
   }
 
   // ...........................................................................
-  final CheckCommands _checkCommands;
+  final Checks _checkCommands;
 }
 
 // .............................................................................

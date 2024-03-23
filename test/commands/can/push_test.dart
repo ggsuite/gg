@@ -17,7 +17,7 @@ import 'package:test/test.dart';
 // .............................................................................
 void main() {
   late Directory d;
-  late CheckCommands commands;
+  late Checks commands;
   final messages = <String>[];
   late Push push;
 
@@ -35,7 +35,7 @@ void main() {
 
   // ...........................................................................
   setUp(() {
-    commands = CheckCommands(
+    commands = Checks(
       ggLog: messages.add,
       isCommitted: MockIsCommitted(),
       isUpgraded: MockIsUpgraded(),

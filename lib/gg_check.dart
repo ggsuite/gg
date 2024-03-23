@@ -21,3 +21,4 @@ export 'src/tools/is_github.dart';
 export 'src/tools/carriage_return.dart';
 export 'src/tools/log_state.dart';
 export 'src/tools/command_cluster.dart';
+export 'src/tools/checks.dart';
