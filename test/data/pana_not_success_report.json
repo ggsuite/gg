@@ -16,10 +16,10 @@
       "flutterRoot": "/Users/gatzsche/dev/flutter"
     }
   },
-  "packageName": "gg_check",
+  "packageName": "gg",
   "packageVersion": "1.0.0",
   "pubspec": {
-    "name": "gg_check",
+    "name": "gg",
     "description": "Offers pre-commit checks like analyzing, linting, tests and coverage.",
     "version": "1.0.0",
     "environment": {
@@ -99,7 +99,7 @@
         "grantedPoints": 20,
         "maxPoints": 20,
         "status": "passed",
-        "summary": "### [*] 10/10 points: 20% or more of the public API has dartdoc comments\n\n6 out of 7 API elements (85.7 %) have documentation comments.\n\nSome symbols that are missing documentation: `gg_check`.\n\n### [*] 10/10 points: Package has an example\n"
+        "summary": "### [*] 10/10 points: 20% or more of the public API has dartdoc comments\n\n6 out of 7 API elements (85.7 %) have documentation comments.\n\nSome symbols that are missing documentation: `gg`.\n\n### [*] 10/10 points: Package has an example\n"
       },
       {
         "id": "platform",
@@ -107,7 +107,7 @@
         "grantedPoints": 20,
         "maxPoints": 20,
         "status": "passed",
-        "summary": "### [*] 20/20 points: Supports 5 of 6 possible platforms (**iOS**, **Android**, Web, **Windows**, **macOS**, **Linux**)\n\n* ✓ Android\n* ✓ iOS\n* ✓ Windows\n* ✓ Linux\n* ✓ macOS\n\nThese platforms are not supported:\n\n<details>\n<summary>\nPackage not compatible with platform Web\n</summary>\n\nBecause:\n* `package:gg_check/gg_check.dart` that imports:\n* `package:gg_check/src/gg_check.dart` that imports:\n* `package:gg_check/src/tools/is_github.dart` that imports:\n* `dart:io`\n</details>"
+        "summary": "### [*] 20/20 points: Supports 5 of 6 possible platforms (**iOS**, **Android**, Web, **Windows**, **macOS**, **Linux**)\n\n* ✓ Android\n* ✓ iOS\n* ✓ Windows\n* ✓ Linux\n* ✓ macOS\n\nThese platforms are not supported:\n\n<details>\n<summary>\nPackage not compatible with platform Web\n</summary>\n\nBecause:\n* `package:gg/gg.dart` that imports:\n* `package:gg/src/gg.dart` that imports:\n* `package:gg/src/tools/is_github.dart` that imports:\n* `dart:io`\n</details>"
       },
       {
         "id": "analysis",

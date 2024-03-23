@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
-import 'package:gg_check/src/commands/can.dart';
+import 'package:gg/src/commands/can.dart';
 import 'package:test/test.dart';
 
 void main() {

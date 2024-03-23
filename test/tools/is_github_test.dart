@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:gg_check/src/tools/is_github.dart';
+import 'package:gg/src/tools/is_github.dart';
 import 'package:test/test.dart';
 
 void main() {

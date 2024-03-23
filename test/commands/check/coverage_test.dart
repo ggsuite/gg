@@ -7,8 +7,8 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:gg_check/src/commands/check/coverage.dart';
-import 'package:gg_check/src/tools/is_flutter.dart';
+import 'package:gg/src/commands/check/coverage.dart';
+import 'package:gg/src/tools/is_flutter.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';

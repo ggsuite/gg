@@ -6,10 +6,10 @@
 
   "configurations": [
     {
-      "name": "gg_check.dart",
+      "name": "gg.dart",
       "type": "dart",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/gg_check.dart",
+      "program": "${workspaceFolder}/bin/gg.dart",
       "args": ["--help"],
       "cwd": "${workspaceFolder}"
     },

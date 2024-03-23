@@ -7,7 +7,7 @@
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_check/gg_check.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';

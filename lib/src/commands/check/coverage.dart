@@ -8,8 +8,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_check/gg_check.dart';
-import 'package:gg_check/src/tools/is_flutter.dart';
+import 'package:gg/gg.dart';
+import 'package:gg/src/tools/is_flutter.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';

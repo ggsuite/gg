@@ -6,7 +6,7 @@
 
 library;
 
-export 'src/gg_check.dart';
+export 'src/gg.dart';
 
 // Checks
 export 'src/commands/check.dart';

@@ -4,7 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:gg_check/gg_check.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:test/test.dart';
 

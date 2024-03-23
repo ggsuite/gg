@@ -15,8 +15,8 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 
 // #############################################################################
 void main() {
-  const exe = 'ggcheck';
-  const src = 'bin/gg_check.dart';
+  const exe = 'gg';
+  const src = 'bin/gg.dart';
   final installDir = '${Platform.environment['HOME']}/.pub-cache/bin';
 
   // Create install dir if it does not exist

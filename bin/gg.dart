@@ -6,7 +6,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_check/gg_check.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 
@@ -18,7 +18,7 @@ Future<void> run({
 }) =>
     GgCommandRunner(
       ggLog: ggLog,
-      command: Ggcheck(
+      command: Gg(
         ggLog: ggLog,
         processWrapper: processWrapper,
       ),

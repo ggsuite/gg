@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
-import 'package:gg_check/gg_check.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
@@ -22,18 +22,18 @@ void main() {
     messages.clear();
   });
 
-  group('Ggcheck()', () {
+  group('gg()', () {
     // #########################################################################
-    group('Ggcheck', () {
-      final ggcheck = Ggcheck(
+    group('gg', () {
+      final gg = Gg(
         ggLog: messages.add,
         processWrapper: processWrapper,
       );
 
       final CommandRunner<void> runner = CommandRunner<void>(
-        'ggcheck',
+        'gg',
         'Description goes here.',
-      )..addCommand(ggcheck);
+      )..addCommand(gg);
 
       test('should allow to run the code from command line', () async {
         final tmp = Directory.systemTemp.createTempSync();
@@ -41,7 +41,7 @@ void main() {
         await capturePrint(
           ggLog: messages.add,
           code: () =>
-              runner.run(['ggcheck', 'check', 'analyze', '--input', tmp.path]),
+              runner.run(['gg', 'check', 'analyze', '--input', tmp.path]),
         );
 
         await tmp.delete(recursive: true);
@@ -69,7 +69,7 @@ void main() {
 
         await capturePrint(
           ggLog: messages.add,
-          code: () async => await runner.run(['ggcheck', '--help']),
+          code: () async => await runner.run(['gg', '--help']),
         );
 
         for (final subCommand in subCommands) {
@@ -79,7 +79,7 @@ void main() {
             hasLog(messages, subCommand),
             isTrue,
             reason: '\nMissing subcommand "$subCommandStr"\n'
-                'Please open  "lib/src/gg_check.dart" and add\n'
+                'Please open  "lib/src/gg.dart" and add\n'
                 '"addSubcommand($subCommandStr(ggLog: ggLog));',
           );
         }

@@ -9,18 +9,18 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 void main() {
-  group('bin/gg_check.dart', () {
+  group('bin/gg.dart', () {
     // #########################################################################
 
     test('should be executable', () async {
-      // Execute bin/gg_check.dart and check if it prints help
+      // Execute bin/gg.dart and check if it prints help
       final result = await Process.run(
-        './bin/gg_check.dart',
+        './bin/gg.dart',
         ['check', 'analyze', '--help'],
       );
 
       final expectedMessages = [
-        RegExp(r'Usage:\s+ggcheck check analyze \[arguments\]'),
+        RegExp(r'Usage:\s+gg check analyze \[arguments\]'),
       ];
 
       final stdout = result.stdout as String;

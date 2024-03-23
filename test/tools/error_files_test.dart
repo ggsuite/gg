@@ -4,7 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:gg_check/src/tools/error_files.dart';
+import 'package:gg/src/tools/error_files.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -34,7 +34,7 @@ void main() {
 
 // .............................................................................
 const dartAnalyzeOutput = '''
-Analyzing gg_check...
+Analyzing gg...
 
    info - lib/src/tools/error_lines.dart:7:14 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
 

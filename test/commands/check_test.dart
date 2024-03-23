@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_check/gg_check.dart';
+import 'package:gg/gg.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -21,7 +21,7 @@ void main() {
   setUp(() {
     messages.clear();
     runner = CommandRunner<void>(
-      'ggcheck',
+      'gg',
       'Description goes here.',
     );
     runner.addCommand(check);

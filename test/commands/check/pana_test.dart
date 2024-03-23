@@ -7,7 +7,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:gg_check/gg_check.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
@@ -27,7 +27,7 @@ void main() {
     processWrapper = MockGgProcessWrapper();
     pana = Pana(ggLog: messages.add, processWrapper: processWrapper);
     runner = CommandRunner('test', 'test')..addCommand(pana);
-    d = await Directory.systemTemp.createTemp('gg_check_test');
+    d = await Directory.systemTemp.createTemp('gg_test');
   });
 
   // ...........................................................................

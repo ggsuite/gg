@@ -6,8 +6,8 @@
 
 import 'dart:io';
 
-import 'package:gg_check/gg_check.dart';
-import 'package:gg_check/src/commands/can/commit.dart';
+import 'package:gg/gg.dart';
+import 'package:gg/src/commands/can/commit.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

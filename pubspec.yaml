@@ -1,7 +1,7 @@
-name: gg_check
-description: A collection of checks like analyzing, linting, tests and coverage.
-version: 2.0.0
-repository: https://github.com/inlavigo/gg_check.git
+name: gg
+description: A collection of checks and actions like analyzing, linting, testing, code coverage, committing, pushing, publishing.
+version: 1.0.0
+repository: https://github.com/inlavigo/gg.git
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -17,7 +17,7 @@ dependencies:
   gg_version: ^1.0.0
   mocktail: ^1.0.3
   path: ^1.8.0
-  recase: any
+  recase: ^4.1.0
 
 dev_dependencies:
   fake_async: ^1.3.1

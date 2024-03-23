@@ -20,24 +20,24 @@ void main() {
 
       final parsedLaunchJson = jsonDecode(launchJson) as Map<String, dynamic>;
 
-      // Ensure there is a configuration for executing bin/gg_check.dart
+      // Ensure there is a configuration for executing bin/gg.dart
       final configurations =
           parsedLaunchJson['configurations'] as List<dynamic>;
 
-      final ggcheck = configurations.firstWhere(
+      final gg = configurations.firstWhere(
         (dynamic configuration) =>
-            configuration['name'].toString() == 'gg_check.dart',
+            configuration['name'].toString() == 'gg.dart',
       );
 
       expect(
-        ggcheck,
+        gg,
         isNotNull,
-        reason: 'Item for executing bin/gg_check.dart not found',
+        reason: 'Item for executing bin/gg.dart not found',
       );
 
-      expect(ggcheck['name'], 'gg_check.dart');
-      expect(ggcheck['type'], 'dart');
-      expect(ggcheck['request'], 'launch');
+      expect(gg['name'], 'gg.dart');
+      expect(gg['type'], 'dart');
+      expect(gg['request'], 'launch');
 
       // Ensure there is a coniguration for executing the current file
       final currentFile = parsedLaunchJson['configurations'].firstWhere(

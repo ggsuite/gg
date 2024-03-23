@@ -6,8 +6,8 @@
 
 import 'dart:io';
 
-import 'package:gg_check/gg_check.dart';
-import 'package:gg_check/src/commands/can/publish.dart';
+import 'package:gg/gg.dart';
+import 'package:gg/src/commands/can/publish.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_version/gg_version.dart';
 

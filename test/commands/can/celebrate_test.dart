@@ -6,8 +6,8 @@
 
 import 'dart:io';
 
-import 'package:gg_check/gg_check.dart';
-import 'package:gg_check/src/commands/can/celebrate.dart';
+import 'package:gg/gg.dart';
+import 'package:gg/src/commands/can/celebrate.dart';
 import 'package:gg_publish/gg_publish.dart';
 
 import 'package:mocktail/mocktail.dart';
