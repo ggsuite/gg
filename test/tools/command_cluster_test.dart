@@ -16,6 +16,7 @@ import 'package:test/test.dart';
 void main() {
   late Directory d;
   final messages = <String>[];
+  final ggLog = messages.add;
   late IsCommitted isCommitted;
   late IsPushed isPushed;
   late IsUpgraded isUpgraded;
@@ -35,7 +36,7 @@ void main() {
 
     // Init command cluster
     commandCluster = CommandCluster(
-      ggLog: messages.add,
+      ggLog: ggLog,
       commands: commands,
       name: 'my-check',
       description: 'A more detailed description.',
@@ -43,12 +44,17 @@ void main() {
     );
 
     // Mock the commands
-    when(() => isCommitted.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {});
-    when(() => isPushed.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {});
-    when(() => isUpgraded.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {});
+    when(() => isCommitted.exec(directory: d, ggLog: ggLog))
+        .thenAnswer((_) async {
+      ggLog('isCommitted');
+    });
+    when(() => isPushed.exec(directory: d, ggLog: ggLog)).thenAnswer((_) async {
+      ggLog('isPushed');
+    });
+    when(() => isUpgraded.exec(directory: d, ggLog: ggLog))
+        .thenAnswer((_) async {
+      ggLog('isUpgraded');
+    });
   });
 
   tearDown(() {
@@ -56,9 +62,13 @@ void main() {
   });
 
   group('CommandCluster', () {
-    group('run', () {
-      test('should run all commands', () {
-        expect(commandCluster, isNotNull);
+    group('exec(directory, log)', () {
+      test('should run all commands', () async {
+        await commandCluster.exec(directory: d, ggLog: ggLog);
+        expect(messages[0], contains('Do all check commands work?'));
+        expect(messages[1], 'isCommitted');
+        expect(messages[2], 'isPushed');
+        expect(messages[3], 'isUpgraded');
       });
     });
   });
