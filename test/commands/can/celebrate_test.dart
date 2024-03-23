@@ -22,7 +22,8 @@ void main() {
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.isPublished.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.isPublished.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('isPublished');
     });
   }
@@ -30,11 +31,11 @@ void main() {
   // ...........................................................................
   setUp(() {
     commands = CheckCommands(
-      log: messages.add,
+      ggLog: messages.add,
       isPublished: MockIsPublished(),
     );
 
-    celebrate = Celebrate(log: messages.add, checkCommands: commands);
+    celebrate = Celebrate(ggLog: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -49,7 +50,7 @@ void main() {
     group('Celebrate', () {
       group('constructor', () {
         test('with defaults', () {
-          final c = Celebrate(log: messages.add);
+          final c = Celebrate(ggLog: messages.add);
           expect(c.name, 'celebrate');
           expect(
             c.description,
@@ -61,8 +62,9 @@ void main() {
         test(
             'should check if is done, '
             'i.e. everything is checked, pushed and published', () async {
-          await celebrate.run(directory: d);
-          expect(messages[0], 'isPublished');
+          await celebrate.exec(directory: d, ggLog: messages.add);
+          expect(messages[0], contains('Can celebrate?'));
+          expect(messages[1], 'isPublished');
         });
       });
     });

@@ -23,10 +23,12 @@ void main() {
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.isCommitted.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.isCommitted.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('did commit');
     });
-    when(() => commands.isUpgraded.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.isUpgraded.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('did upgrade');
     });
   }
@@ -34,12 +36,12 @@ void main() {
   // ...........................................................................
   setUp(() {
     commands = CheckCommands(
-      log: messages.add,
-      isCommitted: MockIsCommited(),
+      ggLog: messages.add,
+      isCommitted: MockIsCommitted(),
       isUpgraded: MockIsUpgraded(),
     );
 
-    push = Push(log: messages.add, checkCommands: commands);
+    push = Push(ggLog: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -54,16 +56,17 @@ void main() {
     group('Push', () {
       group('constructor', () {
         test('with defaults', () {
-          final c = Push(log: messages.add);
+          final c = Push(ggLog: messages.add);
           expect(c.name, 'push');
           expect(c.description, 'Checks if code is ready to push.');
         });
       });
       group('run(directory)', () {
         test('should check if everything is upgraded and commited', () async {
-          await push.run(directory: d);
-          expect(messages[0], 'did upgrade');
-          expect(messages[1], 'did commit');
+          await push.exec(directory: d, ggLog: messages.add);
+          expect(messages[0], contains('Can push?'));
+          expect(messages[1], 'did upgrade');
+          expect(messages[2], 'did commit');
         });
       });
     });

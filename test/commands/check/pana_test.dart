@@ -25,7 +25,7 @@ void main() {
   setUp(() async {
     messages.clear();
     processWrapper = MockGgProcessWrapper();
-    pana = Pana(log: messages.add, processWrapper: processWrapper);
+    pana = Pana(ggLog: messages.add, processWrapper: processWrapper);
     runner = CommandRunner('test', 'test')..addCommand(pana);
     d = await Directory.systemTemp.createTemp('gg_check_test');
   });

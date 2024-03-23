@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
@@ -18,23 +19,25 @@ import 'package:mocktail/mocktail.dart' as mocktail;
 class Format extends DirCommand<void> {
   /// Constructor
   Format({
-    required super.log,
+    required super.ggLog,
     this.processWrapper = const GgProcessWrapper(),
   }) : super(name: 'format', description: 'Runs »dart format«.');
 
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> run({Directory? directory}) async {
-    final inputDir = dir(directory);
-    await check(directory: inputDir);
+  Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    await check(directory: directory);
 
     _logState(LogState.running);
 
     final result = await processWrapper.run(
       'dart',
       ['format', '.', '--fix', '--set-exit-if-changed'],
-      workingDirectory: inputDir.path,
+      workingDirectory: directory.path,
     );
 
     if (result.exitCode == 0) {
@@ -53,9 +56,9 @@ class Format extends DirCommand<void> {
         _logState(LogState.error);
 
         // Log hint
-        log('${yellow}The following files were formatted:$reset');
+        ggLog('${yellow}The following files were formatted:$reset');
         final filesRed = files.map((e) => '- $red$e$reset').join('\n');
-        log(filesRed);
+        ggLog(filesRed);
 
         throw Exception(
           'dart format failed.',
@@ -65,7 +68,7 @@ class Format extends DirCommand<void> {
       // When no files have changed, but an error occurred log the error
       if (files.isEmpty) {
         _logState(LogState.error);
-        log('$brightBlack$std$reset');
+        ggLog('$brightBlack$std$reset');
         throw Exception(
           'dart format failed.',
         );
@@ -77,7 +80,7 @@ class Format extends DirCommand<void> {
 
   // .........................................................................
   void _logState(LogState state) => logState(
-        log: log,
+        ggLog: ggLog,
         state: state,
         message: 'Running "dart format"',
       );

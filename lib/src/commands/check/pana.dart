@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
@@ -22,7 +23,7 @@ typedef _TaskResult = (int, List<String>, List<String>);
 class Pana extends DirCommand<void> {
   /// Constructor
   Pana({
-    required super.log,
+    required super.ggLog,
     this.processWrapper = const GgProcessWrapper(),
   }) : super(
           name: 'pana',
@@ -32,14 +33,15 @@ class Pana extends DirCommand<void> {
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> run({Directory? directory}) async {
-    final inputDir = dir(directory);
-
-    await check(directory: inputDir);
+  Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    await check(directory: directory);
 
     // Announce the command
     _logState(LogState.running);
-    final result = await _task(inputDir);
+    final result = await _task(directory);
     final (code, messages, errors) = result;
     final success = code == 0;
 
@@ -60,7 +62,7 @@ class Pana extends DirCommand<void> {
 
   // ...........................................................................
   void _logState(LogState state) => logState(
-        log: log,
+        ggLog: ggLog,
         state: state,
         message: 'Running "dart pana"',
       );
@@ -74,10 +76,10 @@ class Pana extends DirCommand<void> {
     final stdoutMsg = messages.where((e) => e.isNotEmpty).join('\n');
 
     if (errorMsg.isNotEmpty) {
-      log(errorMsg); // coverage:ignore-line
+      ggLog(errorMsg); // coverage:ignore-line
     }
     if (stdoutMsg.isNotEmpty) {
-      log(stdoutMsg);
+      ggLog(stdoutMsg);
     }
   }
 

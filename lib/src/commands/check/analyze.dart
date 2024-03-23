@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
@@ -18,23 +19,25 @@ import 'package:mocktail/mocktail.dart' as mocktail;
 class Analyze extends DirCommand<void> {
   /// Constructor
   Analyze({
-    required super.log,
+    required super.ggLog,
     this.processWrapper = const GgProcessWrapper(),
   }) : super(name: 'analyze', description: 'Runs »dart analyze«.');
 
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> run({Directory? directory}) async {
-    final inputDir = dir(directory);
-    await check(directory: inputDir);
+  Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    await check(directory: directory);
 
     _logState(LogState.running);
 
     final result = await processWrapper.run(
       'dart',
       ['analyze', '--fatal-infos', '--fatal-warnings'],
-      workingDirectory: inputDir.path,
+      workingDirectory: directory.path,
     );
 
     _logState(result.exitCode == 0 ? LogState.success : LogState.error);
@@ -46,11 +49,11 @@ class Analyze extends DirCommand<void> {
       ];
 
       // Log hint
-      log('${yellow}There are analyzer errors:$reset');
+      ggLog('${yellow}There are analyzer errors:$reset');
 
       // Log files
       final filesRed = files.map((e) => '- $red$e$reset').join('\n');
-      log(filesRed);
+      ggLog(filesRed);
 
       throw Exception(
         '"dart analyze" failed. See log for details.',
@@ -60,7 +63,7 @@ class Analyze extends DirCommand<void> {
 
   // .........................................................................
   void _logState(LogState state) => logState(
-        log: log,
+        ggLog: ggLog,
         state: state,
         message: 'Running "dart analyze"',
       );

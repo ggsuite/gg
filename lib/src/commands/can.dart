@@ -8,21 +8,22 @@ import 'package:args/command_runner.dart';
 import 'package:gg_check/src/commands/can/commit.dart';
 import 'package:gg_check/src/commands/can/publish.dart';
 import 'package:gg_check/src/commands/can/push.dart';
+import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
 /// Various checks for the source code
 class Can extends Command<void> {
   /// Constructor
   Can({
-    required this.log,
+    required this.ggLog,
     DepsOfCan? deps,
   }) {
-    deps ??= DepsOfCan(log: log);
+    deps ??= DepsOfCan(ggLog: ggLog);
     _initSubCommands(deps);
   }
 
   /// The log function
-  final void Function(String message) log;
+  final GgLog ggLog;
 
   /// Then name of the command
   @override
@@ -45,16 +46,16 @@ class Can extends Command<void> {
 class DepsOfCan {
   /// Constructor
   DepsOfCan({
-    required this.log,
+    required this.ggLog,
     Commit? commit,
     Push? push,
     Publish? publish,
-  })  : commit = commit ?? Commit(log: log),
-        push = push ?? Push(log: log),
-        publish = publish ?? Publish(log: log);
+  })  : commit = commit ?? Commit(ggLog: ggLog),
+        push = push ?? Push(ggLog: ggLog),
+        publish = publish ?? Publish(ggLog: ggLog);
 
   /// The log function
-  final void Function(String msg) log;
+  final GgLog ggLog;
 
   /// The can commit command
   final Commit commit;

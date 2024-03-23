@@ -23,13 +23,16 @@ void main() {
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.isPushed.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.isPushed.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('isPushed');
     });
-    when(() => commands.isVersioned.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.isVersioned.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('isVersioned');
     });
-    when(() => commands.pana.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.pana.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('pana');
     });
   }
@@ -37,13 +40,13 @@ void main() {
   // ...........................................................................
   setUp(() {
     commands = CheckCommands(
-      log: messages.add,
+      ggLog: messages.add,
       isPushed: MockIsPushed(),
       isVersioned: MockIsVersioned(),
       pana: MockPana(),
     );
 
-    publish = Publish(log: messages.add, checkCommands: commands);
+    publish = Publish(ggLog: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -57,7 +60,7 @@ void main() {
   group('Can', () {
     group('constructor', () {
       test('with defaults', () {
-        final c = Publish(log: messages.add);
+        final c = Publish(ggLog: messages.add);
         expect(c.name, 'publish');
         expect(c.description, 'Checks if code is ready to be published.');
       });
@@ -66,10 +69,10 @@ void main() {
     group('Publish', () {
       group('run(directory)', () {
         test('should check if everything is upgraded and commited', () async {
-          await publish.run(directory: d);
-          expect(messages[0], 'isPushed');
-          expect(messages[1], 'isVersioned');
-          expect(messages[2], 'pana');
+          await publish.exec(directory: d, ggLog: messages.add);
+          expect(messages[1], 'isPushed');
+          expect(messages[2], 'isVersioned');
+          expect(messages[3], 'pana');
         });
       });
     });

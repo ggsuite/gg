@@ -4,11 +4,11 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 import '../check.dart';
 
@@ -16,9 +16,9 @@ import '../check.dart';
 class Publish extends DirCommand<void> {
   /// Constructor
   Publish({
-    required super.log,
+    required super.ggLog,
     CheckCommands? checkCommands,
-  })  : _checkCommands = checkCommands ?? CheckCommands(log: log),
+  })  : _checkCommands = checkCommands ?? CheckCommands(ggLog: ggLog),
         super(
           name: 'publish',
           description: 'Checks if code is ready to be published.',
@@ -26,12 +26,23 @@ class Publish extends DirCommand<void> {
 
   // ...........................................................................
   @override
-  Future<void> run({Directory? directory}) async {
-    final inputDir = dir(directory);
-    log('${yellow}Can publish?$reset');
-    await _checkCommands.isPushed.run(directory: inputDir);
-    await _checkCommands.isVersioned.run(directory: inputDir);
-    await _checkCommands.pana.run(directory: inputDir);
+  Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    ggLog('${yellow}Can publish?$reset');
+    await _checkCommands.isPushed.exec(
+      directory: directory,
+      ggLog: ggLog,
+    );
+    await _checkCommands.isVersioned.exec(
+      directory: directory,
+      ggLog: ggLog,
+    );
+    await _checkCommands.pana.exec(
+      directory: directory,
+      ggLog: ggLog,
+    );
   }
 
   // ...........................................................................

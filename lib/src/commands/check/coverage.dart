@@ -11,6 +11,7 @@ import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
 import 'package:gg_check/src/tools/is_flutter.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 import 'package:path/path.dart';
@@ -26,24 +27,26 @@ typedef _TaskResult = (int, List<String>, List<String>);
 class Coverage extends DirCommand<void> {
   /// Constructor
   Coverage({
-    required super.log,
+    required super.ggLog,
     this.processWrapper = const GgProcessWrapper(),
   }) : super(name: 'coverage', description: 'Runs »dart test«.');
 
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> run({Directory? directory}) async {
-    final inputDir = dir(directory);
-    await check(directory: inputDir);
+  Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    await check(directory: directory);
 
     // Save directories
-    _coverageDir = Directory(join(inputDir.path, 'coverage'));
-    _srcDir = Directory(join(inputDir.path, 'lib', 'src'));
+    _coverageDir = Directory(join(directory.path, 'coverage'));
+    _srcDir = Directory(join(directory.path, 'lib', 'src'));
 
     // Announce the command
     _logState(LogState.running);
-    final result = await _task(inputDir);
+    final result = await _task(directory);
     final (code, messages, errors) = result;
     final success = code == 0;
 
@@ -68,7 +71,7 @@ class Coverage extends DirCommand<void> {
         isFlutter ? 'Running "flutter test --coverage"' : 'Running "dart test"';
 
     logState(
-      log: log,
+      ggLog: ggLog,
       state: state,
       message: message,
     );
@@ -88,10 +91,10 @@ class Coverage extends DirCommand<void> {
     final stdoutMsg = messages.where((e) => e.isNotEmpty).join('\n');
 
     if (errorMsg.isNotEmpty) {
-      log(errorMsg); // coverage:ignore-line
+      ggLog(errorMsg); // coverage:ignore-line
     }
     if (stdoutMsg.isNotEmpty) {
-      log(stdoutMsg);
+      ggLog(stdoutMsg);
     }
   }
 

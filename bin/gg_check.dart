@@ -7,18 +7,19 @@
 
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 
 // .............................................................................
 Future<void> run({
   required List<String> args,
-  required void Function(String msg) log,
+  required GgLog ggLog,
   GgProcessWrapper processWrapper = const GgProcessWrapper(),
 }) =>
     GgCommandRunner(
-      log: log,
+      ggLog: ggLog,
       command: Ggcheck(
-        log: log,
+        ggLog: ggLog,
         processWrapper: processWrapper,
       ),
     ).run(args: args);
@@ -27,7 +28,7 @@ Future<void> run({
 Future<void> main(List<String> args) async {
   await run(
     args: args,
-    log: (msg) => print(msg),
+    ggLog: print,
     processWrapper: const GgProcessWrapper(),
   );
 }

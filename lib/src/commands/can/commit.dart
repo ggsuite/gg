@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 import '../check.dart';
 
@@ -16,9 +17,9 @@ import '../check.dart';
 class Commit extends DirCommand<void> {
   /// Constructor
   Commit({
-    required super.log,
+    required super.ggLog,
     CheckCommands? checkCommands,
-  })  : _checkCommands = checkCommands ?? CheckCommands(log: log),
+  })  : _checkCommands = checkCommands ?? CheckCommands(ggLog: ggLog),
         super(
           name: 'commit',
           description: 'Checks if code is ready to commit.',
@@ -26,12 +27,14 @@ class Commit extends DirCommand<void> {
 
   // ...........................................................................
   @override
-  Future<void> run({Directory? directory}) async {
-    final inputDir = dir(directory);
+  Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
     log('${yellow}Can commit?$reset');
-    await _checkCommands.analyze.run(directory: inputDir);
-    await _checkCommands.format.run(directory: inputDir);
-    await _checkCommands.coverage.run(directory: inputDir);
+    await _checkCommands.analyze.exec(directory: directory, ggLog: ggLog);
+    await _checkCommands.format.exec(directory: directory, ggLog: ggLog);
+    await _checkCommands.coverage.exec(directory: directory, ggLog: ggLog);
   }
 
   // ...........................................................................

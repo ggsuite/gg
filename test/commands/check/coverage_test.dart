@@ -64,7 +64,7 @@ void main() {
   Future<void> initCommandAndRunner() async {
     runner = CommandRunner<void>('check', 'Check');
 
-    testCmd = Coverage(log: messages.add);
+    testCmd = Coverage(ggLog: messages.add);
     runner.addCommand(testCmd);
   }
 

@@ -30,7 +30,7 @@ void main() {
           logState(
             state: LogState.success,
             message: 'message',
-            log: (msg) => messages.add(msg),
+            ggLog: messages.add,
           );
           expect(messages, ['✅ message']);
         });
@@ -40,7 +40,7 @@ void main() {
           logState(
             state: LogState.error,
             message: 'message',
-            log: (msg) => messages.add(msg),
+            ggLog: messages.add,
           );
           expect(messages, ['❌ message']);
         });
@@ -50,7 +50,7 @@ void main() {
           logState(
             state: LogState.running,
             message: 'message',
-            log: (msg) => messages.add(msg),
+            ggLog: messages.add,
           );
           expect(messages, ['⌛️ message']);
         });
@@ -64,7 +64,7 @@ void main() {
           logState(
             state: LogState.success,
             message: 'message',
-            log: (msg) => messages.add(msg),
+            ggLog: messages.add,
           );
           expect(messages, ['$cr✅ message']);
         });
@@ -74,7 +74,7 @@ void main() {
           logState(
             state: LogState.error,
             message: 'message',
-            log: (msg) => messages.add(msg),
+            ggLog: messages.add,
           );
           expect(messages, ['$cr❌ message']);
         });
@@ -84,7 +84,7 @@ void main() {
           logState(
             state: LogState.running,
             message: 'message',
-            log: (msg) => messages.add(msg),
+            ggLog: messages.add,
           );
           expect(messages, ['⌛️ message']);
         });
@@ -97,7 +97,7 @@ void main() {
         logState(
           state: LogState.success,
           message: 'message',
-          log: (msg) => messages.add(msg),
+          ggLog: messages.add,
         );
         final cr = isGitHub ? '' : carriageReturn;
         expect(messages, ['$cr✅ message']);

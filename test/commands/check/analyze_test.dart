@@ -21,7 +21,7 @@ void main() {
   setUp(() {
     messages.clear();
     runner = CommandRunner<void>('test', 'test');
-    final analyze = Analyze(log: messages.add);
+    final analyze = Analyze(ggLog: messages.add);
     runner.addCommand(analyze);
     tmpDir = Directory.systemTemp.createTempSync();
   });
@@ -36,7 +36,7 @@ void main() {
       group('should print a usage description', () {
         test('when called with args=[--help]', () async {
           await capturePrint(
-            log: messages.add,
+            ggLog: messages.add,
             code: () => runner.run(
               ['analyze', '--help'],
             ),
@@ -74,7 +74,7 @@ void main() {
           final runner = CommandRunner<void>('test', 'test');
           runner.addCommand(
             Analyze(
-              log: messages.add,
+              ggLog: messages.add,
               processWrapper: processWrapper,
             ),
           );

@@ -15,7 +15,7 @@ void main() {
   final messages = <String>[];
   late CommandRunner<void> runner;
   final check = Check(
-    log: (msg) => messages.add(msg),
+    ggLog: messages.add,
   );
 
   setUp(() {

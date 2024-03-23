@@ -20,13 +20,16 @@ void main() {
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.analyze.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.analyze.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('did analyze');
     });
-    when(() => commands.format.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.format.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('did format');
     });
-    when(() => commands.coverage.run(directory: d)).thenAnswer((_) async {
+    when(() => commands.coverage.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
       messages.add('did cover');
     });
   }
@@ -34,13 +37,13 @@ void main() {
   // ...........................................................................
   setUp(() {
     commands = CheckCommands(
-      log: messages.add,
+      ggLog: messages.add,
       analyze: MockAnalyze(),
       format: MockFormat(),
       coverage: MockCoverage(),
     );
 
-    commit = Commit(log: messages.add, checkCommands: commands);
+    commit = Commit(ggLog: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -54,7 +57,7 @@ void main() {
   group('Can', () {
     group('constructor', () {
       test('with defaults', () {
-        final c = Commit(log: messages.add);
+        final c = Commit(ggLog: messages.add);
         expect(c.name, 'commit');
         expect(c.description, 'Checks if code is ready to commit.');
       });
@@ -63,7 +66,7 @@ void main() {
     group('Commit', () {
       group('run(directory)', () {
         test('should run analyze, format and coverage', () async {
-          await commit.run(directory: d);
+          await commit.exec(directory: d, ggLog: messages.add);
           expect(messages[0], 'did analyze');
           expect(messages[1], 'did format');
           expect(messages[2], 'did cover');

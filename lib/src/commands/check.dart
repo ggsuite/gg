@@ -7,6 +7,7 @@
 import 'package:args/command_runner.dart';
 import 'package:gg_check/gg_check.dart';
 import 'package:gg_git/gg_git.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:gg_version/gg_version.dart';
 import 'package:gg_publish/gg_publish.dart';
 
@@ -15,14 +16,14 @@ import 'package:gg_publish/gg_publish.dart';
 class Check extends Command<void> {
   /// Constructor
   Check({
-    required this.log,
+    required this.ggLog,
     CheckCommands? commands,
-  }) : commands = commands ?? CheckCommands(log: log) {
+  }) : commands = commands ?? CheckCommands(ggLog: ggLog) {
     _initSubCommands();
   }
 
   /// The log function
-  final void Function(String message) log;
+  final GgLog ggLog;
 
   /// Then name of the command
   @override
@@ -56,7 +57,7 @@ class Check extends Command<void> {
 class CheckCommands {
   /// Constructor
   CheckCommands({
-    required this.log,
+    required this.ggLog,
     Analyze? analyze,
     Format? format,
     Coverage? coverage,
@@ -66,18 +67,18 @@ class CheckCommands {
     IsVersioned? isVersioned,
     IsPublished? isPublished,
     IsUpgraded? isUpgraded,
-  })  : analyze = analyze ?? Analyze(log: log),
-        format = format ?? Format(log: log),
-        coverage = coverage ?? Coverage(log: log),
-        pana = pana ?? Pana(log: log),
-        isPushed = isPushed ?? IsPushed(log: log),
-        isCommitted = isCommitted ?? IsCommitted(log: log),
-        isVersioned = isVersioned ?? IsVersioned(log: log),
-        isPublished = isPublished ?? IsPublished(log: log),
-        isUpgraded = isUpgraded ?? IsUpgraded(log: log);
+  })  : analyze = analyze ?? Analyze(ggLog: ggLog),
+        format = format ?? Format(ggLog: ggLog),
+        coverage = coverage ?? Coverage(ggLog: ggLog),
+        pana = pana ?? Pana(ggLog: ggLog),
+        isPushed = isPushed ?? IsPushed(ggLog: ggLog),
+        isCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
+        isVersioned = isVersioned ?? IsVersioned(ggLog: ggLog),
+        isPublished = isPublished ?? IsPublished(ggLog: ggLog),
+        isUpgraded = isUpgraded ?? IsUpgraded(ggLog: ggLog);
 
   /// The log function
-  final void Function(String msg) log;
+  final GgLog ggLog;
 
   /// The analyze command
   final Analyze analyze;

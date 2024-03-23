@@ -21,7 +21,7 @@ void main() {
     d = Directory.systemTemp.createTempSync();
     messages.clear();
     can = Can(
-      log: (msg) => messages.add(msg),
+      ggLog: messages.add,
     );
     runner = CommandRunner<void>(
       'test',
@@ -39,7 +39,7 @@ void main() {
         code: () async {
           await runner.run(['can', '--help']);
         },
-        log: messages.add,
+        ggLog: messages.add,
       );
 
       expect(

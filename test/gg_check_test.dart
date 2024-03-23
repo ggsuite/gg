@@ -26,7 +26,7 @@ void main() {
     // #########################################################################
     group('Ggcheck', () {
       final ggcheck = Ggcheck(
-        log: (msg) => messages.add(msg),
+        ggLog: messages.add,
         processWrapper: processWrapper,
       );
 
@@ -39,7 +39,7 @@ void main() {
         final tmp = Directory.systemTemp.createTempSync();
 
         await capturePrint(
-          log: messages.add,
+          ggLog: messages.add,
           code: () =>
               runner.run(['ggcheck', 'check', 'analyze', '--input', tmp.path]),
         );
@@ -68,7 +68,7 @@ void main() {
             .toList();
 
         await capturePrint(
-          log: messages.add,
+          ggLog: messages.add,
           code: () async => await runner.run(['ggcheck', '--help']),
         );
 
@@ -80,7 +80,7 @@ void main() {
             isTrue,
             reason: '\nMissing subcommand "$subCommandStr"\n'
                 'Please open  "lib/src/gg_check.dart" and add\n'
-                '"addSubcommand($subCommandStr(log: log));',
+                '"addSubcommand($subCommandStr(ggLog: ggLog));',
           );
         }
       });

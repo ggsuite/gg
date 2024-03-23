@@ -7,21 +7,22 @@
 import 'package:args/command_runner.dart';
 import 'package:gg_check/src/commands/can.dart';
 import 'package:gg_check/src/commands/check.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 
 /// The command line interface for Ggcheck
 class Ggcheck extends Command<dynamic> {
   /// Constructor
   Ggcheck({
-    required this.log,
+    required this.ggLog,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
   }) {
-    addSubcommand(Check(log: log));
-    addSubcommand(Can(log: log));
+    addSubcommand(Check(ggLog: ggLog));
+    addSubcommand(Can(ggLog: ggLog));
   }
 
   /// The log function
-  final void Function(String message) log;
+  final GgLog ggLog;
 
   // ...........................................................................
   @override

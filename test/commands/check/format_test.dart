@@ -24,7 +24,7 @@ void main() {
     testIsGitHub = false;
     messages.clear();
     runner = CommandRunner<void>('test', 'test');
-    final format = Format(log: messages.add);
+    final format = Format(ggLog: messages.add);
     runner.addCommand(format);
     tmpDir = Directory.systemTemp.createTempSync();
   });
@@ -52,7 +52,7 @@ void main() {
       group('should print a usage description', () {
         test('when called with args=[--help]', () async {
           await capturePrint(
-            log: messages.add,
+            ggLog: messages.add,
             code: () => runner.run(
               ['format', '--help'],
             ),
@@ -131,7 +131,7 @@ void main() {
           final runner = CommandRunner<void>('test', 'test');
           runner.addCommand(
             Format(
-              log: messages.add,
+              ggLog: messages.add,
               processWrapper: processWrapper,
             ),
           );

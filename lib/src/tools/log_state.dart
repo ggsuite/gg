@@ -5,6 +5,8 @@
 // found in the LICENSE file in the root of this package.
 
 // ...........................................................................
+import 'package:gg_log/gg_log.dart';
+
 import 'is_github.dart';
 import 'carriage_return.dart';
 
@@ -25,7 +27,7 @@ enum LogState {
 void logState({
   required LogState state,
   required String message,
-  required void Function(String msg) log,
+  required GgLog ggLog,
 }) {
   // On GitHub we have no carriage return.
   // Thus we not logging the icon the first time
@@ -38,5 +40,5 @@ void logState({
     _ => '⌛️ $message',
   };
 
-  log(msg);
+  ggLog(msg);
 }
