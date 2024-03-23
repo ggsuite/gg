@@ -4,42 +4,33 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'dart:io';
-
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 /// Checks if the changes can be pushed.
-class Celebrate extends DirCommand<void> {
+class Celebrate extends CommandCluster {
   /// Constructor
   Celebrate({
     required super.ggLog,
     Checks? checkCommands,
-  })  : _checkCommands = checkCommands ?? Checks(ggLog: ggLog),
-        super(
-          name: 'celebrate',
-          description:
-              'Checks if everything is done and we can start the party.',
-        );
+    super.name = 'celebrate',
+    super.description =
+        'Checks if everything is done and we can start the party.',
+    super.shortDescription = 'Can celebrate?',
+  }) : super(commands: _checks(checkCommands, ggLog));
 
   // ...........................................................................
-  @override
-  Future<void> exec({
-    required Directory directory,
-    required GgLog ggLog,
-  }) async {
-    ggLog(yellow('Can celebrate?'));
-    await _checkCommands.isPublished.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+  static List<DirCommand<void>> _checks(
+    Checks? checks,
+    GgLog ggLog,
+  ) {
+    checks ??= Checks(ggLog: ggLog);
+    return [
+      checks.isPublished,
+    ];
   }
-
-  // ...........................................................................
-  final Checks _checkCommands;
 }
 
 // .............................................................................

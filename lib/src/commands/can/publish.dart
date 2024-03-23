@@ -4,49 +4,34 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'dart:io';
-
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 /// Checks if the changes can be published.
-class Publish extends DirCommand<void> {
+class Publish extends CommandCluster {
   /// Constructor
   Publish({
     required super.ggLog,
     Checks? checks,
-  })  : _checkCommands = checks ?? Checks(ggLog: ggLog),
-        super(
-          name: 'publish',
-          description: 'Checks if code is ready to be published.',
-        );
+    super.name = 'publish',
+    super.description = 'Checks if code is ready to be published.',
+    super.shortDescription = 'Can publish?',
+  }) : super(commands: _checks(checks, ggLog));
 
   // ...........................................................................
-  @override
-  Future<void> exec({
-    required Directory directory,
-    required GgLog ggLog,
-  }) async {
-    ggLog(yellow('Can publish?'));
-    await _checkCommands.isPushed.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
-    await _checkCommands.isVersioned.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
-    await _checkCommands.pana.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+  static List<DirCommand<void>> _checks(
+    Checks? checks,
+    GgLog ggLog,
+  ) {
+    checks ??= Checks(ggLog: ggLog);
+    return [
+      checks.isPushed,
+      checks.isVersioned,
+      checks.pana,
+    ];
   }
-
-  // ...........................................................................
-  final Checks _checkCommands;
 }
 
 // .............................................................................

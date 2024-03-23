@@ -15,23 +15,21 @@ class Commit extends CommandCluster {
   Commit({
     required super.ggLog,
     Checks? checks,
-  }) : super(
-          name: 'commit',
-          description: 'Checks if code is ready to commit.',
-          shortDescription: 'Can commit?',
-          commands: _checks(checks, ggLog),
-        );
+    super.name = 'commit',
+    super.description = 'Checks if code is ready to commit.',
+    super.shortDescription = 'Can commit?',
+  }) : super(commands: _checks(checks, ggLog));
 
   // ...........................................................................
   static List<DirCommand<void>> _checks(
-    Checks? checkCommands,
+    Checks? checks,
     GgLog ggLog,
   ) {
-    checkCommands ??= Checks(ggLog: ggLog);
+    checks ??= Checks(ggLog: ggLog);
     return [
-      checkCommands.analyze,
-      checkCommands.format,
-      checkCommands.coverage,
+      checks.analyze,
+      checks.format,
+      checks.coverage,
     ];
   }
 }

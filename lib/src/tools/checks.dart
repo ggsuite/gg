@@ -72,7 +72,6 @@ class Checks {
   Iterable<DirCommand<void>> get all => _all;
 
   // ...........................................................................
-
   late List<DirCommand<void>> _all;
 
   void _initAll() {

@@ -4,45 +4,33 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'dart:io';
-
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_check/gg_check.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// Checks if the changes can be pushed.
-class Push extends DirCommand<void> {
+class Push extends CommandCluster {
   /// Constructor
   Push({
     required super.ggLog,
     Checks? checkCommands,
-  })  : _checkCommands = checkCommands ?? Checks(ggLog: ggLog),
-        super(
-          name: 'push',
-          description: 'Checks if code is ready to push.',
-        );
+    super.name = 'push',
+    super.shortDescription = 'Can push?',
+    super.description = 'Checks if code is ready to push.',
+  }) : super(commands: _checks(checkCommands, ggLog));
 
   // ...........................................................................
-  @override
-  Future<void> exec({
-    required Directory directory,
-    required GgLog ggLog,
-  }) async {
-    ggLog(yellow('Can push?'));
-    await _checkCommands.isUpgraded.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
-    await _checkCommands.isCommitted.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+  static List<DirCommand<void>> _checks(
+    Checks? checks,
+    GgLog ggLog,
+  ) {
+    checks ??= Checks(ggLog: ggLog);
+    return [
+      checks.isUpgraded,
+      checks.isCommitted,
+    ];
   }
-
-  // ...........................................................................
-  final Checks _checkCommands;
 }
 
 // .............................................................................
