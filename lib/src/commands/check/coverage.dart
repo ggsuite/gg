@@ -13,9 +13,9 @@ import 'package:gg_check/src/tools/is_flutter.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
-import 'package:mocktail/mocktail.dart' as mocktail;
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
+import 'package:mocktail/mocktail.dart';
 
 typedef _Report = Map<String, Map<int, int>>;
 typedef _MissingLines = Map<String, List<int>>;
@@ -98,7 +98,7 @@ class Coverage extends DirCommand<void> {
     }
   }
 
-// .............................................................................
+  // ...........................................................................
   List<String> _extractErrorLines(String message) {
     // Regular expression to match file paths and line numbers
     RegExp exp = RegExp(r'test\/[\/\w]+\.dart[\s:]*\d+:\d+');
@@ -117,7 +117,7 @@ class Coverage extends DirCommand<void> {
     return result;
   }
 
-// .............................................................................
+  // ...........................................................................
   String _addDotSlash(String relativeFile) {
     if (!relativeFile.startsWith('./')) {
       return './$relativeFile';
@@ -245,7 +245,7 @@ class Coverage extends DirCommand<void> {
     return percentage;
   }
 
-// .............................................................................
+  // ...........................................................................
   final Map<String, List<bool>> _ignoredLinesCache = {};
 
   // ...........................................................................
@@ -291,7 +291,7 @@ class Coverage extends DirCommand<void> {
     return ignoredLines;
   }
 
-// .............................................................................
+  // ...........................................................................
   _MissingLines _estimateMissingLines(_Report report) {
     final _MissingLines result = {};
     for (final script in report.keys) {
@@ -310,7 +310,7 @@ class Coverage extends DirCommand<void> {
     return result;
   }
 
-// .............................................................................
+  // ...........................................................................
   void _printMissingLines(_MissingLines missingLines, Directory dir) {
     for (final script in missingLines.keys) {
       final testFile = script
@@ -324,15 +324,17 @@ class Coverage extends DirCommand<void> {
       final lineNumbers = missingLines[script]!;
       for (final lineNumber in lineNumbers) {
         // Don't print too many lines
+        var implementationRed = red('$relativeScript:$lineNumber');
+        var testFileBlue = blue(relativeTestFile);
 
-        _messages.add('- $red$relativeScript:$lineNumber$reset');
-        _messages.add('  $blue$relativeTestFile$reset\n');
+        _messages.add('- $implementationRed');
+        _messages.add('  $testFileBlue');
         if (printFirstOnly) break;
       }
     }
   }
 
-// .............................................................................
+  // ...........................................................................
   void _writeLcovReport(_Report report) {
     final buffer = StringBuffer();
     for (final script in report.keys) {
@@ -403,7 +405,9 @@ void main() {
   ) {
     // Create missing test files and ask user to edit it
     _messages.add(
-      '${yellow}Tests were created. Please revise:$reset',
+      yellow(
+        'Tests were created. Please revise:',
+      ),
     );
     final packageName = basename(dir.path);
 
@@ -432,12 +436,16 @@ void main() {
 
       // Create boilerplate file
       testFile.writeAsStringSync(boilerplate);
-      final relativeTestFile = relative(testFile.path, from: dir.path);
-      final relativeSrcFile = relative(implementationFile.path, from: dir.path);
+      final relativeTestFile = red(relative(testFile.path, from: dir.path));
+      final relativeSrcFile = brightBlack(
+        relative(
+          implementationFile.path,
+          from: dir.path,
+        ),
+      );
 
       // Print message
-      _messages.add('- $red$relativeTestFile$reset');
-      _messages.add('  $brightBlack$relativeSrcFile$reset');
+      _messages.add('- $relativeTestFile $relativeSrcFile');
     }
   }
 
@@ -465,11 +473,12 @@ void main() {
   ) {
     for (final tuple in files) {
       final (implementation, test) = tuple;
-      final srcFileRelative = relative(implementation.path, from: dir.path);
-      final testFileRelative = relative(test.path, from: dir.path);
+      final srcFileRelative =
+          blue(relative(implementation.path, from: dir.path));
+      final testFileRelative = red(relative(test.path, from: dir.path));
 
-      _messages.add('- $red$testFileRelative$reset');
-      _messages.add('  $blue$srcFileRelative$reset');
+      _messages.add('- $testFileRelative');
+      _messages.add('  $srcFileRelative');
     }
   }
 
@@ -535,12 +544,16 @@ void main() {
           !errorLines.contains(newErrorLines.first)) {
         // Print error line
 
-        final newErrorLinesString = _addDotSlash(newErrorLines.join(',\n   '));
-        _messages.add(' - $red$newErrorLinesString$reset');
+        final newErrorLinesString = red(
+          _addDotSlash(
+            newErrorLines.join(',\n   '),
+          ),
+        );
+        _messages.add(' - $newErrorLinesString');
 
         // Print messages belonging to this error
         for (var message in previousMessagesBelongingToError) {
-          _messages.add('$brightBlack$message$reset');
+          _messages.add(brightBlack(message));
         }
 
         isError = false;
@@ -606,7 +619,9 @@ void main() {
     final untestedFiles = _findUntestedFiles(report, files);
     if (untestedFiles.isNotEmpty) {
       _messages.add(
-        '${yellow}Please add valid tests to the following files:$reset',
+        yellow(
+          'Please add valid tests to the following files:',
+        ),
       );
       _printUntestedFiles(untestedFiles, dir);
       return (1, _messages, _errors);
@@ -621,7 +636,9 @@ void main() {
     if (percentage != 100.0) {
       // Print percentage
       _messages.add(
-        '${yellow}Coverage not 100%. Untested code:$reset',
+        yellow(
+          'Coverage not 100%. Untested code:',
+        ),
       );
 
       // Print missing lines
@@ -640,4 +657,4 @@ void main() {
 
 // .............................................................................
 /// Mocktail mock
-class MockCoverage extends mocktail.Mock implements Coverage {}
+class MockCoverage extends Mock implements Coverage {}

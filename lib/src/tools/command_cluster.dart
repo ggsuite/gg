@@ -31,7 +31,7 @@ class CommandCluster extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
   }) async {
-    ggLog('$yellow$shortDescription?$reset');
+    ggLog(yellow(shortDescription));
 
     for (final command in commands) {
       await command.exec(directory: directory, ggLog: ggLog);

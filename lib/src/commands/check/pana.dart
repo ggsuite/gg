@@ -104,10 +104,10 @@ class Pana extends DirCommand<void> {
         final title = parts.first;
         final details = parts.skip(1);
 
-        final titleRed = '$red$title$reset';
+        final titleRed = red(title);
         final detailsGray = details
             .map(
-              (e) => '$brightBlack$e$reset',
+              (e) => brightBlack(e),
             )
             .join('\n');
         problems.add('\n$titleRed$detailsGray');

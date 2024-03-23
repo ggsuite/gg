@@ -31,7 +31,7 @@ class Commit extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
   }) async {
-    log('${yellow}Can commit?$reset');
+    log(yellow('Can commit?'));
     await _checkCommands.analyze.exec(directory: directory, ggLog: ggLog);
     await _checkCommands.format.exec(directory: directory, ggLog: ggLog);
     await _checkCommands.coverage.exec(directory: directory, ggLog: ggLog);

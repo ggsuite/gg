@@ -31,7 +31,7 @@ class Celebrate extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
   }) async {
-    ggLog('${yellow}Can celebrate?$reset');
+    ggLog(yellow('Can celebrate?'));
     await _checkCommands.isPublished.exec(
       directory: directory,
       ggLog: ggLog,

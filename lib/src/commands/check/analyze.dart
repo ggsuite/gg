@@ -49,10 +49,10 @@ class Analyze extends DirCommand<void> {
       ];
 
       // Log hint
-      ggLog('${yellow}There are analyzer errors:$reset');
+      ggLog(yellow('There are analyzer errors:'));
 
       // Log files
-      final filesRed = files.map((e) => '- $red$e$reset').join('\n');
+      final filesRed = files.map((e) => red('- $e')).join('\n');
       ggLog(filesRed);
 
       throw Exception(

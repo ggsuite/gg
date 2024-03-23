@@ -116,12 +116,12 @@ void main() {
         expect(messages[1], contains('❌ Running "dart pana"'));
         expect(
           messages[2],
-          contains('$red[x] 0/10 points: Provide a valid `pubspec.yaml`'),
+          contains(red('[x] 0/10 points: Provide a valid `pubspec.yaml`')),
         );
         expect(
           messages[2],
           contains(
-            '$brightBlack* `pubspec.yaml` doesn\'t have a `homepage` entry.',
+            brightBlack('* `pubspec.yaml` doesn\'t have a `repository` entry.'),
           ),
         );
       });

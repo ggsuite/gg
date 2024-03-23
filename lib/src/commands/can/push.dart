@@ -30,7 +30,7 @@ class Push extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
   }) async {
-    ggLog('${yellow}Can push?$reset');
+    ggLog(yellow('Can push?'));
     await _checkCommands.isUpgraded.exec(
       directory: directory,
       ggLog: ggLog,

@@ -30,7 +30,7 @@ void main() {
   final result = Process.runSync('dart', ['compile', 'exe', src, '-o', dest]);
 
   if (result.stderr.toString().trim().isNotEmpty) {
-    print('❌ $red${result.stderr.toString()}$reset');
+    print(red('❌ result.stderr'));
   }
-  print(('✅ ${green}Installed $exe in $dest$reset'));
+  print(green('✅ Installed $exe in $dest'));
 }

@@ -30,7 +30,7 @@ class Publish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
   }) async {
-    ggLog('${yellow}Can publish?$reset');
+    ggLog(yellow('Can publish?'));
     await _checkCommands.isPushed.exec(
       directory: directory,
       ggLog: ggLog,

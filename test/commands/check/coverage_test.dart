@@ -145,12 +145,12 @@ void main() {
 
                 expect(
                   messages[2],
-                  contains('${red}test/simple_base_test.dart$reset'),
+                  contains(red('test/simple_base_test.dart')),
                 );
 
                 expect(
                   messages[2],
-                  contains('${brightBlack}lib/src/simple_base.dart$reset'),
+                  contains(brightBlack('lib/src/simple_base.dart')),
                 );
               },
             );
@@ -194,27 +194,23 @@ void main() {
               expect(
                 messages[2],
                 contains(
-                  '${yellow}Please add valid tests to the following files:',
-                ),
-              );
-              expect(
-                messages[2],
-                contains(
-                  '${yellow}Please add valid tests to the following files:',
+                  yellow(
+                    'Please add valid tests to the following files:',
+                  ),
                 ),
               );
 
               expect(
                 messages[2],
                 contains(
-                  '${red}test/simple_base_test.dart$reset',
+                  red('test/simple_base_test.dart'),
                 ),
               );
 
               expect(
                 messages[2],
                 contains(
-                  '${blue}lib/src/simple_base.dart$reset',
+                  blue('lib/src/simple_base.dart'),
                 ),
               );
             });
@@ -247,17 +243,17 @@ void main() {
 
               expect(
                 messages[2],
-                contains('${yellow}Coverage not 100%. Untested code:$reset'),
+                contains(yellow('Coverage not 100%. Untested code:')),
               );
 
               expect(
                 messages[2],
-                contains('- ${red}lib/src/simple_base.dart:8$reset'),
+                contains('- ${red('lib/src/simple_base.dart:8')}'),
               );
 
               expect(
                 messages[2],
-                contains('  ${blue}test/simple_base_test.dart$reset'),
+                contains('  ${blue('test/simple_base_test.dart')}'),
               );
             });
 
@@ -288,7 +284,7 @@ void main() {
               expect(messages[1], contains('❌ Running "dart test"'));
               expect(
                 messages[2],
-                contains('$red./test/simple_base_test.dart:17:7$reset'),
+                contains(red('./test/simple_base_test.dart:17:7')),
               );
               expect(
                 messages[2],

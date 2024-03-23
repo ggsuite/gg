@@ -56,8 +56,8 @@ class Format extends DirCommand<void> {
         _logState(LogState.error);
 
         // Log hint
-        ggLog('${yellow}The following files were formatted:$reset');
-        final filesRed = files.map((e) => '- $red$e$reset').join('\n');
+        ggLog(yellow('The following files were formatted:'));
+        final filesRed = files.map((e) => '- ${red(e)}').join('\n');
         ggLog(filesRed);
 
         throw Exception(
@@ -68,7 +68,7 @@ class Format extends DirCommand<void> {
       // When no files have changed, but an error occurred log the error
       if (files.isEmpty) {
         _logState(LogState.error);
-        ggLog('$brightBlack$std$reset');
+        ggLog(brightBlack('std'));
         throw Exception(
           'dart format failed.',
         );
