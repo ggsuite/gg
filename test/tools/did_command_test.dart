@@ -123,11 +123,10 @@ void main() {
           test('when state was set to success before', () async {
             await didCommand.set(directory: d, success: true);
 
-            final result = await didCommand.exec(
+            await didCommand.exec(
               directory: d,
               ggLog: messages.add,
             );
-            expect(result, isTrue);
             expect(messages[0], contains('⌛️ Did do?'));
             expect(messages[1], contains('✅ Did do?'));
           });
@@ -188,7 +187,7 @@ void main() {
                     'toString()',
                     predicate<String>(
                       (s) {
-                        expect(s, contains(red('- ⛌ Did predecessor1 do?')));
+                        expect(s, contains(red('Did predecessor1 do?')));
                         expect(s, contains(darkGray('log of predecessor1')));
                         return true;
                       },
@@ -236,7 +235,7 @@ void main() {
                       'toString()',
                       predicate<String>(
                         (s) {
-                          expect(s, contains(red('- ⛌ Did predecessor0 do?')));
+                          expect(s, contains(red('Did predecessor0 do?')));
                           expect(
                             s,
                             contains(
@@ -301,8 +300,8 @@ void main() {
 
                 // Only the father's error message should be logged
 
-                expect(exception, isNot(contains('- ⛌ Did child do?')));
-                expect(exception, contains(red('- ⛌ Did father do?')));
+                expect(exception, isNot(contains('Did child do?')));
+                expect(exception, contains(red('Did father do?')));
                 expect(
                   exception,
                   contains(darkGray('Exception: father failed')),
@@ -499,7 +498,7 @@ void main() {
             } on Exception catch (e) {
               exception = e.toString();
             }
-            expect(exception, contains(red('- ⛌ Did predecessor1 do?')));
+            expect(exception, contains(red('Did predecessor1 do?')));
 
             // Where the predecessors be called in the right order?
             expect(predecessorCalls[0], 'predecessor0');

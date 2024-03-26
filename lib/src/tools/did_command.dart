@@ -17,7 +17,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
 
 /// Base class for all did commands
-class DidCommand extends DirCommand<bool> {
+class DidCommand extends DirCommand<void> {
   /// Constructor
   DidCommand({
     required super.name,
@@ -33,7 +33,7 @@ class DidCommand extends DirCommand<bool> {
   // ...........................................................................
   @override
   @mustCallSuper
-  Future<bool> exec({
+  Future<void> exec({
     required Directory directory,
     required GgLog ggLog,
   }) async {
@@ -52,8 +52,6 @@ class DidCommand extends DirCommand<bool> {
     if (!result) {
       throw Exception(brightBlack(messages.join('\n')));
     }
-
-    return true;
   }
 
   // ...........................................................................
@@ -197,7 +195,7 @@ class DidCommand extends DirCommand<bool> {
         var error = '';
 
         // Log the predecessor question with red color
-        error += red('- ⛌ ${predecessor.question}');
+        error += red(predecessor.question);
 
         // Log the details in dark gray color
         if (subMessages.isNotEmpty) {
