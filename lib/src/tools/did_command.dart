@@ -304,7 +304,7 @@ class DidCommand extends DirCommand<void> {
     }
 
     final gitIgnoreContent = await gitIgnore.readAsString();
-    if (!gitIgnoreContent.contains(RegExp(r'^\s*\.check\.json\s*$'))) {
+    if (!gitIgnoreContent.contains(RegExp(r'.check\.json'))) {
       throw Exception('.check.json is not in .gitignore.');
     }
   }
