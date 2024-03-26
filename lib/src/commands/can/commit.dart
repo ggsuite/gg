@@ -29,7 +29,7 @@ class Commit extends CommandCluster {
     return [
       checks.analyze,
       checks.format,
-      checks.coverage,
+      checks.tests,
     ];
   }
 }

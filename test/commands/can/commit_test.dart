@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/commit.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -29,7 +30,7 @@ void main() {
         .thenAnswer((_) async {
       messages.add('did format');
     });
-    when(() => commands.coverage.exec(directory: d, ggLog: messages.add))
+    when(() => commands.tests.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
       messages.add('did cover');
     });
@@ -41,7 +42,7 @@ void main() {
       ggLog: messages.add,
       analyze: MockAnalyze(),
       format: MockFormat(),
-      coverage: MockCoverage(),
+      tests: MockTests(),
     );
 
     commit = Commit(ggLog: messages.add, checks: commands);

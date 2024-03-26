@@ -11,6 +11,7 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
@@ -49,7 +50,7 @@ class Format extends DirCommand<void> {
       final stdOut = result.stdout as String;
       final std = '$stdErr\n$stdOut';
 
-      final files = errorFiles(std);
+      final files = ErrorInfoReader().filePathes(std);
 
       // When running on git hub, log the file that have been changed
       if (isGitHub && files.isNotEmpty) {

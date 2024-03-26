@@ -20,7 +20,7 @@ void main() {
         expect(checks.all, [
           checks.analyze,
           checks.format,
-          checks.coverage,
+          checks.tests,
           checks.pana,
           checks.isPushed,
           checks.isCommitted,

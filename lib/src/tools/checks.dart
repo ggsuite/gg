@@ -8,6 +8,7 @@ import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
+import 'package:gg_test/gg_test.dart';
 import 'package:gg_version/gg_version.dart';
 import 'package:gg_publish/gg_publish.dart';
 
@@ -19,7 +20,7 @@ class Checks {
     required this.ggLog,
     Analyze? analyze,
     Format? format,
-    Coverage? coverage,
+    Tests? tests,
     Pana? pana,
     IsPushed? isPushed,
     IsCommitted? isCommitted,
@@ -28,7 +29,7 @@ class Checks {
     IsUpgraded? isUpgraded,
   })  : analyze = analyze ?? Analyze(ggLog: ggLog),
         format = format ?? Format(ggLog: ggLog),
-        coverage = coverage ?? Coverage(ggLog: ggLog),
+        tests = tests ?? Tests(ggLog: ggLog),
         pana = pana ?? Pana(ggLog: ggLog),
         isPushed = isPushed ?? IsPushed(ggLog: ggLog),
         isCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
@@ -48,7 +49,7 @@ class Checks {
   final Format format;
 
   /// The coverage command
-  final Coverage coverage;
+  final Tests tests;
 
   /// The pana command
   final Pana pana;
@@ -78,7 +79,7 @@ class Checks {
     _all = [
       analyze,
       format,
-      coverage,
+      tests,
       pana,
       isPushed,
       isCommitted,

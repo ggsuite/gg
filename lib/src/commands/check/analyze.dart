@@ -11,6 +11,7 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
@@ -44,8 +45,8 @@ class Analyze extends DirCommand<void> {
 
     if (result.exitCode != 0) {
       final files = [
-        ...errorFiles(result.stderr as String),
-        ...errorFiles(result.stdout as String),
+        ...ErrorInfoReader().filePathes(result.stderr as String),
+        ...ErrorInfoReader().filePathes(result.stdout as String),
       ];
 
       // Log hint
