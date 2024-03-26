@@ -5,9 +5,11 @@
 // found in the LICENSE file in the root of this package.
 
 import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:gg/src/tools/did_command.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:mocktail/mocktail.dart';
@@ -17,6 +19,7 @@ void main() {
   late Directory d;
   late DidCommand didCommand;
   final messages = <String>[];
+  final predecessorCalls = <String>[];
 
   // ...........................................................................
   void initCommand() {
@@ -33,6 +36,7 @@ void main() {
   // ...........................................................................
   setUp(() async {
     messages.clear();
+    predecessorCalls.clear();
     d = Directory.systemTemp.createTempSync();
     await initGit(d);
     initCommand();
@@ -63,6 +67,55 @@ void main() {
   });
 
   // ...........................................................................
+  MockDidCommand mockDidCommand({
+    String name = 'predecessor',
+    required bool success,
+    String? logMessage,
+    String? throwException,
+    DidCommand? predecessor,
+  }) {
+    // Create the mock
+    final result = MockDidCommand();
+
+    // Mock quesetions
+    when(() => result.question).thenReturn('Did $name do?');
+
+    // Mock the get method
+    final getMethod = when(
+      () => result.get(
+        directory: d,
+        ggLog: any(named: 'ggLog'),
+      ),
+    );
+
+    // Mock the predecessor
+    if (predecessor != null) {
+      when(() => result.predecessors).thenReturn([predecessor]);
+    }
+
+    // Throw an exception
+    if (throwException != null) {
+      getMethod.thenThrow(Exception(throwException));
+    }
+
+    // Succeed or fail
+    else {
+      getMethod.thenAnswer((invocation) {
+        final ggLog =
+            invocation.namedArguments[#ggLog] as void Function(String);
+        if (logMessage != null) {
+          ggLog(logMessage);
+        }
+
+        predecessorCalls.add(name);
+        return Future.value(success);
+      });
+    }
+
+    return result;
+  }
+
+  // ...........................................................................
   group('DidCommand', () {
     group('exec(directory, ggLog)', () {
       group('should return true', () {
@@ -84,42 +137,178 @@ void main() {
       group('should throw', () {
         group('and print ❌', () {
           test('when state was set to failure before', () async {
-            // Create a failing predecessor
-            final predecessor = MockDidCommand();
-            when(
-              () => predecessor.exec(
-                directory: d,
-                ggLog: any(named: 'ggLog'),
-              ),
-            ).thenThrow(Exception('❌ Predecessor failed'));
+            // Set state to false
+            await didCommand.set(directory: d, success: false);
 
-            // Add the predecessor to the command
-            didCommand = DidCommand(
-              name: 'run-test',
-              description: 'description',
-              question: 'Did do?',
-              ggLog: messages.add,
-              predecessors: [predecessor],
-            );
-
+            // Getting the state should throw
             await expectLater(
               didCommand.exec(
                 directory: d,
                 ggLog: messages.add,
               ),
               throwsA(
-                isA<Exception>().having(
-                  (e) => e.toString(),
-                  'toString()',
-                  contains('❌ Predecessor failed'),
-                ),
+                isA<Exception>(),
               ),
             );
 
-            // TODO: HIER WEITER:
-
             expect(messages[0], contains('⌛️ Did do?'));
             expect(messages[1], contains('❌ Did do?'));
+          });
+
+          group('when one of the predecessors', () {
+            test('returns false', () async {
+              // Prepare predecessors
+              final predecessor0 = mockDidCommand(
+                name: 'predecessor0',
+                success: true,
+                logMessage: 'log of predecessor0',
+              );
+
+              final predecessor1 = mockDidCommand(
+                name: 'predecessor1',
+                success: false,
+                logMessage: 'log of predecessor1',
+              );
+
+              // Add predecessors to the command
+              didCommand = DidCommand(
+                name: 'run-test',
+                description: 'description',
+                question: 'Did do?',
+                ggLog: messages.add,
+                predecessors: [predecessor0, predecessor1],
+              );
+
+              // Get the state
+              await expectLater(
+                didCommand.exec(directory: d, ggLog: messages.add),
+                throwsA(
+                  isA<Exception>().having(
+                    (e) => e.toString(),
+                    'toString()',
+                    predicate<String>(
+                      (s) {
+                        expect(s, contains(red('- ⛌ Did predecessor1 do?')));
+                        expect(s, contains(darkGray('log of predecessor1')));
+                        return true;
+                      },
+                    ),
+                  ),
+                ),
+              );
+
+              // Where the predecessors be called in the right order?
+              expect(predecessorCalls[0], 'predecessor0');
+              expect(predecessorCalls[1], 'predecessor1');
+            });
+
+            group('throws an exception', () {
+              test('with a direct predecessor failing', () async {
+                // Prepare predecessors xyz
+                final predecessor0 = mockDidCommand(
+                  name: 'predecessor0',
+                  success: true,
+                  logMessage: 'log of predecessor0',
+                  throwException: 'predecessor0 failed',
+                );
+
+                final predecessor1 = mockDidCommand(
+                  name: 'predecessor1',
+                  success: false,
+                  logMessage: 'log of predecessor1',
+                );
+
+                // Add predecessors to the command
+                didCommand = DidCommand(
+                  name: 'run-test',
+                  description: 'description',
+                  question: 'Did do?',
+                  ggLog: messages.add,
+                  predecessors: [predecessor0, predecessor1],
+                );
+
+                // Get the state
+                await expectLater(
+                  didCommand.exec(directory: d, ggLog: messages.add),
+                  throwsA(
+                    isA<Exception>().having(
+                      (e) => e.toString(),
+                      'toString()',
+                      predicate<String>(
+                        (s) {
+                          expect(s, contains(red('- ⛌ Did predecessor0 do?')));
+                          expect(
+                            s,
+                            contains(
+                              darkGray(
+                                'Exception: predecessor0 failed',
+                              ),
+                            ),
+                          );
+                          return true;
+                        },
+                      ),
+                    ),
+                  ),
+                );
+
+                // Where the predecessors be called in the right order?
+                expect(messages[0], contains('⌛️ Did do?'));
+                expect(messages[1], contains('❌ Did do?'));
+
+                // If one predecessor fails the process is interrupted
+                expect(predecessorCalls, isEmpty);
+              });
+
+              test('with an earlier predecessor failing', () async {
+                // Prepare a father predecessor, failing
+                final father = mockDidCommand(
+                  name: 'father',
+                  success: false,
+                  logMessage: 'log of father',
+                  throwException: 'father failed',
+                );
+
+                // Prepare a child predecessor
+                final child = DidCommand(
+                  name: 'child',
+                  description: 'description',
+                  question: 'Did child do?',
+                  ggLog: messages.add,
+                  predecessors: [father],
+                );
+                await child.set(directory: d, success: true);
+
+                // Add the child predecessor to the command
+                didCommand = DidCommand(
+                  name: 'run-test',
+                  description: 'description',
+                  question: 'Did do?',
+                  ggLog: messages.add,
+                  predecessors: [child],
+                );
+
+                // Get the state
+                late String exception;
+                try {
+                  await didCommand.exec(directory: d, ggLog: messages.add);
+                } on Exception catch (e) {
+                  exception = e.toString();
+                }
+
+                // If the father fails, the child should not be called
+                expect(predecessorCalls, isEmpty);
+
+                // Only the father's error message should be logged
+
+                expect(exception, isNot(contains('- ⛌ Did child do?')));
+                expect(exception, contains(red('- ⛌ Did father do?')));
+                expect(
+                  exception,
+                  contains(darkGray('Exception: father failed')),
+                );
+              });
+            });
           });
         });
       });
@@ -281,19 +470,15 @@ void main() {
 
           test('if one of the predecessors was not successful', () async {
             // Prepare predecessors
-            final predecessor0 = MockDidCommand();
-            when(() => predecessor0.exec(directory: d, ggLog: messages.add))
-                .thenAnswer((_) {
-              messages.add('predecessor0');
-              return Future.value(false); // fails
-            });
+            final predecessor0 = mockDidCommand(
+              name: 'predecessor0',
+              success: true,
+            );
 
-            final predecessor1 = MockDidCommand();
-            when(() => predecessor1.exec(directory: d, ggLog: messages.add))
-                .thenAnswer((_) {
-              messages.add('predecessor1'); // fails not
-              return Future.value(true);
-            });
+            final predecessor1 = mockDidCommand(
+              name: 'predecessor1',
+              success: false,
+            );
 
             // Add predecessors to the command
             didCommand = DidCommand(
@@ -308,14 +493,17 @@ void main() {
             await didCommand.set(directory: d, success: true);
 
             // Get the state
-            expect(
-              await didCommand.get(directory: d, ggLog: messages.add),
-              isFalse, // because predecessor0 failed
-            );
+            late String exception;
+            try {
+              await didCommand.get(directory: d, ggLog: messages.add);
+            } on Exception catch (e) {
+              exception = e.toString();
+            }
+            expect(exception, contains(red('- ⛌ Did predecessor1 do?')));
 
             // Where the predecessors be called in the right order?
-            expect(messages[0], 'predecessor0');
-            expect(messages[1], 'predecessor1');
+            expect(predecessorCalls[0], 'predecessor0');
+            expect(predecessorCalls[1], 'predecessor1');
           });
         });
 
@@ -332,19 +520,15 @@ void main() {
 
             test('with successful predecessors', () async {
               // Prepare predecessors
-              final predecessor0 = MockDidCommand();
-              when(() => predecessor0.exec(directory: d, ggLog: messages.add))
-                  .thenAnswer((_) {
-                messages.add('predecessor0');
-                return Future.value(true);
-              });
+              final predecessor0 = mockDidCommand(
+                name: 'predecessor0',
+                success: true,
+              );
 
-              final predecessor1 = MockDidCommand();
-              when(() => predecessor1.exec(directory: d, ggLog: messages.add))
-                  .thenAnswer((_) {
-                messages.add('predecessor1');
-                return Future.value(true);
-              });
+              final predecessor1 = mockDidCommand(
+                name: 'predecessor1',
+                success: true,
+              );
 
               // Add predecessors to the command
               didCommand = DidCommand(
@@ -365,8 +549,8 @@ void main() {
               );
 
               // Where the predecessors be called in the right order?
-              expect(messages[0], 'predecessor0');
-              expect(messages[1], 'predecessor1');
+              expect(predecessorCalls[0], 'predecessor0');
+              expect(predecessorCalls[1], 'predecessor1');
             });
           });
         });

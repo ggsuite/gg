@@ -50,7 +50,7 @@ class DidCommand extends DirCommand<bool> {
     );
 
     if (!result) {
-      throw Exception(brightBlack(messages.join('\n'))); // coverage:ignore-line
+      throw Exception(brightBlack(messages.join('\n')));
     }
 
     return true;
@@ -169,13 +169,45 @@ class DidCommand extends DirCommand<bool> {
 
     // Execute all predecessors
     for (final predecessor in predecessors) {
-      final result = await predecessor.exec(
-        directory: directory,
-        ggLog: ggLog,
-      );
-      if (!result) {
-        allPredecessorsAreSuccessful = false;
+      final subMessages = <String>[];
+      late bool predecessorWasSuccessful;
+
+      // Execute predecessor and write log to subMessages
+      try {
+        predecessorWasSuccessful = await predecessor.get(
+          directory: directory,
+          ggLog: subMessages.add,
+        );
+      } catch (e) {
+        // If a predecessor fails, don't execute its successors.
+        // Only the last predecessor in the list does catch the exception
+        if (e is PredecessorException) {
+          final isLastInChain = predecessors.isEmpty;
+          if (!isLastInChain) {
+            rethrow;
+          }
+        }
+
+        predecessorWasSuccessful = false;
+        subMessages.add(e.toString());
       }
+
+      // Predecessor was not successful?
+      if (!predecessorWasSuccessful) {
+        var error = '';
+
+        // Log the predecessor question with red color
+        error += red('- ⛌ ${predecessor.question}');
+
+        // Log the details in dark gray color
+        if (subMessages.isNotEmpty) {
+          error += '\n${darkGray(subMessages.join('\n'))}';
+        }
+
+        throw PredecessorException(error);
+      }
+
+      allPredecessorsAreSuccessful &= predecessorWasSuccessful;
     }
 
     return allPredecessorsAreSuccessful;
@@ -275,6 +307,18 @@ class DidCommand extends DirCommand<bool> {
       throw Exception('.check.json is not in .gitignore.');
     }
   }
+}
+
+/// Exception that is thrown when a predecessor did not succeed
+class PredecessorException implements Exception {
+  /// Constructor
+  PredecessorException(this.message);
+
+  /// The message of the exception
+  final String message;
+
+  @override
+  String toString() => message;
 }
 
 /// Mock for [DidCommand]
