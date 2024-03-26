@@ -57,6 +57,9 @@ class DidCommand extends DirCommand<void> {
   // ...........................................................................
   /// Returns previously set value
   Future<bool> get({required Directory directory, required GgLog ggLog}) async {
+    // Check if .check.json is in .gitignore
+    await _checkCheckJsonIsInGitIgnore(directory);
+
     // Are all predecessors successful?
     if (!await _arePredecessorsSuccessful(directory: directory, ggLog: ggLog)) {
       return false;
