@@ -10,6 +10,7 @@ import 'package:args/command_runner.dart';
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/commands/did/did_commit.dart';
 import 'package:gg/src/commands/do/do_commit.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
@@ -208,6 +209,12 @@ void main() {
             message: 'my message',
           );
 
+          // Did log the right message?
+          expect(
+            messages.last,
+            yellow('Already committed.'),
+          );
+
           // But no git commands are executed
           verifyNever(
             () => processWrapper.run(
@@ -250,6 +257,12 @@ void main() {
 
             // Expect didCommit is set to true
             verifyDidCommitIsSet(true);
+
+            // Did log the right message?
+            expect(
+              messages.last,
+              yellow('Already committed. Just stored state.'),
+            );
 
             // No git commands should be called
             verifyNever(

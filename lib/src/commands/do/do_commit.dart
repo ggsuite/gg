@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/commands/did/did_commit.dart';
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
@@ -51,7 +52,7 @@ class DoCommit extends DirCommand<void> {
     if (isCommitted) {
       final isDone = await _didCommit.get(directory: directory, ggLog: ggLog);
       if (isDone) {
-        ggLog('Already committed.');
+        ggLog(yellow('Already committed.'));
         return;
       }
     }
@@ -66,6 +67,9 @@ class DoCommit extends DirCommand<void> {
     if (!isCommitted) {
       await _add(directory, message);
       await _commit(directory, message);
+      ggLog(yellow('Everything is committed.'));
+    } else {
+      ggLog(yellow('Already committed. Just stored state.'));
     }
 
     // Write state to didCommit
