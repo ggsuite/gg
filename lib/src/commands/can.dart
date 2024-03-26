@@ -5,9 +5,9 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:gg/src/commands/can/commit.dart';
-import 'package:gg/src/commands/can/publish.dart';
-import 'package:gg/src/commands/can/push.dart';
+import 'package:gg/src/commands/can/can_commit.dart';
+import 'package:gg/src/commands/can/can_publish.dart';
+import 'package:gg/src/commands/can/can_push.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
@@ -35,9 +35,9 @@ class Can extends Command<void> {
 
   // ...........................................................................
   void _initSubCommands(DepsOfCan deps) {
-    addSubcommand(deps.commit);
-    addSubcommand(deps.push);
-    addSubcommand(deps.publish);
+    addSubcommand(deps.canCommit);
+    addSubcommand(deps.canPush);
+    addSubcommand(deps.canPublish);
   }
 }
 
@@ -47,22 +47,22 @@ class DepsOfCan {
   /// Constructor
   DepsOfCan({
     required this.ggLog,
-    Commit? commit,
-    Push? push,
-    Publish? publish,
-  })  : commit = commit ?? Commit(ggLog: ggLog),
-        push = push ?? Push(ggLog: ggLog),
-        publish = publish ?? Publish(ggLog: ggLog);
+    CanCommit? commit,
+    CanPush? push,
+    CanPublish? publish,
+  })  : canCommit = commit ?? CanCommit(ggLog: ggLog),
+        canPush = push ?? CanPush(ggLog: ggLog),
+        canPublish = publish ?? CanPublish(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;
 
   /// The can commit command
-  final Commit commit;
+  final CanCommit canCommit;
 
   /// The can push command
-  final Push push;
+  final CanPush canPush;
 
   /// The can publish command
-  final Publish publish;
+  final CanPublish canPublish;
 }

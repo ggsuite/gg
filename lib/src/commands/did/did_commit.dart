@@ -7,9 +7,9 @@
 import 'package:gg/src/tools/did_command.dart';
 
 /// Saves the current state of the source code
-class Commit extends DidCommand {
+class DidCommit extends DidCommand {
   /// Constructor
-  Commit({
+  DidCommit({
     required super.ggLog,
     super.name = 'commit',
     super.description = 'Informs if everything is committed.',

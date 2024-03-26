@@ -5,9 +5,9 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:gg/src/commands/did/commit.dart';
-import 'package:gg/src/commands/did/publish.dart';
-import 'package:gg/src/commands/did/push.dart';
+import 'package:gg/src/commands/did/did_commit.dart';
+import 'package:gg/src/commands/did/did_publish.dart';
+import 'package:gg/src/commands/did/did_push.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
@@ -35,9 +35,9 @@ class Did extends Command<void> {
 
   // ...........................................................................
   void _initSubCommands(DepsOfDid deps) {
-    addSubcommand(deps.commit);
-    addSubcommand(deps.push);
-    addSubcommand(deps.publish);
+    addSubcommand(deps.didCommit);
+    addSubcommand(deps.didPush);
+    addSubcommand(deps.didPublish);
   }
 }
 
@@ -47,22 +47,22 @@ class DepsOfDid {
   /// Constructor
   DepsOfDid({
     required this.ggLog,
-    Commit? commit,
-    Push? push,
-    Publish? publish,
-  })  : commit = commit ?? Commit(ggLog: ggLog),
-        push = push ?? Push(ggLog: ggLog),
-        publish = publish ?? Publish(ggLog: ggLog);
+    DidCommit? commit,
+    DidPush? push,
+    DidPublish? publish,
+  })  : didCommit = commit ?? DidCommit(ggLog: ggLog),
+        didPush = push ?? DidPush(ggLog: ggLog),
+        didPublish = publish ?? DidPublish(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;
 
   /// The can commit command
-  final Commit commit;
+  final DidCommit didCommit;
 
   /// The can push command
-  final Push push;
+  final DidPush didPush;
 
   /// The can publish command
-  final Publish publish;
+  final DidPublish didPublish;
 }

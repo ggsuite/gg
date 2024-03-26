@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:gg/src/commands/did/commit.dart';
+import 'package:gg/src/commands/did/did_commit.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:test/test.dart';
@@ -15,7 +15,7 @@ void main() {
   late Directory d;
   final messages = <String>[];
   GgLog ggLog = messages.add;
-  late Commit commit;
+  late DidCommit commit;
 
   setUp(() async {
     messages.clear();
@@ -23,7 +23,7 @@ void main() {
     await initGit(d);
     await addAndCommitGitIgnoreFile(d, content: '.check.json');
     await addAndCommitSampleFile(d, fileName: 'pubspec.yaml');
-    commit = Commit(ggLog: messages.add);
+    commit = DidCommit(ggLog: messages.add);
   });
 
   tearDown(() async {

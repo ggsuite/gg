@@ -9,15 +9,15 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
-/// Checks if the changes can be published.
-class Publish extends CommandCluster {
+/// Checks if the changes can be committed.
+class CanCommit extends CommandCluster {
   /// Constructor
-  Publish({
+  CanCommit({
     required super.ggLog,
     Checks? checks,
-    super.name = 'publish',
-    super.description = 'Checks if code is ready to be published.',
-    super.shortDescription = 'Can publish?',
+    super.name = 'commit',
+    super.description = 'Checks if code is ready to commit.',
+    super.shortDescription = 'Can commit?',
   }) : super(commands: _checks(checks, ggLog));
 
   // ...........................................................................
@@ -27,13 +27,13 @@ class Publish extends CommandCluster {
   ) {
     checks ??= Checks(ggLog: ggLog);
     return [
-      checks.isPushed,
-      checks.isVersioned,
-      checks.pana,
+      checks.analyze,
+      checks.format,
+      checks.tests,
     ];
   }
 }
 
 // .............................................................................
 /// A mocktail mock
-class MockPublish extends mocktail.Mock implements Publish {}
+class MockCommit extends mocktail.Mock implements CanCommit {}

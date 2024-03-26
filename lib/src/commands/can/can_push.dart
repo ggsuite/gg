@@ -10,9 +10,9 @@ import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// Checks if the changes can be pushed.
-class Push extends CommandCluster {
+class CanPush extends CommandCluster {
   /// Constructor
-  Push({
+  CanPush({
     required super.ggLog,
     Checks? checkCommands,
     super.name = 'push',
@@ -35,4 +35,4 @@ class Push extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockPush extends Mock implements Push {}
+class MockPush extends Mock implements CanPush {}

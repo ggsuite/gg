@@ -7,7 +7,7 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
-import 'package:gg/src/commands/can/celebrate.dart';
+import 'package:gg/src/commands/can/can_celebrate.dart';
 import 'package:gg_publish/gg_publish.dart';
 
 import 'package:mocktail/mocktail.dart';
@@ -18,7 +18,7 @@ void main() {
   late Directory d;
   late Checks commands;
   final messages = <String>[];
-  late Celebrate celebrate;
+  late CanCelebrate celebrate;
 
   // ...........................................................................
   void mockCommands() {
@@ -35,7 +35,7 @@ void main() {
       isPublished: MockIsPublished(),
     );
 
-    celebrate = Celebrate(ggLog: messages.add, checkCommands: commands);
+    celebrate = CanCelebrate(ggLog: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -50,7 +50,7 @@ void main() {
     group('Celebrate', () {
       group('constructor', () {
         test('with defaults', () {
-          final c = Celebrate(ggLog: messages.add);
+          final c = CanCelebrate(ggLog: messages.add);
           expect(c.name, 'celebrate');
           expect(
             c.description,

@@ -7,9 +7,10 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
-import 'package:gg/src/commands/can/commit.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_test/gg_test.dart';
+import 'package:gg/src/commands/can/can_push.dart';
+import 'package:gg_git/gg_git.dart';
+import 'package:gg_publish/gg_publish.dart';
+
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -18,21 +19,17 @@ void main() {
   late Directory d;
   late Checks commands;
   final messages = <String>[];
-  late Commit commit;
+  late CanPush push;
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.analyze.exec(directory: d, ggLog: messages.add))
+    when(() => commands.isCommitted.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
-      messages.add('did analyze');
+      messages.add('did commit');
     });
-    when(() => commands.format.exec(directory: d, ggLog: messages.add))
+    when(() => commands.isUpgraded.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
-      messages.add('did format');
-    });
-    when(() => commands.tests.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
-      messages.add('did cover');
+      messages.add('did upgrade');
     });
   }
 
@@ -40,12 +37,11 @@ void main() {
   setUp(() {
     commands = Checks(
       ggLog: messages.add,
-      analyze: MockAnalyze(),
-      format: MockFormat(),
-      tests: MockTests(),
+      isCommitted: MockIsCommitted(),
+      isUpgraded: MockIsUpgraded(),
     );
 
-    commit = Commit(ggLog: messages.add, checks: commands);
+    push = CanPush(ggLog: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -57,22 +53,20 @@ void main() {
 
   // ...........................................................................
   group('Can', () {
-    group('constructor', () {
-      test('with defaults', () {
-        final c = Commit(ggLog: messages.add);
-        expect(c.name, 'commit');
-        expect(c.description, 'Checks if code is ready to commit.');
+    group('Push', () {
+      group('constructor', () {
+        test('with defaults', () {
+          final c = CanPush(ggLog: messages.add);
+          expect(c.name, 'push');
+          expect(c.description, 'Checks if code is ready to push.');
+        });
       });
-    });
-
-    group('Commit', () {
       group('run(directory)', () {
-        test('should run analyze, format and coverage', () async {
-          await commit.exec(directory: d, ggLog: messages.add);
-          expect(messages[0], yellow('Can commit?'));
-          expect(messages[1], 'did analyze');
-          expect(messages[2], 'did format');
-          expect(messages[3], 'did cover');
+        test('should check if everything is upgraded and commited', () async {
+          await push.exec(directory: d, ggLog: messages.add);
+          expect(messages[0], contains('Can push?'));
+          expect(messages[1], 'did upgrade');
+          expect(messages[2], 'did commit');
         });
       });
     });

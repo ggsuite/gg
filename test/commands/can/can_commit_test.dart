@@ -7,10 +7,9 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
-import 'package:gg/src/commands/can/publish.dart';
-import 'package:gg_git/gg_git.dart';
-import 'package:gg_version/gg_version.dart';
-
+import 'package:gg/src/commands/can/can_commit.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -19,21 +18,21 @@ void main() {
   late Directory d;
   late Checks commands;
   final messages = <String>[];
-  late Publish publish;
+  late CanCommit commit;
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.isPushed.exec(directory: d, ggLog: messages.add))
+    when(() => commands.analyze.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
-      messages.add('isPushed');
+      messages.add('did analyze');
     });
-    when(() => commands.isVersioned.exec(directory: d, ggLog: messages.add))
+    when(() => commands.format.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
-      messages.add('isVersioned');
+      messages.add('did format');
     });
-    when(() => commands.pana.exec(directory: d, ggLog: messages.add))
+    when(() => commands.tests.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
-      messages.add('pana');
+      messages.add('did cover');
     });
   }
 
@@ -41,12 +40,12 @@ void main() {
   setUp(() {
     commands = Checks(
       ggLog: messages.add,
-      isPushed: MockIsPushed(),
-      isVersioned: MockIsVersioned(),
-      pana: MockPana(),
+      analyze: MockAnalyze(),
+      format: MockFormat(),
+      tests: MockTests(),
     );
 
-    publish = Publish(ggLog: messages.add, checks: commands);
+    commit = CanCommit(ggLog: messages.add, checks: commands);
     d = Directory.systemTemp.createTempSync();
     mockCommands();
   });
@@ -60,19 +59,20 @@ void main() {
   group('Can', () {
     group('constructor', () {
       test('with defaults', () {
-        final c = Publish(ggLog: messages.add);
-        expect(c.name, 'publish');
-        expect(c.description, 'Checks if code is ready to be published.');
+        final c = CanCommit(ggLog: messages.add);
+        expect(c.name, 'commit');
+        expect(c.description, 'Checks if code is ready to commit.');
       });
     });
 
-    group('Publish', () {
+    group('Commit', () {
       group('run(directory)', () {
-        test('should check if everything is upgraded and commited', () async {
-          await publish.exec(directory: d, ggLog: messages.add);
-          expect(messages[1], 'isPushed');
-          expect(messages[2], 'isVersioned');
-          expect(messages[3], 'pana');
+        test('should run analyze, format and coverage', () async {
+          await commit.exec(directory: d, ggLog: messages.add);
+          expect(messages[0], yellow('Can commit?'));
+          expect(messages[1], 'did analyze');
+          expect(messages[2], 'did format');
+          expect(messages[3], 'did cover');
         });
       });
     });

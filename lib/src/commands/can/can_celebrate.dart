@@ -9,16 +9,17 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
-/// Checks if the changes can be committed.
-class Commit extends CommandCluster {
+/// Checks if the changes can be pushed.
+class CanCelebrate extends CommandCluster {
   /// Constructor
-  Commit({
+  CanCelebrate({
     required super.ggLog,
-    Checks? checks,
-    super.name = 'commit',
-    super.description = 'Checks if code is ready to commit.',
-    super.shortDescription = 'Can commit?',
-  }) : super(commands: _checks(checks, ggLog));
+    Checks? checkCommands,
+    super.name = 'celebrate',
+    super.description =
+        'Checks if everything is done and we can start the party.',
+    super.shortDescription = 'Can celebrate?',
+  }) : super(commands: _checks(checkCommands, ggLog));
 
   // ...........................................................................
   static List<DirCommand<void>> _checks(
@@ -27,13 +28,11 @@ class Commit extends CommandCluster {
   ) {
     checks ??= Checks(ggLog: ggLog);
     return [
-      checks.analyze,
-      checks.format,
-      checks.tests,
+      checks.isPublished,
     ];
   }
 }
 
 // .............................................................................
 /// A mocktail mock
-class MockCommit extends mocktail.Mock implements Commit {}
+class MockCelebrate extends mocktail.Mock implements CanCelebrate {}
