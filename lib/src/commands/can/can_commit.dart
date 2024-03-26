@@ -36,4 +36,4 @@ class CanCommit extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockCommit extends mocktail.Mock implements CanCommit {}
+class MockCanCommit extends mocktail.Mock implements CanCommit {}

@@ -8,6 +8,7 @@ import 'package:args/command_runner.dart';
 import 'package:gg/src/commands/can.dart';
 import 'package:gg/src/commands/check.dart';
 import 'package:gg/src/commands/did.dart';
+import 'package:gg/src/commands/do.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 
@@ -21,6 +22,7 @@ class Gg extends Command<dynamic> {
     addSubcommand(Check(ggLog: ggLog));
     addSubcommand(Can(ggLog: ggLog));
     addSubcommand(Did(ggLog: ggLog));
+    addSubcommand(Do(ggLog: ggLog));
   }
 
   /// The log function
