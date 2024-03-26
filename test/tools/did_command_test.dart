@@ -5,6 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'dart:io';
 
@@ -352,7 +353,7 @@ void main() {
 
             test('when .gitignore does not contain .check.json', () async {
               // Empty .gitignore
-              await addAndCommitGitIgnoreFile(d, content: './test');
+              await addAndCommitGitIgnoreFile(d, content: gitIgnoreContent);
 
               // Try to set the state
               await expectLater(
@@ -394,6 +395,7 @@ void main() {
             );
 
             // Set the state
+            debugger();
             await didCommand.set(directory: d, success: true);
 
             // Check the file
@@ -557,3 +559,13 @@ void main() {
     });
   });
 }
+
+const gitIgnoreContent = '''
+node_modules
+coverage
+build
+*.vm.json
+.DS_Store
+.check.json
+
+''';
