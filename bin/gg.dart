@@ -5,8 +5,11 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:io';
+
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 
@@ -26,9 +29,14 @@ Future<void> run({
 
 // .............................................................................
 Future<void> main(List<String> args) async {
-  await run(
-    args: args,
-    ggLog: print,
-    processWrapper: const GgProcessWrapper(),
-  );
+  try {
+    await run(
+      args: args,
+      ggLog: print,
+      processWrapper: const GgProcessWrapper(),
+    );
+  } catch (e) {
+    print(red(e));
+    exit(1);
+  }
 }
