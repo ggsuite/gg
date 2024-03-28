@@ -159,6 +159,7 @@ void main() {
     mockGitAdd();
   });
 
+  // ...........................................................................
   tearDown(() async {
     await d.delete(recursive: true);
   });
@@ -212,7 +213,7 @@ void main() {
           // Did log the right message?
           expect(
             messages.last,
-            yellow('Already committed.'),
+            yellow('Everything committed.'),
           );
 
           // But no git commands are executed
@@ -261,7 +262,7 @@ void main() {
             // Did log the right message?
             expect(
               messages.last,
-              yellow('Already committed. Just stored state.'),
+              yellow('Everything committed. Storing state.'),
             );
 
             // No git commands should be called

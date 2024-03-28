@@ -52,7 +52,7 @@ class DoCommit extends DirCommand<void> {
     if (isCommitted) {
       final isDone = await _didCommit.get(directory: directory, ggLog: ggLog);
       if (isDone) {
-        ggLog(yellow('Already committed.'));
+        ggLog(yellow('Everything committed.'));
         return;
       }
     }
@@ -69,7 +69,7 @@ class DoCommit extends DirCommand<void> {
       await _commit(directory, message);
       ggLog(yellow('Everything is committed.'));
     } else {
-      ggLog(yellow('Already committed. Just stored state.'));
+      ggLog(yellow('Everything committed. Storing state.'));
     }
 
     // Write state to didCommit
