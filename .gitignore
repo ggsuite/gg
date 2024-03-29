@@ -11,4 +11,3 @@ coverage
 build
 *.vm.json
 .DS_Store
-.check.json

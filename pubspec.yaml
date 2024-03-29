@@ -1,6 +1,6 @@
 name: gg
 description: A collection of checks and actions like analyzing, linting, testing, code coverage, committing, pushing, publishing.
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/inlavigo/gg.git
 
 environment:
@@ -29,6 +29,10 @@ dependencies:
 dev_dependencies:
   fake_async: ^1.3.1
   gg_capture_print: ^1.0.3
+  gg_install_gg: ^1.0.1
   lints: ^3.0.0
   pana: ^0.22.2
   test: ^1.24.0
+
+executables:
+  gg:

@@ -16,21 +16,16 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 // #############################################################################
 void main() {
   const exe = 'gg';
-  const src = 'bin/gg.dart';
-  final installDir = '${Platform.environment['HOME']}/.pub-cache/bin';
 
-  // Create install dir if it does not exist
-  if (!Directory(installDir).existsSync()) {
-    print('Creating $installDir');
-    Directory(installDir).createSync(recursive: true);
-  }
-
-  final dest = '$installDir/$exe';
-  print('Installing $exe in $dest');
-  final result = Process.runSync('dart', ['compile', 'exe', src, '-o', dest]);
+  print('Installing $exe globally');
+  final result = Process.runSync(
+    'dart',
+    ['pub', 'global', 'activate', '--source', 'path', '.'],
+  );
 
   if (result.stderr.toString().trim().isNotEmpty) {
-    print(red('❌ result.stderr'));
+    print(red('❌ ${result.stderr.toString().trim()}'));
+    return;
   }
-  print(green('✅ Installed $exe in $dest'));
+  print(green('✅ Installed $exe.'));
 }
