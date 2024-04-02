@@ -118,8 +118,7 @@ class CommandCluster extends DirCommand<void> {
     // we will ammend changes to .gg.json to the last commit.
     // - If everything was committed and pushed, create a new commit
     // - If everything was committed but not pushed, ammend to last commit
-    final message =
-        everythingWasPushed ? 'Update .gg.json for $headMessage' : headMessage;
+    final message = everythingWasPushed ? 'Update .gg.json' : headMessage;
 
     await _commit.commit(
       directory: directory,
