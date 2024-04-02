@@ -46,7 +46,7 @@ class DidCommand extends DirCommand<void> {
 
     if (!result) {
       final printedMessages = <String>[
-        _formatSuggestion(suggestion),
+        colorizeSuggestion(suggestion),
         brightBlack(messages.join('\n')),
       ];
 
@@ -92,11 +92,9 @@ class DidCommand extends DirCommand<void> {
   /// Saves and restores the success state
   final GgState state;
 
-  // ######################
-  // Private
-  // ######################
-
-  String _formatSuggestion(String suggestion) {
+  /// Formats the suggestion string by applying the blue color to the text
+  /// between » and «
+  static String colorizeSuggestion(String suggestion) {
     const startSymbol = '»';
     const endSymbol = '«';
 
@@ -128,6 +126,10 @@ class DidCommand extends DirCommand<void> {
 
     return buffer.toString();
   }
+
+  // ######################
+  // Private
+  // ######################
 }
 
 /// Mock for [DidCommand]

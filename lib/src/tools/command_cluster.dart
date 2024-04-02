@@ -101,7 +101,7 @@ class CommandCluster extends DirCommand<void> {
   // ...........................................................................
   void _printAlreadyDoneSuccess(GgLog ggLog) {
     GgStatusPrinter<void>(
-      message: 'Already checked. Nothing to do.',
+      message: 'Everything is fine.',
       ggLog: ggLog,
       useCarriageReturn: false,
     ).logStatus(GgStatusPrinterStatus.success);

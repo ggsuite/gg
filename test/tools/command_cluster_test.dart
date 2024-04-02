@@ -83,7 +83,7 @@ void main() {
           expect(messages[4], contains('Do all check commands work?'));
           expect(
             messages[5],
-            '✅ Already checked. Nothing to do.',
+            '✅ Everything is fine.',
           );
         });
       });

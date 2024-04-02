@@ -6,16 +6,17 @@
 
 import 'dart:io';
 
-// import 'package:gg/src/commands/did/did_publish.dart';
+import 'package:gg/src/commands/did/did_publish.dart';
+import 'package:gg/src/tools/did_command.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
-// import 'package:gg_log/gg_log.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:test/test.dart';
 
 void main() {
   late Directory d;
   final messages = <String>[];
-  // GgLog ggLog = messages.add;
-  // late DidPublish didPublish;
+  GgLog ggLog = messages.add;
+  late DidPublish didPublish;
 
   setUp(() async {
     messages.clear();
@@ -27,7 +28,7 @@ void main() {
     await initGit(d);
     await addAndCommitGitIgnoreFile(d, content: '.check.json');
     await addAndCommitSampleFile(d, fileName: 'pubspec.yaml');
-    // didPublish = DidPublish(ggLog: messages.add);
+    didPublish = DidPublish(ggLog: messages.add);
   });
 
   tearDown(() async {
@@ -37,37 +38,18 @@ void main() {
   group('did', () {
     group('Publish', () {
       test('should work fine ', () async {
-        // // ..................................
-        // // Initally the command should throw,
-        // // because we did not commit yet
-        // late String exception;
-        // try {
-        //   await didPublish.exec(directory: d, ggLog: ggLog);
-        // } catch (e) {
-        //   exception = e.toString();
-        // }
-        // expect(exception, contains(red('Did run »gg do commit«?')));
-        //
-        // // ...............................
-        // // The command should still throw,
-        // // because we did not push yet
-        // try {
-        //   await didPublish.exec(directory: d, ggLog: ggLog);
-        // } catch (e) {
-        //   exception = e.toString();
-        // }
-        // expect(exception, contains(red('Did run »gg do push?')));
-        //
-        // // ...........................
-        // // It should not throw anymore
-        // // but return false,
-        // // because we did not push yet
-        // expect(await didPublish.get(directory: d, ggLog: ggLog), isFalse);
-        //
-        // // Now the command should return true
-        // expect(await didPublish.get(directory: d, ggLog: ggLog), isTrue);
-        //
-        // // For more details look into "did_command_test.dart"
+        const colorize = DidCommand.colorizeSuggestion;
+
+        // ..................................
+        // Initally the command should throw,
+        // because we did not commit yet
+        late String exception;
+        try {
+          await didPublish.exec(directory: d, ggLog: ggLog);
+        } catch (e) {
+          exception = e.toString();
+        }
+        expect(exception, contains(colorize('Please run »gg do publish«.')));
       });
     });
   });

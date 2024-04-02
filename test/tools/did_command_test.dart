@@ -127,5 +127,20 @@ void main() {
         });
       });
     });
+
+    group('set(directory, ggLog)', () {
+      test('should set the state to success', () async {
+        await didCommand.set(
+          directory: d,
+        );
+
+        final success = await didCommand.get(
+          directory: d,
+          ggLog: messages.add,
+        );
+
+        expect(success, isTrue);
+      });
+    });
   });
 }
