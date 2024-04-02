@@ -29,7 +29,7 @@ class GgState {
   /// Returns previously set value
   Future<bool> readSuccess({
     required Directory directory,
-    required String stage,
+    required String key,
     required GgLog ggLog,
   }) async {
     // Get the last changes hash
@@ -50,7 +50,7 @@ class GgState {
     // Get the hash written to .gg.json
     final hashInCheckJson = await _ggJson.readFile<int>(
       file: _configFile(directory: directory),
-      path: _hashPath(stage).join('/'),
+      path: _hashPath(key).join('/'),
     );
 
     // Compare the two hashes
@@ -60,15 +60,15 @@ class GgState {
   }
 
   // ...........................................................................
-  /// Updates .gg.json and writes the success state for this stage.
+  /// Updates .gg.json and writes the success state for this key.
   Future<void> writeSuccess({
     required Directory directory,
-    required String stage,
+    required String key,
   }) async {
     // If success is already written, return
     final isWritten = await readSuccess(
       directory: directory,
-      stage: stage,
+      key: key,
       ggLog: ggLog,
     );
     if (isWritten) {
@@ -85,7 +85,7 @@ class GgState {
     // Write the hash to .gg.json
     await _ggJson.writeFile(
       file: _configFile(directory: directory),
-      path: _hashPath(stage).join('/'),
+      path: _hashPath(key).join('/'),
       value: currentHash,
     );
   }

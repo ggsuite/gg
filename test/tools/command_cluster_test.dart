@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_git/gg_git.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -23,10 +24,11 @@ void main() {
   late List<DirCommand<void>> commands;
   late CommandCluster commandCluster;
 
-  setUp(() {
+  setUp(() async {
     // Init basics
     d = Directory.systemTemp.createTempSync();
     messages.clear();
+    await initGit(d);
 
     // Init commands
     isCommitted = MockIsCommitted();
@@ -63,12 +65,49 @@ void main() {
 
   group('CommandCluster', () {
     group('exec(directory, log)', () {
-      test('should run all commands', () async {
-        await commandCluster.exec(directory: d, ggLog: ggLog);
-        expect(messages[0], contains('Do all check commands work?'));
-        expect(messages[1], 'isCommitted');
-        expect(messages[2], 'isPushed');
-        expect(messages[3], 'isUpgraded');
+      group('with force == false', () {
+        test('should not run commands again that were successful before',
+            () async {
+          // Run the command a first time
+          await commandCluster.exec(directory: d, ggLog: ggLog);
+          expect(messages[0], contains('Do all check commands work?'));
+          expect(messages[1], 'isCommitted');
+          expect(messages[2], 'isPushed');
+          expect(messages[3], 'isUpgraded');
+
+          // Run the command a second time.
+          // Should not run the commands again,
+          // because force is false
+          // and the commands were successful before.
+          await commandCluster.exec(directory: d, ggLog: ggLog);
+          expect(messages[4], contains('Do all check commands work?'));
+          expect(
+            messages[5],
+            '✅ Already checked. Nothing to do.',
+          );
+        });
+      });
+
+      group('with force == true', () {
+        test(
+          'should run commands '
+          'no matter if they were successful before or not',
+          () async {
+            // Run the command a first time
+            await commandCluster.exec(directory: d, ggLog: ggLog);
+            expect(messages[0], contains('Do all check commands work?'));
+            expect(messages[1], 'isCommitted');
+            expect(messages[2], 'isPushed');
+            expect(messages[3], 'isUpgraded');
+
+            // Run the command a second first time
+            await commandCluster.exec(directory: d, ggLog: ggLog, force: true);
+            expect(messages[4], contains('Do all check commands work?'));
+            expect(messages[5], 'isCommitted');
+            expect(messages[6], 'isPushed');
+            expect(messages[7], 'isUpgraded');
+          },
+        );
       });
     });
   });

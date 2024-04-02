@@ -57,7 +57,7 @@ void main() {
           // Set the state
           await ggState.writeSuccess(
             directory: d,
-            stage: 'can-commit',
+            key: 'can-commit',
           );
 
           // Check the file
@@ -73,7 +73,7 @@ void main() {
       });
     });
 
-    group('readSuccess(directory, stage, ggLog)', () {
+    group('readSuccess(directory, key, ggLog)', () {
       group('should return', () {
         group('false', () {
           test('if no .gg.json exists', () async {
@@ -81,7 +81,7 @@ void main() {
             final result = await ggState.readSuccess(
               directory: d,
               ggLog: messages.add,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
             expect(result, isFalse);
           });
@@ -92,7 +92,7 @@ void main() {
             final result = await ggState.readSuccess(
               directory: d,
               ggLog: messages.add,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
             expect(result, isFalse);
           });
@@ -101,7 +101,7 @@ void main() {
             // Set the state
             await ggState.writeSuccess(
               directory: d,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
 
             // Change the file
@@ -110,7 +110,7 @@ void main() {
             final result = await ggState.readSuccess(
               directory: d,
               ggLog: messages.add,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
             expect(result, isFalse);
           });
@@ -124,14 +124,14 @@ void main() {
             // Write success after everything is committed
             await ggState.writeSuccess(
               directory: d,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
 
             // Read succes -> It should be true
             final result = await ggState.readSuccess(
               directory: d,
               ggLog: messages.add,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
             expect(result, isTrue);
 
@@ -142,21 +142,21 @@ void main() {
             final result2 = await ggState.readSuccess(
               directory: d,
               ggLog: messages.add,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
             expect(result2, isFalse);
 
             // Write success again
             await ggState.writeSuccess(
               directory: d,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
 
             // Read success -> It should be true
             final result3 = await ggState.readSuccess(
               directory: d,
               ggLog: messages.add,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
             expect(result3, isTrue);
 
@@ -168,7 +168,7 @@ void main() {
             final result4 = await ggState.readSuccess(
               directory: d,
               ggLog: messages.add,
-              stage: 'can-commit',
+              key: 'can-commit',
             );
             expect(result4, isTrue);
           });

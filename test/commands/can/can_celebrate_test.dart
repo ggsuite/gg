@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/can_celebrate.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_publish/gg_publish.dart';
 
 import 'package:mocktail/mocktail.dart';
@@ -29,7 +30,7 @@ void main() {
   }
 
   // ...........................................................................
-  setUp(() {
+  setUp(() async {
     commands = Checks(
       ggLog: messages.add,
       isPublished: MockIsPublished(),
@@ -37,6 +38,7 @@ void main() {
 
     celebrate = CanCelebrate(ggLog: messages.add, checkCommands: commands);
     d = Directory.systemTemp.createTempSync();
+    await initGit(d);
     mockCommands();
   });
 

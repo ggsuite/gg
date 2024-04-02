@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/can_publish.dart';
 import 'package:gg_git/gg_git.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_version/gg_version.dart';
 
 import 'package:mocktail/mocktail.dart';
@@ -38,7 +39,7 @@ void main() {
   }
 
   // ...........................................................................
-  setUp(() {
+  setUp(() async {
     commands = Checks(
       ggLog: messages.add,
       isPushed: MockIsPushed(),
@@ -48,6 +49,7 @@ void main() {
 
     publish = CanPublish(ggLog: messages.add, checks: commands);
     d = Directory.systemTemp.createTempSync();
+    await initGit(d);
     mockCommands();
   });
 

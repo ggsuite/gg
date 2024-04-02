@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -37,7 +38,7 @@ void main() {
   }
 
   // ...........................................................................
-  setUp(() {
+  setUp(() async {
     commands = Checks(
       ggLog: messages.add,
       analyze: MockAnalyze(),
@@ -47,6 +48,7 @@ void main() {
 
     commit = CanCommit(ggLog: messages.add, checks: commands);
     d = Directory.systemTemp.createTempSync();
+    await initGit(d);
     mockCommands();
   });
 
