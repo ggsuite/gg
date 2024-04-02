@@ -65,6 +65,7 @@ void main() {
       });
       group('run(directory)', () {
         test('should check if everything is upgraded and commited', () async {
+          await addAndCommitSampleFile(d);
           await push.exec(directory: d, ggLog: messages.add);
           expect(messages[0], contains('Can push?'));
           expect(messages[1], 'did upgrade');

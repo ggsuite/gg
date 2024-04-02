@@ -70,6 +70,7 @@ void main() {
     group('Commit', () {
       group('run(directory)', () {
         test('should run analyze, format and coverage', () async {
+          await addAndCommitSampleFile(d);
           await commit.exec(directory: d, ggLog: messages.add);
           expect(messages[0], yellow('Can commit?'));
           expect(messages[1], 'did analyze');

@@ -4,6 +4,8 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:io';
+
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
@@ -21,11 +23,23 @@ class CanCommit extends CommandCluster {
   }) : super(commands: _checks(checks, ggLog));
 
   // ...........................................................................
+  @override
+  Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+    bool? force,
+  }) async {
+    // Execute commands.
+    await super.exec(directory: directory, ggLog: ggLog, force: force);
+  }
+
+  // ...........................................................................
   static List<DirCommand<void>> _checks(
     Checks? checks,
     GgLog ggLog,
   ) {
     checks ??= Checks(ggLog: ggLog);
+
     return [
       checks.analyze,
       checks.format,

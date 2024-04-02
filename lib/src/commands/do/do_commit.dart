@@ -43,8 +43,10 @@ class DoCommit extends DirCommand<void> {
     await check(directory: directory);
 
     // Is everything committed?
-    final isCommitted =
-        await _isCommitted.get(directory: directory, ggLog: ggLog);
+    final isCommitted = await _isCommitted.get(
+      directory: directory,
+      ggLog: ggLog,
+    );
 
     // Is didCommit already set?
     if (isCommitted) {

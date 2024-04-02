@@ -64,6 +64,7 @@ void main() {
         test(
             'should check if is done, '
             'i.e. everything is checked, pushed and published', () async {
+          await addAndCommitSampleFile(d);
           await celebrate.exec(directory: d, ggLog: messages.add);
           expect(messages[0], contains('Can celebrate?'));
           expect(messages[1], 'isPublished');

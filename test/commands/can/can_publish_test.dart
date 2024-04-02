@@ -71,6 +71,7 @@ void main() {
     group('Publish', () {
       group('run(directory)', () {
         test('should check if everything is upgraded and commited', () async {
+          await addAndCommitSampleFile(d);
           await publish.exec(directory: d, ggLog: messages.add);
           expect(messages[1], 'isPushed');
           expect(messages[2], 'isVersioned');
