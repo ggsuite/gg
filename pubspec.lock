@@ -157,18 +157,18 @@ packages:
     dependency: "direct main"
     description:
       name: gg_console_colors
-      sha256: "2b7a7de390e7d8bcfe30d385c9898f9d7f0bd59898f97c020721ed40b46e5e96"
+      sha256: "36deda619f73adb0e2b70c295cf2aa0c43f40b2f0222c74c4417f617efd2b07f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   gg_git:
     dependency: "direct main"
     description:
       name: gg_git
-      sha256: "8a52a0a95a7bf5d5e03a480a946388c2362a475db1d0b93274046ce9035b42c1"
+      sha256: "9618ba12e8550466a6d26a0d0614e9888ec8210cc64e1a87490819206b27bc5e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.8.3"
+    version: "1.8.4"
   gg_install_gg:
     dependency: "direct dev"
     description:
@@ -205,10 +205,10 @@ packages:
     dependency: "direct main"
     description:
       name: gg_log
-      sha256: "04be88abb1ec7543ee9d5b2382108c89c7d2653f9a23cd553cc6aa1b46d0f0ee"
+      sha256: "8900bca6521a73ceb92d87a5bf139b8ce4d3604338ac45ebbe57a86ace2c47c1"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   gg_process:
     dependency: "direct main"
     description:
@@ -229,10 +229,10 @@ packages:
     dependency: "direct main"
     description:
       name: gg_publish
-      sha256: b4cf79ea728c09c5b64bd445c957369db3a8e3b873153f9fec3f54fb68624f09
+      sha256: "2e7807708538cead96b885999d1dd25fc3b0327e5623eba59b24abc8deb0f812"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.7"
   gg_status_printer:
     dependency: "direct main"
     description:
@@ -245,10 +245,10 @@ packages:
     dependency: "direct main"
     description:
       name: gg_test
-      sha256: ef6237f15d921e40b50cf87803fb9ab0a42ec5d2afbcbbb5a8c8edef758c39d4
+      sha256: db599389c8c6a7d7a0b9a46f94a7265f3b0bbf07618a678e0b28cd0a6d89e81f
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.7"
   gg_version:
     dependency: "direct main"
     description:

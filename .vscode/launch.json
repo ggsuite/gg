@@ -11,7 +11,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
       "args": ["can", "commit"],
-      "cwd": "${workspaceFolder}/../aud_tone_selection"
+      "cwd": "${workspaceFolder}/../gg_periodic_timer"
     },
     {
       "name": "Current File",
