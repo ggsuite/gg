@@ -39,8 +39,6 @@ class DoCommit extends DirCommand<void> {
     required GgLog ggLog,
     String? message,
   }) async {
-    message ??= argResults!['message'] as String;
-
     // Does directory exist?
     await check(directory: directory);
 
@@ -65,6 +63,7 @@ class DoCommit extends DirCommand<void> {
 
     // Execute the commit
     if (!isCommitted) {
+      message ??= argResults!['message'] as String;
       await _add(directory, message);
       await _commit(directory, message);
       ggLog(yellow('Everything is committed.'));
