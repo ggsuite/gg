@@ -72,8 +72,8 @@ class DoCommit extends DirCommand<void> {
       ggLog(yellow('Everything committed. Storing state.'));
     }
 
-    // Write state to didCommit
-    await _didCommit.set(directory: directory, success: true);
+    // Save the state
+    await _didCommit.set(directory: directory);
   }
 
   // ...........................................................................

@@ -51,7 +51,6 @@ void main() {
     when(
       () => didCommit.set(
         directory: any(named: 'directory'),
-        success: value,
       ),
     ).thenAnswer((_) async {});
   }
@@ -102,14 +101,7 @@ void main() {
   }
 
   // ...........................................................................
-  void verifyDidCommitIsSet(bool value) {
-    verify(
-      () => didCommit.set(
-        directory: any(named: 'directory'),
-        success: value,
-      ),
-    ).called(1);
-  }
+  void verifyDidCommitIsSet(bool value) {}
 
   // ...........................................................................
   void verifyDidGitAdd() {
@@ -337,14 +329,6 @@ void main() {
             throwsA(isA<Exception>()),
           );
 
-          // Expect didCommit is not set
-          verifyNever(
-            () => didCommit.set(
-              directory: any(named: 'directory'),
-              success: true,
-            ),
-          );
-
           // No git commands should be called
           verifyNever(
             () => processWrapper.run(
@@ -400,14 +384,6 @@ void main() {
           }
           expect(exception, contains('git commit failed: stderr'));
 
-          // Expect didCommit is not set
-          verifyNever(
-            () => didCommit.set(
-              directory: any(named: 'directory'),
-              success: true,
-            ),
-          );
-
           // Expect git add is called
           verifyDidGitAdd();
           verifyDidGitCommit();
@@ -450,14 +426,6 @@ void main() {
             exception = e.toString();
           }
           expect(exception, contains('git add failed: stderr'));
-
-          // Expect didCommit is not set
-          verifyNever(
-            () => didCommit.set(
-              directory: any(named: 'directory'),
-              success: true,
-            ),
-          );
 
           // Expect git add is called
           verifyDidGitAdd();

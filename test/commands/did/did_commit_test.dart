@@ -15,15 +15,14 @@ void main() {
   late Directory d;
   final messages = <String>[];
   GgLog ggLog = messages.add;
-  late DidCommit commit;
+  late DidCommit didCommit;
 
   setUp(() async {
     messages.clear();
     d = await Directory.systemTemp.createTemp();
     await initGit(d);
-    await addAndCommitGitIgnoreFile(d, content: '.check.json');
     await addAndCommitSampleFile(d, fileName: 'pubspec.yaml');
-    commit = DidCommit(ggLog: messages.add);
+    didCommit = DidCommit(ggLog: messages.add);
   });
 
   tearDown(() async {
@@ -35,15 +34,15 @@ void main() {
       test('work fine ', () async {
         // Initally the command should return false,
         // because nothing is committed
-        expect(await commit.get(directory: d, ggLog: ggLog), isFalse);
+        expect(await didCommit.get(directory: d, ggLog: ggLog), isFalse);
 
         // Let's set a success state
-        await commit.set(directory: d, success: true);
+        await didCommit.set(
+          directory: d,
+        );
 
         // Now the command should return true
-        expect(await commit.get(directory: d, ggLog: ggLog), isTrue);
-
-        // For more details look into "did_command_test.dart"
+        expect(await didCommit.get(directory: d, ggLog: ggLog), isTrue);
       });
     });
   });
