@@ -9,7 +9,6 @@ import 'dart:io';
 import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
 
@@ -24,21 +23,7 @@ class CommandCluster extends DirCommand<void> {
     required this.stateKey,
     required this.shortDescription,
     GgState? state,
-    IsPushed? isPushed,
-    IsCommitted? isCommitted,
-    ModifiedFiles? modifiedFiles,
-    Commit? commit,
-    HeadMessage? headMessage,
-    HasRemote? hasRemote,
-    CommitCount? commitCount,
-  })  : _state = state ?? GgState(ggLog: ggLog),
-        _isPushed = isPushed ?? IsPushed(ggLog: ggLog),
-        _isCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
-        _modifiedFiles = modifiedFiles ?? ModifiedFiles(ggLog: ggLog),
-        _commit = commit ?? Commit(ggLog: ggLog),
-        _headMessage = headMessage ?? HeadMessage(ggLog: ggLog),
-        _hasRemote = hasRemote ?? HasRemote(ggLog: ggLog),
-        _commitCount = commitCount ?? CommitCount(ggLog: ggLog) {
+  }) : _state = state ?? GgState(ggLog: ggLog) {
     _addArgs();
   }
 
@@ -64,31 +49,6 @@ class CommandCluster extends DirCommand<void> {
       return;
     }
 
-    // Nothing committed so far? Do nothing.
-    await _checkCommitsAvailable(directory, ggLog);
-
-    // Remember if everything is committed and pushed
-    final everythingWasCommitted = await _isCommitted.get(
-      directory: directory,
-      ggLog: ggLog,
-    );
-
-    final hasRemote = await _hasRemote.get(
-      directory: directory,
-      ggLog: ggLog,
-    );
-
-    final everythingWasPushed = everythingWasCommitted &&
-        hasRemote &&
-        await _isPushed.get(
-          directory: directory,
-          ggLog: ggLog,
-        );
-
-    final headMessage = everythingWasCommitted
-        ? await _headMessage.get(directory: directory, ggLog: ggLog)
-        : '';
-
     // Execute commands.
     for (final command in commands) {
       await command.exec(directory: directory, ggLog: ggLog);
@@ -98,38 +58,6 @@ class CommandCluster extends DirCommand<void> {
     await _state.writeSuccess(
       directory: directory,
       key: stateKey,
-    );
-
-    // ....................................................
-    // If not everything was committed before, return here.
-    //  gg.json will be committed with the next commit.
-    if (!everythingWasCommitted) {
-      return;
-    }
-
-    // Check if .gg.json has changed.
-    // If not, return here.
-    final modifiedFiles = await _modifiedFiles.get(
-      directory: directory,
-      ggLog: ggLog,
-    );
-    if (modifiedFiles.isEmpty) {
-      return;
-    }
-
-    // ...........................
-    // To have a clean git history,
-    // we will ammend changes to .gg.json to the last commit.
-    // - If everything was committed and pushed, create a new commit
-    // - If everything was committed but not pushed, ammend to last commit
-    final message = everythingWasPushed ? 'Update .gg.json' : headMessage;
-
-    await _commit.commit(
-      directory: directory,
-      ggLog: ggLog,
-      doStage: true,
-      message: message,
-      ammend: !everythingWasPushed,
     );
   }
 
@@ -141,13 +69,6 @@ class CommandCluster extends DirCommand<void> {
   // ######################
 
   final GgState _state;
-  final IsPushed _isPushed;
-  final IsCommitted _isCommitted;
-  final ModifiedFiles _modifiedFiles;
-  final Commit _commit;
-  final HeadMessage _headMessage;
-  final HasRemote _hasRemote;
-  final CommitCount _commitCount;
 
   // ...........................................................................
   void _addArgs() {
@@ -188,16 +109,5 @@ class CommandCluster extends DirCommand<void> {
       ggLog: ggLog,
       useCarriageReturn: false,
     ).logStatus(GgStatusPrinterStatus.success);
-  }
-
-  // ...........................................................................
-  Future<void> _checkCommitsAvailable(Directory directory, GgLog ggLog) async {
-    final commitCount = await _commitCount.get(
-      directory: directory,
-      ggLog: ggLog,
-    );
-    if (commitCount == 0) {
-      throw Exception('There must be at least one commit in the repository.');
-    }
   }
 }

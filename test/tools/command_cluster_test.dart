@@ -15,25 +15,21 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late Directory tmp;
-  late Directory dLocal;
-  late Directory dRemote;
+  late Directory d;
   final messages = <String>[];
   final ggLog = messages.add;
   late IsCommitted isCommitted;
   late IsPushed isPushed;
   late IsUpgraded isUpgraded;
-  late CommitCount commitCount;
-  late ModifiedFiles modifiedFiles;
+
   late List<DirCommand<void>> commands;
   late CommandCluster commandCluster;
 
   setUp(() async {
     // Init basics
-    tmp = await Directory.systemTemp.createTemp();
-    dLocal = await initLocalGit(tmp);
-    dRemote = await initRemoteGit(tmp);
     messages.clear();
+    d = Directory.systemTemp.createTempSync();
+    await initGit(d);
 
     // Init commands
     isCommitted = MockIsCommitted();
@@ -50,26 +46,23 @@ void main() {
       shortDescription: 'Do all check commands work?',
       stateKey: 'my-check',
     );
-    commitCount = CommitCount(ggLog: messages.add);
-    modifiedFiles = ModifiedFiles(ggLog: messages.add);
 
     // Mock the commands
-    when(() => isCommitted.exec(directory: dLocal, ggLog: ggLog))
+    when(() => isCommitted.exec(directory: d, ggLog: ggLog))
         .thenAnswer((_) async {
       ggLog('isCommitted');
     });
-    when(() => isPushed.exec(directory: dLocal, ggLog: ggLog))
-        .thenAnswer((_) async {
+    when(() => isPushed.exec(directory: d, ggLog: ggLog)).thenAnswer((_) async {
       ggLog('isPushed');
     });
-    when(() => isUpgraded.exec(directory: dLocal, ggLog: ggLog))
+    when(() => isUpgraded.exec(directory: d, ggLog: ggLog))
         .thenAnswer((_) async {
       ggLog('isUpgraded');
     });
   });
 
   tearDown(() async {
-    await tmp.delete(recursive: true);
+    await d.delete(recursive: true);
   });
 
   group('CommandCluster', () {
@@ -81,35 +74,39 @@ void main() {
           // Should complain about missing commits
           late String exception;
           try {
-            await commandCluster.exec(directory: dLocal, ggLog: ggLog);
+            await commandCluster.exec(directory: d, ggLog: ggLog);
           } catch (e) {
             exception = e.toString();
           }
 
           expect(messages[0], contains('Do all check commands work?'));
+          expect(messages[1], 'isCommitted');
+          expect(messages[2], 'isPushed');
+          expect(messages[3], 'isUpgraded');
+
           expect(
             exception,
             'Exception: There must be at least one commit in the repository.',
           );
 
           // Make an initial commit
-          await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
+          await addAndCommitSampleFile(d, fileName: 'file1.txt');
 
           // Run command again
-          await commandCluster.exec(directory: dLocal, ggLog: ggLog);
-          expect(messages[1], contains('Do all check commands work?'));
-          expect(messages[2], 'isCommitted');
-          expect(messages[3], 'isPushed');
-          expect(messages[4], 'isUpgraded');
+          await commandCluster.exec(directory: d, ggLog: ggLog);
+          expect(messages[4], contains('Do all check commands work?'));
+          expect(messages[5], 'isCommitted');
+          expect(messages[6], 'isPushed');
+          expect(messages[7], 'isUpgraded');
 
           // Run the command a second time.
           // Should not run the commands again,
           // because force is false
           // and the commands were successful before.
-          await commandCluster.exec(directory: dLocal, ggLog: ggLog);
-          expect(messages[5], contains('Do all check commands work?'));
+          await commandCluster.exec(directory: d, ggLog: ggLog);
+          expect(messages[8], contains('Do all check commands work?'));
           expect(
-            messages[6],
+            messages[9],
             '✅ Everything is fine.',
           );
         });
@@ -120,10 +117,10 @@ void main() {
           'should run commands '
           'no matter if they were successful before or not',
           () async {
-            await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
+            await addAndCommitSampleFile(d, fileName: 'file1.txt');
 
             // Run the command a first time
-            await commandCluster.exec(directory: dLocal, ggLog: ggLog);
+            await commandCluster.exec(directory: d, ggLog: ggLog);
             expect(messages[0], contains('Do all check commands work?'));
             expect(messages[1], 'isCommitted');
             expect(messages[2], 'isPushed');
@@ -131,7 +128,7 @@ void main() {
 
             // Run the command a second first time
             await commandCluster.exec(
-              directory: dLocal,
+              directory: d,
               ggLog: ggLog,
               force: true,
             );
@@ -141,124 +138,6 @@ void main() {
             expect(messages[7], 'isUpgraded');
           },
         );
-      });
-
-      group('should ammend changes to .gg.json to the last commit', () {
-        test('when previous changes were not already pushed', () async {
-          // Let's create an inital commit
-          await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
-
-          // Check the inital commit count
-          final initialCommitCount = await commitCount.get(
-            directory: dLocal,
-            ggLog: ggLog,
-          );
-          expect(initialCommitCount, 1);
-
-          // file1.txt should be shown as modified in the last commit
-          expect(
-            await modifiedFiles.get(
-              directory: dLocal,
-              ggLog: ggLog,
-              force: true,
-            ),
-            ['file1.txt'],
-          );
-
-          // Run the command a first time
-          await commandCluster.exec(directory: dLocal, ggLog: ggLog);
-          expect(messages[0], contains('Do all check commands work?'));
-          expect(messages[1], 'isCommitted');
-          expect(messages[2], 'isPushed');
-          expect(messages[3], 'isUpgraded');
-
-          // Because we have not pushed the changes yet,
-          // changes to gg.json should be ammended to the last commit
-
-          // - i.e. commit count has not changed
-          final commitCount0 = await commitCount.get(
-            directory: dLocal,
-            ggLog: ggLog,
-          );
-          expect(commitCount0, 1);
-
-          // - i.e. file1.txt should be shown as modified in the last commit
-          expect(
-            await modifiedFiles.get(
-              directory: dLocal,
-              ggLog: ggLog,
-              force: true,
-            ),
-            ['.gg.json', 'file1.txt'],
-          );
-        });
-      });
-
-      group('should create a new commit', () {
-        test('when previous changes were already pushed', () async {
-          // Let's create an inital commit
-          await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
-
-          // Let's connect the local and remote repositories
-          await addRemoteToLocal(local: dLocal, remote: dRemote);
-
-          // Check the inital commit count
-          final initialCommitCount = await commitCount.get(
-            directory: dLocal,
-            ggLog: ggLog,
-          );
-          expect(initialCommitCount, 1);
-
-          // file1.txt should be shown as modified in the last commit
-          expect(
-            await modifiedFiles.get(
-              directory: dLocal,
-              ggLog: ggLog,
-              force: true,
-            ),
-            ['file1.txt'],
-          );
-
-          // Push the changes
-          await Process.run(
-            'git',
-            ['push'],
-            workingDirectory: dLocal.path,
-          );
-
-          // Run the command a first time
-          await commandCluster.exec(directory: dLocal, ggLog: ggLog);
-          expect(messages[0], contains('Do all check commands work?'));
-          expect(messages[1], 'Everything is pushed.');
-          expect(messages[2], 'isCommitted');
-          expect(messages[3], 'isPushed');
-          expect(messages[4], 'isUpgraded');
-
-          // Because we have pushed the changes already,
-          // changes to gg.json should be commited as a new commit
-
-          // - i.e. commit count has changed
-          final commitCount0 = await commitCount.get(
-            directory: dLocal,
-            ggLog: ggLog,
-          );
-          expect(commitCount0, 2);
-
-          // - i.e. only .gg.json should be shown as modified in the last commit
-          expect(
-            await modifiedFiles.get(
-              directory: dLocal,
-              ggLog: ggLog,
-              force: true,
-            ),
-            ['.gg.json'],
-          );
-
-          // Executing the cluster again should not change anything
-          await commandCluster.exec(directory: dLocal, ggLog: ggLog);
-          expect(messages[5], contains('Do all check commands work?'));
-          expect(messages[6], '✅ Everything is fine.');
-        });
       });
     });
   });

@@ -8,10 +8,9 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg/src/commands/can/can_commit.dart';
-import 'package:gg/src/commands/did/did_commit.dart';
 import 'package:gg/src/commands/do/do_commit.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_git/gg_git.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -19,136 +18,37 @@ import 'package:test/test.dart';
 void main() {
   late Directory d;
   late DoCommit doCommit;
-  late DidCommit didCommit;
-  late IsCommitted isCommitted;
-  late CanCommit canCommit;
-  late GgProcessWrapper processWrapper;
   final messages = <String>[];
   final ggLog = messages.add;
 
-  // ...........................................................................
-  void mockIsCommitted(bool value) {
-    when(
-      () => isCommitted.get(
-        directory: any(named: 'directory'),
-        ggLog: any(named: 'ggLog'),
-      ),
-    ).thenAnswer((_) async => value);
-  }
+  late CanCommit canCommit;
 
   // ...........................................................................
-  void mockDidCommitGet(bool value) {
-    when(
-      () => didCommit.get(
-        directory: any(named: 'directory'),
-        ggLog: any(named: 'ggLog'),
-      ),
-    ).thenAnswer((_) async => value);
-  }
+  void mockCanCommit() {
+    registerFallbackValue(d);
 
-  // ...........................................................................
-  void mockDidCommitSet(bool value) {
     when(
-      () => didCommit.set(
-        directory: any(named: 'directory'),
-      ),
-    ).thenAnswer((_) async {});
-  }
-
-  // ...........................................................................
-  void mockCanCommit(bool value) {
-    final mock = when(
       () => canCommit.exec(
         directory: any(named: 'directory'),
-        ggLog: any(named: 'ggLog'),
+        ggLog: ggLog,
+        force: null,
       ),
-    );
-    if (value) {
-      mock.thenAnswer((_) async {});
-    } else {
-      mock.thenThrow(Exception('Cannot commit.'));
-    }
+    ).thenAnswer((_) => Future.value());
   }
-
-  // ...........................................................................
-  void mockGitCommit() {
-    when(
-      () => processWrapper.run(
-        'git',
-        ['commit', '-m', 'my message'],
-        workingDirectory: d.path,
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        ProcessResult(0, 0, '', ''),
-      ),
-    );
-  }
-
-  // ...........................................................................
-  void mockGitAdd() {
-    when(
-      () => processWrapper.run(
-        'git',
-        ['add', '.'],
-        workingDirectory: d.path,
-      ),
-    ).thenAnswer(
-      (_) => Future.value(
-        ProcessResult(0, 0, '', ''),
-      ),
-    );
-  }
-
-  // ...........................................................................
-  void verifyDidCommitIsSet(bool value) {}
-
-  // ...........................................................................
-  void verifyDidGitAdd() {
-    verify(
-      () => processWrapper.run(
-        'git',
-        ['add', '.'],
-        workingDirectory: d.path,
-      ),
-    ).called(1);
-  }
-
-  // ...........................................................................
-  void verifyDidGitCommit() {
-    verify(
-      () => processWrapper.run(
-        'git',
-        ['commit', '-m', 'my message'],
-        workingDirectory: d.path,
-      ),
-    ).called(1);
-  }
-
-  // ...........................................................................
-  setUpAll(() {
-    registerFallbackValue(Directory.systemTemp);
-  });
 
   // ...........................................................................
   setUp(() async {
     messages.clear();
     d = await Directory.systemTemp.createTemp();
-    processWrapper = MockGgProcessWrapper();
-    didCommit = MockDidCommit();
-    isCommitted = MockIsCommitted();
+    await initGit(d);
+    await addAndCommitSampleFile(d);
     canCommit = MockCanCommit();
+    mockCanCommit();
 
     doCommit = DoCommit(
       ggLog: ggLog,
-      processWrapper: processWrapper,
-      didCommit: didCommit,
-      isCommitted: isCommitted,
       canCommit: canCommit,
     );
-
-    mockGitCommit();
-    mockGitAdd();
   });
 
   // ...........................................................................
@@ -157,250 +57,72 @@ void main() {
   });
 
   group('DoCommit', () {
-    group('exec', () {
-      group('should check, add and commit the current state,', () {
-        test('with mocked dependencies', () async {
-          // Assume not everything is commited yet.
-          mockIsCommitted(false);
-
-          // Assume didCommit is not yet set
-          mockDidCommitGet(false);
-          mockDidCommitSet(true);
-
-          // Assume everything is fine
-          mockCanCommit(true);
-
-          // Execute the command
+    group('exec(directory, ggLog, message)', () {
+      group('should log »Already committed and checked.«', () {
+        test('when the command is executed the second time', () async {
+          // Execute command the first time
           await doCommit.exec(
             directory: d,
             ggLog: ggLog,
-            message: 'my message',
+            message: 'My commit',
           );
 
-          // Expect didCommit is set to true
-          verifyDidCommitIsSet(true);
-          verifyDidGitAdd();
-          verifyDidGitCommit();
+          // Execute command the second time
+          await doCommit.exec(
+            directory: d,
+            ggLog: ggLog,
+            message: 'My commit 2',
+          );
+
+          expect(messages.last, yellow('Already committed and checked.'));
         });
       });
 
-      group('should do nothing', () {
-        test('if everything is already committed', () async {
-          // Assume everything is already committed
-          mockIsCommitted(true);
-
-          // Assume didCommit is not already set
-          mockDidCommitGet(true);
-
-          // Assume canCommit returns true
-          mockCanCommit(true);
-
-          // Execute the command
+      group('should log »Checks successful. Nothing to commit.«', () {
+        test(
+            'when the command is executed the first time '
+            'but nothing needs to be committed.', () async {
+          // Execute command the first time
           await doCommit.exec(
             directory: d,
             ggLog: ggLog,
-            message: 'my message',
+            message: 'My commit',
           );
 
-          // Did log the right message?
           expect(
             messages.last,
-            yellow('Everything committed.'),
-          );
-
-          // But no git commands are executed
-          verifyNever(
-            () => processWrapper.run(
-              'git',
-              ['add', '.'],
-              workingDirectory: d.path,
-            ),
-          );
-          verifyNever(
-            () => processWrapper.run(
-              'git',
-              ['commit', '-m', 'my message'],
-              workingDirectory: d.path,
-            ),
+            yellow('Checks successful. Nothing to commit.'),
           );
         });
       });
 
-      group('should just update didCommit state', () {
-        group('if eveything is already commited but', () {
-          test('but the state was not set before', () async {
-            // Assume everything is already committed
-            mockIsCommitted(true);
+      group('should commit and log »Checks successful. Commit successful.«',
+          () {
+        test(
+            'when the command is executed the first time '
+            'and uncommitted changes were committed.', () async {
+          // Add uncommitted file
+          await initUncommittedFile(d);
 
-            // Assume didCommit is not yet set
-            mockDidCommitGet(false);
+          // Execute command the first time
+          await doCommit.exec(
+            directory: d,
+            ggLog: ggLog,
+            message: 'My commit',
+          );
 
-            // Assume didCommit will be set to true
-            mockDidCommitSet(true);
-
-            // Assume canCommit returns true
-            mockCanCommit(true);
-
-            // Execute the command
-            await doCommit.exec(
-              directory: d,
-              ggLog: ggLog,
-              message: 'my message',
-            );
-
-            // Expect didCommit is set to true
-            verifyDidCommitIsSet(true);
-
-            // Did log the right message?
-            expect(
-              messages.last,
-              yellow('Everything committed. Storing state.'),
-            );
-
-            // No git commands should be called
-            verifyNever(
-              () => processWrapper.run(
-                'git',
-                ['add', '.'],
-                workingDirectory: d.path,
-              ),
-            );
-            verifyNever(
-              () => processWrapper.run(
-                'git',
-                ['commit', '-m', 'my message'],
-                workingDirectory: d.path,
-              ),
-            );
-          });
-        });
-      });
-
-      group('should take message from command line', () {
-        test('if not provided', () async {
-          // Assume not everything is commited yet.
-          mockIsCommitted(false);
-
-          // Assume didCommit is not yet set
-          mockDidCommitGet(false);
-          mockDidCommitSet(true);
-
-          // Assume everything is fine
-          mockCanCommit(true);
-
-          // Execute the command
-          final runner = CommandRunner<void>('test', 'test');
-          runner.addCommand(doCommit);
-
-          await runner.run([
-            'commit',
-            '--input',
-            d.path,
-            '-m',
-            'my message',
-          ]);
-
-          // Expect didCommit is set to true
-          verifyDidCommitIsSet(true);
-          verifyDidGitAdd();
-          verifyDidGitCommit();
+          expect(
+            messages.last,
+            yellow('Checks successful. Commit successful.'),
+          );
         });
       });
 
       group('should throw', () {
-        test('if canCommit throws', () async {
-          // Assume not everything is commited yet.
-          mockIsCommitted(false);
+        test('when »git add finishes with an error', () async {
+          // Mock the error
+          final processWrapper = MockGgProcessWrapper();
 
-          // Assume didCommit is not yet set
-          mockDidCommitGet(false);
-          mockDidCommitSet(true);
-
-          // Assume canCommit throws
-          mockCanCommit(false);
-
-          // Execute the command
-          expect(
-            () => doCommit.exec(
-              directory: d,
-              ggLog: ggLog,
-              message: 'my message',
-            ),
-            throwsA(isA<Exception>()),
-          );
-
-          // No git commands should be called
-          verifyNever(
-            () => processWrapper.run(
-              'git',
-              ['add', '.'],
-              workingDirectory: d.path,
-            ),
-          );
-          verifyNever(
-            () => processWrapper.run(
-              'git',
-              ['commit', '-m', 'my message'],
-              workingDirectory: d.path,
-            ),
-          );
-        });
-
-        test('if »git commit« fails', () async {
-          // Assume not everything is commited yet.
-          mockIsCommitted(false);
-
-          // Assume didCommit is not yet set
-          mockDidCommitGet(false);
-          mockDidCommitSet(true);
-
-          // Assume everything is fine
-          mockCanCommit(true);
-
-          // Assume git commit fails
-          when(
-            () => processWrapper.run(
-              'git',
-              ['commit', '-m', 'my message'],
-              workingDirectory: d.path,
-            ),
-          ).thenAnswer(
-            (_) => Future.value(
-              ProcessResult(1, 1, 'stdout', 'stderr'),
-            ),
-          );
-
-          // Execute the command
-          late String exception;
-
-          try {
-            await doCommit.exec(
-              directory: d,
-              ggLog: ggLog,
-              message: 'my message',
-            );
-          } catch (e) {
-            exception = e.toString();
-          }
-          expect(exception, contains('git commit failed: stderr'));
-
-          // Expect git add is called
-          verifyDidGitAdd();
-          verifyDidGitCommit();
-        });
-
-        test('if »git add« fails', () async {
-          // Assume not everything is commited yet.
-          mockIsCommitted(false);
-
-          // Assume didCommit is not yet set
-          mockDidCommitGet(false);
-          mockDidCommitSet(true);
-
-          // Assume everything is fine
-          mockCanCommit(true);
-
-          // Assume git commit fails
           when(
             () => processWrapper.run(
               'git',
@@ -409,46 +131,124 @@ void main() {
             ),
           ).thenAnswer(
             (_) => Future.value(
-              ProcessResult(1, 1, 'stdout', 'stderr'),
+              ProcessResult(
+                1,
+                1,
+                '',
+                'Some error',
+              ),
             ),
           );
 
+          mockCanCommit();
+
+          // Add an uncommitted file
+          await initUncommittedFile(d);
+
           // Execute the command
-          late String exception;
-
-          try {
-            await doCommit.exec(
-              directory: d,
-              ggLog: ggLog,
-              message: 'my message',
-            );
-          } catch (e) {
-            exception = e.toString();
-          }
-          expect(exception, contains('git add failed: stderr'));
-
-          // Expect git add is called
-          verifyDidGitAdd();
-        });
-
-        test('if directory is not a git dir', () async {
           final doCommit = DoCommit(
             ggLog: ggLog,
+            canCommit: canCommit,
+            processWrapper: processWrapper,
           );
 
           late String exception;
+
           try {
             await doCommit.exec(
               directory: d,
               ggLog: ggLog,
-              message: 'my message',
+              message: 'My commit',
             );
           } catch (e) {
             exception = e.toString();
           }
 
-          expect(exception, contains('is not a git repository'));
+          expect(exception, 'Exception: git add failed: Some error');
         });
+
+        test('when »git commit finishes with an error', () async {
+          // Make git commit failing
+          final processWrapper = MockGgProcessWrapper();
+          when(
+            () => processWrapper.run(
+              'git',
+              ['commit', '-m', 'My commit'],
+              workingDirectory: d.path,
+            ),
+          ).thenAnswer(
+            (_) => Future.value(
+              ProcessResult(
+                1,
+                1,
+                '',
+                'Some error',
+              ),
+            ),
+          );
+
+          // Make git add working
+          when(
+            () => processWrapper.run(
+              'git',
+              ['add', '.'],
+              workingDirectory: d.path,
+            ),
+          ).thenAnswer(
+            (_) => Future.value(
+              ProcessResult(
+                1,
+                0,
+                '',
+                '',
+              ),
+            ),
+          );
+
+          mockCanCommit();
+
+          // Add an uncommitted file
+          await initUncommittedFile(d);
+
+          // Execute the command
+          final doCommit = DoCommit(
+            ggLog: ggLog,
+            canCommit: canCommit,
+            processWrapper: processWrapper,
+          );
+
+          late String exception;
+
+          try {
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: 'My commit',
+            );
+          } catch (e) {
+            exception = e.toString();
+          }
+
+          expect(exception, 'Exception: git commit failed: Some error');
+        });
+      });
+
+      group('should allow to execute from cli', () {
+        test('with message', () async {
+          await initUncommittedFile(d);
+
+          final runner = CommandRunner<void>('test', 'test');
+          runner.addCommand(doCommit);
+          await runner.run(['commit', '-i', d.path, '-m', 'My commit']);
+          expect(
+            messages.last,
+            yellow('Checks successful. Commit successful.'),
+          );
+        });
+      });
+      test('should have 100% code coverage', () {
+        final instance = DoCommit(ggLog: ggLog);
+        expect(instance, isNotNull);
       });
     });
   });

@@ -32,6 +32,7 @@ void main() {
     messages.clear();
     d = Directory.systemTemp.createTempSync();
     await initGit(d);
+    await addAndCommitSampleFile(d);
     initDidCommand();
   });
 
@@ -98,7 +99,11 @@ void main() {
               key: 'did-do',
             );
 
-            await addAndCommitSampleFile(d, fileName: 'pubspec.yaml');
+            await addAndCommitSampleFile(
+              d,
+              fileName: 'another-file.txt',
+              content: 'another content',
+            );
 
             final success = await didCommand.get(
               directory: d,

@@ -14,31 +14,43 @@ import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late Directory d;
+  late Directory tmp;
+  late Directory dLocal;
+  late Directory dRemote;
   late GgState ggState;
   final messages = <String>[];
+  final ggLog = messages.add;
+  late CommitCount commitCount;
+  late ModifiedFiles modifiedFiles;
 
   // ...........................................................................
   void initCommand() {
     ggState = GgState(
       ggLog: messages.add,
     );
-    initGit(d);
+    initGit(dLocal);
   }
 
   // ...........................................................................
   setUp(() async {
     messages.clear();
-    d = Directory.systemTemp.createTempSync();
-    await initGit(d);
+    tmp = await Directory.systemTemp.createTemp();
+    dLocal = await initLocalGit(tmp);
+
+    await initGit(dLocal);
     initCommand();
-    await setPubspec(d, version: '1.0.0');
-    await commitPubspec(d);
+
+    dRemote = await initRemoteGit(tmp);
+    await setPubspec(dLocal, version: '1.0.0');
+    await commitPubspec(dLocal);
+
+    commitCount = CommitCount(ggLog: messages.add);
+    modifiedFiles = ModifiedFiles(ggLog: messages.add);
   });
 
   // ...........................................................................
-  tearDown(() {
-    d.deleteSync(recursive: true);
+  tearDown(() async {
+    await tmp.delete(recursive: true);
   });
 
   // ...........................................................................
@@ -46,22 +58,22 @@ void main() {
     group('writeSuccess(directory, success)', () {
       group('with success == true', () {
         test('should write last change hash to .gg.json', () async {
-          await addAndCommitSampleFile(d);
+          await addAndCommitSampleFile(dLocal);
 
           // Get last changes hash
           final hash = await LastChangesHash(ggLog: messages.add).get(
-            directory: d,
+            directory: dLocal,
             ggLog: messages.add,
           );
 
           // Set the state
           await ggState.writeSuccess(
-            directory: d,
+            directory: dLocal,
             key: 'can-commit',
           );
 
           // Check the file
-          final checkJson = File('${d.path}/.gg.json');
+          final checkJson = File('${dLocal.path}/.gg.json');
           await expectLater(await checkJson.exists(), isTrue);
           final contentsString = await checkJson.readAsString();
           final contents = json.decode(contentsString);
@@ -71,15 +83,160 @@ void main() {
           );
         });
       });
+
+      group('should ammend changes to .gg.json to the last commit', () {
+        test('when previous changes were not already pushed', () async {
+          // Let's create an inital commit
+          await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
+
+          // Check the inital commit count
+          final initialCommitCount = await commitCount.get(
+            directory: dLocal,
+            ggLog: ggLog,
+          );
+          expect(initialCommitCount, 2);
+
+          // file1.txt should be shown as modified in the last commit
+          expect(
+            await modifiedFiles.get(
+              directory: dLocal,
+              ggLog: ggLog,
+              force: true,
+            ),
+            ['file1.txt'],
+          );
+
+          // Run the command a first time
+          await ggState.writeSuccess(
+            directory: dLocal,
+            key: 'isCommitted',
+          );
+
+          // Because we have not pushed the changes yet,
+          // changes to gg.json should be ammended to the last commit
+
+          // - i.e. commit count has not changed
+          final commitCount0 = await commitCount.get(
+            directory: dLocal,
+            ggLog: ggLog,
+          );
+          expect(commitCount0, 2);
+
+          // - i.e. file1.txt should be shown as modified in the last commit
+          expect(
+            await modifiedFiles.get(
+              directory: dLocal,
+              ggLog: ggLog,
+              force: true,
+            ),
+            ['.gg.json', 'file1.txt'],
+          );
+        });
+      });
+
+      group('should create a new commit', () {
+        test('when previous changes were already pushed', () async {
+          // Let's create an inital commit
+          await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
+
+          // Let's connect the local and remote repositories
+          await addRemoteToLocal(local: dLocal, remote: dRemote);
+
+          // Check the inital commit count
+          final initialCommitCount = await commitCount.get(
+            directory: dLocal,
+            ggLog: ggLog,
+          );
+          expect(initialCommitCount, 2);
+
+          // file1.txt should be shown as modified in the last commit
+          expect(
+            await modifiedFiles.get(
+              directory: dLocal,
+              ggLog: ggLog,
+              force: true,
+            ),
+            ['file1.txt'],
+          );
+
+          // Push the changes
+          await Process.run(
+            'git',
+            ['push'],
+            workingDirectory: dLocal.path,
+          );
+
+          // Run the command a first time
+          await ggState.writeSuccess(
+            directory: dLocal,
+            key: 'isCommitted',
+          );
+
+          // Because we have pushed the changes already,
+          // changes to gg.json should be commited as a new commit
+
+          // - i.e. commit count has changed
+          final commitCount0 = await commitCount.get(
+            directory: dLocal,
+            ggLog: ggLog,
+          );
+          expect(commitCount0, 3);
+
+          // - i.e. only .gg.json should be shown as modified in the last commit
+          expect(
+            await modifiedFiles.get(
+              directory: dLocal,
+              ggLog: ggLog,
+              force: true,
+            ),
+            ['.gg.json'],
+          );
+
+          // Executing the cluster again should not change anything
+          await ggState.writeSuccess(
+            directory: dLocal,
+            key: 'isCommitted',
+          );
+
+          final commitCount1 = await commitCount.get(
+            directory: dLocal,
+            ggLog: ggLog,
+          );
+          expect(commitCount1, 3);
+        });
+      });
+
+      group('should throw', () {
+        test('if nothing is comitted', () async {
+          await tmp.delete(recursive: true);
+          tmp = await Directory.systemTemp.createTemp();
+          await initGit(tmp);
+
+          expect(
+            () async => await ggState.writeSuccess(
+              directory: tmp,
+              key: 'isCommitted',
+            ),
+            throwsA(
+              isA<Exception>().having(
+                (e) => e.toString(),
+                'toString()',
+                'Exception: '
+                    'There must be at least one commit in the repository.',
+              ),
+            ),
+          );
+        });
+      });
     });
 
     group('readSuccess(directory, key, ggLog)', () {
       group('should return', () {
         group('false', () {
           test('if no .gg.json exists', () async {
-            expect(await File('${d.path}/.gg.json').exists(), isFalse);
+            expect(await File('${dLocal.path}/.gg.json').exists(), isFalse);
             final result = await ggState.readSuccess(
-              directory: d,
+              directory: dLocal,
               ggLog: messages.add,
               key: 'can-commit',
             );
@@ -87,10 +244,10 @@ void main() {
           });
 
           test('if .gg.json is empty', () async {
-            File('${d.path}/.gg.json').writeAsStringSync('{}');
+            File('${dLocal.path}/.gg.json').writeAsStringSync('{}');
 
             final result = await ggState.readSuccess(
-              directory: d,
+              directory: dLocal,
               ggLog: messages.add,
               key: 'can-commit',
             );
@@ -100,15 +257,15 @@ void main() {
           test('if last success hash is not current hash', () async {
             // Set the state
             await ggState.writeSuccess(
-              directory: d,
+              directory: dLocal,
               key: 'can-commit',
             );
 
             // Change the file
-            await addAndCommitSampleFile(d);
+            await addAndCommitSampleFile(dLocal);
 
             final result = await ggState.readSuccess(
-              directory: d,
+              directory: dLocal,
               ggLog: messages.add,
               key: 'can-commit',
             );
@@ -119,28 +276,28 @@ void main() {
         group('true', () {
           test('if last success hash is current hash', () async {
             // Commit something
-            await addAndCommitSampleFile(d, fileName: 'file0.txt');
+            await addAndCommitSampleFile(dLocal, fileName: 'file0.txt');
 
             // Write success after everything is committed
             await ggState.writeSuccess(
-              directory: d,
+              directory: dLocal,
               key: 'can-commit',
             );
 
             // Read succes -> It should be true
             final result = await ggState.readSuccess(
-              directory: d,
+              directory: dLocal,
               ggLog: messages.add,
               key: 'can-commit',
             );
             expect(result, isTrue);
 
             // Make a modification
-            await File('${d.path}/file0.txt').writeAsString('modified');
+            await File('${dLocal.path}/file0.txt').writeAsString('modified');
 
             // Read success -> It should be false
             final result2 = await ggState.readSuccess(
-              directory: d,
+              directory: dLocal,
               ggLog: messages.add,
               key: 'can-commit',
             );
@@ -148,13 +305,13 @@ void main() {
 
             // Write success again
             await ggState.writeSuccess(
-              directory: d,
+              directory: dLocal,
               key: 'can-commit',
             );
 
             // Read success -> It should be true
             final result3 = await ggState.readSuccess(
-              directory: d,
+              directory: dLocal,
               ggLog: messages.add,
               key: 'can-commit',
             );
@@ -162,11 +319,11 @@ void main() {
 
             // Commit the last changes.
             // This should not change the success state.
-            await commitFile(d, 'file0.txt');
+            await commitFile(dLocal, 'file0.txt');
 
             // Read success -> It should be true
             final result4 = await ggState.readSuccess(
-              directory: d,
+              directory: dLocal,
               ggLog: messages.add,
               key: 'can-commit',
             );

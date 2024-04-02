@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/commands/did/did_commit.dart';
+import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
@@ -25,10 +26,11 @@ class DoCommit extends DirCommand<void> {
     IsCommitted? isCommitted,
     CanCommit? canCommit,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
+    GgState? state,
   })  : _processWrapper = processWrapper,
-        _didCommit = didCommit ?? DidCommit(ggLog: ggLog),
         _isCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
-        _canCommit = canCommit ?? CanCommit(ggLog: ggLog) {
+        _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
+        state = state ?? GgState(ggLog: ggLog) {
     _addParam();
   }
 
@@ -50,9 +52,14 @@ class DoCommit extends DirCommand<void> {
 
     // Is didCommit already set?
     if (isCommitted) {
-      final isDone = await _didCommit.get(directory: directory, ggLog: ggLog);
+      final isDone = await state.readSuccess(
+        directory: directory,
+        key: stateKey,
+        ggLog: ggLog,
+      );
+
       if (isDone) {
-        ggLog(yellow('Everything committed.'));
+        ggLog(yellow('Already committed and checked.'));
         return;
       }
     }
@@ -68,24 +75,32 @@ class DoCommit extends DirCommand<void> {
       message ??= argResults!['message'] as String;
       await _add(directory, message);
       await _commit(directory, message);
-      ggLog(yellow('Everything is committed.'));
+      ggLog(yellow('Checks successful. Commit successful.'));
     } else {
-      ggLog(yellow('Everything committed. Storing state.'));
+      ggLog(yellow('Checks successful. Nothing to commit.'));
     }
 
     // Save the state
-    await _didCommit.set(directory: directory);
+    await state.writeSuccess(
+      directory: directory,
+      key: stateKey,
+    );
   }
 
-  // ...........................................................................
-  final GgProcessWrapper _processWrapper;
-  final IsCommitted _isCommitted;
-  final DidCommit _didCommit;
-  final CanCommit _canCommit;
+  /// The state used to save the state of the command
+  final GgState state;
+
+  /// The key used to save the state of the command
+  final String stateKey = 'doCommit';
 
   // ######################
   // Private
   // ######################
+
+  // ...........................................................................
+  final GgProcessWrapper _processWrapper;
+  final IsCommitted _isCommitted;
+  final CanCommit _canCommit;
 
   // ...........................................................................
   void _addParam() {
