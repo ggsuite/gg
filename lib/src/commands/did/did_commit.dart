@@ -16,7 +16,7 @@ class DidCommit extends DidCommand {
     super.description = 'Informs if everything is committed.',
     super.question = 'Did commit?',
     super.suggestion = 'Please run »gg do commit« and try again.',
-    super.stateKey = 'did-commit',
+    super.stateKey = 'didCommit',
   });
 }
 
