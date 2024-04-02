@@ -20,6 +20,7 @@ class CanCommit extends CommandCluster {
     super.name = 'commit',
     super.description = 'Checks if code is ready to commit.',
     super.shortDescription = 'Can commit?',
+    super.stateKey = 'canCommit',
   }) : super(commands: _checks(checks, ggLog));
 
   // ...........................................................................

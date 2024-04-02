@@ -18,6 +18,7 @@ class CanCelebrate extends CommandCluster {
     super.name = 'celebrate',
     super.description =
         'Checks if everything is done and we can start the party.',
+    super.stateKey = 'canCelebrate',
     super.shortDescription = 'Can celebrate?',
   }) : super(commands: _checks(checkCommands, ggLog));
 

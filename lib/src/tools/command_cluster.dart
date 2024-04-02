@@ -21,6 +21,7 @@ class CommandCluster extends DirCommand<void> {
     required this.commands,
     required super.name,
     required super.description,
+    required this.stateKey,
     required this.shortDescription,
     GgState? state,
     IsPushed? isPushed,
@@ -44,6 +45,9 @@ class CommandCluster extends DirCommand<void> {
   // ...........................................................................
   /// The short description printed at the beginning of each command
   final String shortDescription;
+
+  /// The state key used to save the state of the command cluster
+  final String stateKey;
 
   // ...........................................................................
   @override
@@ -93,7 +97,7 @@ class CommandCluster extends DirCommand<void> {
     // Save success
     await _state.writeSuccess(
       directory: directory,
-      key: name,
+      key: stateKey,
     );
 
     // ....................................................
@@ -160,7 +164,7 @@ class CommandCluster extends DirCommand<void> {
   Future<bool> _wasSuccessfulBefore(Directory directory, GgLog ggLog) async {
     return await _state.readSuccess(
       directory: directory,
-      key: name,
+      key: stateKey,
       ggLog: ggLog,
     );
   }

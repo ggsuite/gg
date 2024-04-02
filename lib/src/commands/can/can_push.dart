@@ -18,6 +18,7 @@ class CanPush extends CommandCluster {
     super.name = 'push',
     super.shortDescription = 'Can push?',
     super.description = 'Checks if code is ready to push.',
+    super.stateKey = 'canPush',
   }) : super(commands: _checks(checkCommands, ggLog));
 
   // ...........................................................................

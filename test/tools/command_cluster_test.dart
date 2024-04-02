@@ -48,6 +48,7 @@ void main() {
       name: 'my-check',
       description: 'A more detailed description.',
       shortDescription: 'Do all check commands work?',
+      stateKey: 'my-check',
     );
     commitCount = CommitCount(ggLog: messages.add);
     modifiedFiles = ModifiedFiles(ggLog: messages.add);

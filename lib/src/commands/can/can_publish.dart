@@ -18,6 +18,7 @@ class CanPublish extends CommandCluster {
     super.name = 'publish',
     super.description = 'Checks if code is ready to be published.',
     super.shortDescription = 'Can publish?',
+    super.stateKey = 'canPublish',
   }) : super(commands: _checks(checks, ggLog));
 
   // ...........................................................................
