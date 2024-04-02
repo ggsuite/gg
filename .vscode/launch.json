@@ -10,8 +10,8 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
-      "args": ["do", "commit", "-m", "test", "-i", "${workspaceFolder}"],
-      "cwd": "${workspaceFolder}"
+      "args": ["can", "commit"],
+      "cwd": "${workspaceFolder}/../aud_tone_selection"
     },
     {
       "name": "Current File",

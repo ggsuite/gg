@@ -50,15 +50,19 @@ class CommandCluster extends DirCommand<void> {
     }
 
     // Execute commands.
-    for (final command in commands) {
-      await command.exec(directory: directory, ggLog: ggLog);
-    }
+    try {
+      for (final command in commands) {
+        await command.exec(directory: directory, ggLog: ggLog);
+      }
 
-    // Save success
-    await _state.writeSuccess(
-      directory: directory,
-      key: stateKey,
-    );
+      // Save success
+      await _state.writeSuccess(
+        directory: directory,
+        key: stateKey,
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// The commands to run
