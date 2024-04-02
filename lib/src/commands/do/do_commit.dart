@@ -72,7 +72,7 @@ class DoCommit extends DirCommand<void> {
 
     // Execute the commit
     if (!isCommitted) {
-      message ??= argResults!['message'] as String;
+      message ??= _messageFromArgs();
       await _add(directory, message);
       await _commit(directory, message);
       ggLog(yellow('Checks successful. Commit successful.'));
@@ -135,6 +135,21 @@ class DoCommit extends DirCommand<void> {
 
     if (result.exitCode != 0) {
       throw Exception('git add failed: ${result.stderr}');
+    }
+  }
+
+  // ...........................................................................
+  String _messageFromArgs() {
+    try {
+      final message = argResults!['message'] as String;
+      return message;
+    } catch (e) {
+      throw Exception(
+        red('Message missing.\n') +
+            darkGray('Run command again with ') +
+            yellow('--message ') +
+            blue('"your message"'),
+      );
     }
   }
 }

@@ -20,7 +20,7 @@ void main() {
     didCommand = DidCommand(
       name: 'do',
       description: 'description',
-      question: 'Did do?',
+      shortDescription: 'Did do?',
       suggestion: 'Please run »gg do«.',
       ggLog: messages.add,
       stateKey: 'did-do',

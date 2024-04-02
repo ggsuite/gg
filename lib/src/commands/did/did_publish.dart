@@ -12,7 +12,7 @@ class DidPublish extends DidCommand {
   DidPublish({
     super.name = 'publish',
     super.description = 'Informs if everything is published.',
-    super.question = 'Did publish',
+    super.shortDescription = 'Did publish',
     super.suggestion = 'Please run »gg do publish«.',
     super.stateKey = 'did-publish',
     required super.ggLog,

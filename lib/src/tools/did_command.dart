@@ -20,7 +20,7 @@ class DidCommand extends DirCommand<void> {
   DidCommand({
     required super.name,
     required super.description,
-    required this.question,
+    required this.shortDescription,
     required this.suggestion,
     required super.ggLog,
     required this.stateKey,
@@ -37,7 +37,7 @@ class DidCommand extends DirCommand<void> {
     final messages = <String>[];
 
     final result = await GgStatusPrinter<bool>(
-      message: question,
+      message: shortDescription,
       ggLog: ggLog,
     ).logTask(
       task: () => get(ggLog: messages.add, directory: directory),
@@ -81,7 +81,7 @@ class DidCommand extends DirCommand<void> {
   }
 
   /// The question to be answered by the did command
-  final String question;
+  final String shortDescription;
 
   /// The suggestions shown when the state was not successful
   final String suggestion;

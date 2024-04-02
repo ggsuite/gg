@@ -14,8 +14,8 @@ class DidCommit extends DidCommand {
     required super.ggLog,
     super.name = 'commit',
     super.description = 'Informs if everything is committed.',
-    super.question = 'Did commit?',
-    super.suggestion = 'Please run »gg do commit« and try again.',
+    super.shortDescription = 'Did commit',
+    super.suggestion = 'Not committed yet. Please run »gg do commit«.',
     super.stateKey = 'doCommit',
   });
 }

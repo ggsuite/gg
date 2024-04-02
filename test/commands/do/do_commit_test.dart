@@ -231,6 +231,49 @@ void main() {
 
           expect(exception, 'Exception: git commit failed: Some error');
         });
+
+        test('when no message is provided', () async {
+          // Add an uncommitted file
+          await initUncommittedFile(d);
+
+          // Execute the command
+          final doCommit = DoCommit(
+            ggLog: ggLog,
+            canCommit: canCommit,
+          );
+
+          late String exception;
+
+          try {
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: null, // no message
+            );
+          } catch (e) {
+            exception = e.toString();
+          }
+
+          expect(
+            exception,
+            contains(red('Message missing.\n')),
+          );
+
+          expect(
+            exception,
+            contains(darkGray('Run command again with ')),
+          );
+
+          expect(
+            exception,
+            contains(yellow('--message ')),
+          );
+
+          expect(
+            exception,
+            contains(blue('"your message"')),
+          );
+        });
       });
 
       group('should allow to execute from cli', () {

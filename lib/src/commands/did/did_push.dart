@@ -12,7 +12,7 @@ class DidPush extends DidCommand {
   DidPush({
     super.name = 'push',
     super.description = 'Informs if everything is pushed.',
-    super.question = 'Did run »gg do push?',
+    super.shortDescription = 'Did run »gg do push?',
     super.suggestion = 'Please run »gg do push«.',
     super.stateKey = 'did-push',
     required super.ggLog,
