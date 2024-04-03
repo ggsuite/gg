@@ -11,6 +11,7 @@ import 'package:gg/src/commands/can/can_publish.dart';
 import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_publish/gg_publish.dart';
+import 'package:gg_version/gg_version.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -24,6 +25,7 @@ void main() {
   late CanPublish canPublish;
   late Publish publish;
   late GgState state;
+  late AddVersionTag addVersionTag;
 
   // ...........................................................................
   void mockCanPublish(bool success) => when(
@@ -71,6 +73,15 @@ void main() {
         ggLog('State was written for key "doPublish".');
       });
 
+  void mockAddVersionTag() => when(
+        () => addVersionTag.exec(
+          directory: d,
+          ggLog: ggLog,
+        ),
+      ).thenAnswer((_) async {
+        ggLog('Version tag was added.');
+      });
+
   // ...........................................................................
   setUp(() async {
     d = await Directory.systemTemp.createTemp();
@@ -79,13 +90,22 @@ void main() {
     canPublish = MockCanPublish();
     publish = MockPublish();
     state = MockGgState();
+    addVersionTag = MockAddVersionTag();
 
     doPublish = DoPublish(
       ggLog: ggLog,
       canPublish: canPublish,
       publish: publish,
       state: state,
+      addVersionTag: addVersionTag,
     );
+
+    // Mock the method to pass all methods by default
+    mockCanPublish(true);
+    mockWasPreviouslySuccessful(false);
+    mockPublishIsSuccessful(true);
+    mockWriteSuccess();
+    mockAddVersionTag();
   });
 
   tearDown(() async {
@@ -103,21 +123,27 @@ void main() {
       });
     });
 
-    group('should check if publishing is possible', () {
-      test('and publish when tests pass', () async {
-        mockCanPublish(true);
-        mockWasPreviouslySuccessful(false);
-        mockPublishIsSuccessful(true);
-        mockWriteSuccess();
-
-        await doPublish.exec(directory: d, ggLog: ggLog);
-        expect(messages[0], 'Can publish did pass.');
-        expect(messages[1], 'Publishing was successful.');
-        expect(messages[2], 'State was written for key "doPublish".');
-      });
+    test('should check if publishing is possible', () async {
+      await doPublish.exec(directory: d, ggLog: ggLog);
+      expect(messages[0], 'Can publish did pass.');
     });
 
-    test('should have a code coverage of 1005', () {
+    test('should publish when tests pass', () async {
+      await doPublish.exec(directory: d, ggLog: ggLog);
+      expect(messages[1], 'Publishing was successful.');
+    });
+
+    test('should write the success state', () async {
+      await doPublish.exec(directory: d, ggLog: ggLog);
+      expect(messages[2], 'State was written for key "doPublish".');
+    });
+
+    test('should add version tag after successful publishing', () async {
+      await doPublish.exec(directory: d, ggLog: ggLog);
+      expect(messages[3], 'Version tag was added.');
+    });
+
+    test('should have a code coverage of 100%', () {
       expect(DoPublish(ggLog: ggLog), isNotNull);
     });
   });

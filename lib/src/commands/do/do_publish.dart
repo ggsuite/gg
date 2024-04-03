@@ -12,6 +12,7 @@ import 'package:gg_args/gg_args.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
+import 'package:gg_version/gg_version.dart';
 
 /// Publishes the current directory.
 class DoPublish extends DirCommand<void> {
@@ -23,9 +24,11 @@ class DoPublish extends DirCommand<void> {
     CanPublish? canPublish,
     Publish? publish,
     GgState? state,
+    AddVersionTag? addVersionTag,
   })  : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
         _publish = publish ?? Publish(ggLog: ggLog),
-        _state = state ?? GgState(ggLog: ggLog);
+        _state = state ?? GgState(ggLog: ggLog),
+        _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog);
 
   // ...........................................................................
   /// The key used to save the state of the command
@@ -69,6 +72,12 @@ class DoPublish extends DirCommand<void> {
       directory: directory,
       key: stateKey,
     );
+
+    // Add git version tag
+    await _addVersionTag.exec(
+      directory: directory,
+      ggLog: ggLog,
+    );
   }
 
   // ######################
@@ -79,4 +88,5 @@ class DoPublish extends DirCommand<void> {
   final Publish _publish;
   final CanPublish _canPublish;
   final GgState _state;
+  final AddVersionTag _addVersionTag;
 }
