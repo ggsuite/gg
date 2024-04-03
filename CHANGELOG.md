@@ -1,8 +1,12 @@
 # Change Log
 
-## 1.0.3
+## 1.0.4
 
-- Work in progress
+- gg can commit
+- gg do commit
+- gg did commit
+- gg can push
+- gg do push
 
 ## 1.0.2
 
