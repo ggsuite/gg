@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.7
+
+- Fix issue with creating tags
+
 ## 1.0.6
 
 - Push to remote after publishing

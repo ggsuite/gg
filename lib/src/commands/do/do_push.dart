@@ -78,7 +78,7 @@ class DoPush extends DirCommand<void> {
     // Execute the commit
     if (!isPushedViaGit) {
       force ??= _forceFromArgs();
-      await _gitPush(directory, force);
+      await gitPush(directory: directory, force: force);
       ggLog(yellow('Checks successful. Pushed successful.'));
     } else {
       ggLog(yellow('Checks successful. Nothing to push.'));
@@ -112,7 +112,11 @@ class DoPush extends DirCommand<void> {
   }
 
   // ...........................................................................
-  Future<void> _gitPush(Directory directory, bool force) async {
+  /// Pushes the current state to the remote.
+  Future<void> gitPush({
+    required Directory directory,
+    required bool force,
+  }) async {
     final result = await _processWrapper.run(
       'git',
       ['push', if (force) '-f'],

@@ -31,7 +31,7 @@ class DoPublish extends DirCommand<void> {
         _publish = publish ?? Publish(ggLog: ggLog),
         _state = state ?? GgState(ggLog: ggLog),
         _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog),
-        _doPUsh = doPush ?? DoPush(ggLog: ggLog);
+        _doPush = doPush ?? DoPush(ggLog: ggLog);
 
   // ...........................................................................
   /// The key used to save the state of the command
@@ -83,9 +83,9 @@ class DoPublish extends DirCommand<void> {
     );
 
     // Push to remote
-    await _doPUsh.exec(
+    await _doPush.gitPush(
       directory: directory,
-      ggLog: ggLog,
+      force: false,
     );
   }
 
@@ -98,5 +98,5 @@ class DoPublish extends DirCommand<void> {
   final CanPublish _canPublish;
   final GgState _state;
   final AddVersionTag _addVersionTag;
-  final DoPush _doPUsh;
+  final DoPush _doPush;
 }

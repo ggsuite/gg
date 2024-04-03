@@ -84,9 +84,9 @@ void main() {
       });
 
   void mockDoPush() => when(
-        () => doPush.exec(
+        () => doPush.gitPush(
           directory: d,
-          ggLog: ggLog,
+          force: false,
         ),
       ).thenAnswer((_) async {
         ggLog('Did push.');
