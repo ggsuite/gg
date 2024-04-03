@@ -7,7 +7,6 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
-import 'package:gg/src/commands/can/can_push.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_publish/gg_publish.dart';

@@ -102,7 +102,7 @@ void main() {
             'when the command is executed the first time '
             'and uncommitted changes were committed.', () async {
           // Add uncommitted file
-          await initUncommittedFile(d);
+          await addFileWithoutCommitting(d);
 
           // Execute command the first time
           await doCommit.exec(
@@ -143,7 +143,7 @@ void main() {
           mockCanCommit();
 
           // Add an uncommitted file
-          await initUncommittedFile(d);
+          await addFileWithoutCommitting(d);
 
           // Execute the command
           final doCommit = DoCommit(
@@ -208,7 +208,7 @@ void main() {
           mockCanCommit();
 
           // Add an uncommitted file
-          await initUncommittedFile(d);
+          await addFileWithoutCommitting(d);
 
           // Execute the command
           final doCommit = DoCommit(
@@ -234,7 +234,7 @@ void main() {
 
         test('when no message is provided', () async {
           // Add an uncommitted file
-          await initUncommittedFile(d);
+          await addFileWithoutCommitting(d);
 
           // Execute the command
           final doCommit = DoCommit(
@@ -278,7 +278,7 @@ void main() {
 
       group('should allow to execute from cli', () {
         test('with message', () async {
-          await initUncommittedFile(d);
+          await addFileWithoutCommitting(d);
 
           final runner = CommandRunner<void>('test', 'test');
           runner.addCommand(doCommit);

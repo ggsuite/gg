@@ -36,4 +36,4 @@ class CanPush extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockPush extends Mock implements CanPush {}
+class MockCanPush extends Mock implements CanPush {}

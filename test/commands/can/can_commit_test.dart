@@ -7,7 +7,6 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
-import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_test/gg_test.dart';

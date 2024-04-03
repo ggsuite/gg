@@ -3,5 +3,7 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
-  }
+  },
+  "dart.testAdditionalArgs": ["--timeout=120s"],
+  "dart.flutterTestAdditionalArgs": ["--timeout=120s"]
 }

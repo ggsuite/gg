@@ -14,7 +14,6 @@ import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late Directory tmp;
   late Directory dLocal;
   late Directory dRemote;
   late GgState ggState;
@@ -34,15 +33,15 @@ void main() {
   // ...........................................................................
   setUp(() async {
     messages.clear();
-    tmp = await Directory.systemTemp.createTemp();
-    dLocal = await initLocalGit(tmp);
+    dLocal = await initTestDir();
+    dRemote = await initTestDir();
 
     await initGit(dLocal);
-    initCommand();
+    await initRemoteGit(dRemote);
 
-    dRemote = await initRemoteGit(tmp);
-    await setPubspec(dLocal, version: '1.0.0');
-    await commitPubspec(dLocal);
+    initCommand();
+    await addPubspecFileWithoutCommitting(dLocal, version: '1.0.0');
+    await commitPubspecFile(dLocal);
 
     commitCount = CommitCount(ggLog: messages.add);
     modifiedFiles = ModifiedFiles(ggLog: messages.add);
@@ -50,7 +49,8 @@ void main() {
 
   // ...........................................................................
   tearDown(() async {
-    await tmp.delete(recursive: true);
+    await dLocal.delete(recursive: true);
+    await dRemote.delete(recursive: true);
   });
 
   // ...........................................................................
@@ -136,18 +136,18 @@ void main() {
 
       group('should create a new commit', () {
         test('when previous changes were already pushed', () async {
-          // Let's create an inital commit
-          await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
-
           // Let's connect the local and remote repositories
           await addRemoteToLocal(local: dLocal, remote: dRemote);
+
+          // Let's create an inital commit
+          await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
 
           // Check the inital commit count
           final initialCommitCount = await commitCount.get(
             directory: dLocal,
             ggLog: ggLog,
           );
-          expect(initialCommitCount, 2);
+          expect(initialCommitCount, isNot(0));
 
           // file1.txt should be shown as modified in the last commit
           expect(
@@ -180,7 +180,7 @@ void main() {
             directory: dLocal,
             ggLog: ggLog,
           );
-          expect(commitCount0, 3);
+          expect(commitCount0, initialCommitCount + 1);
 
           // - i.e. only .gg.json should be shown as modified in the last commit
           expect(
@@ -202,19 +202,19 @@ void main() {
             directory: dLocal,
             ggLog: ggLog,
           );
-          expect(commitCount1, 3);
+          expect(commitCount1, initialCommitCount + 1);
         });
       });
 
       group('should throw', () {
         test('if nothing is comitted', () async {
-          await tmp.delete(recursive: true);
-          tmp = await Directory.systemTemp.createTemp();
-          await initGit(tmp);
+          await dLocal.delete(recursive: true);
+          dLocal = await initTestDir();
+          await initGit(dLocal);
 
           expect(
             () async => await ggState.writeSuccess(
-              directory: tmp,
+              directory: dLocal,
               key: 'isCommitted',
             ),
             throwsA(

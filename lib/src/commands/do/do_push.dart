@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:gg/src/commands/can/can_commit.dart';
+import 'package:gg/src/commands/can/can_push.dart';
 import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
@@ -14,20 +14,20 @@ import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 
-/// Does a commit of the current directory.
-class DoCommit extends DirCommand<void> {
+/// Pushes the current state.
+class DoPush extends DirCommand<void> {
   /// Constructor
-  DoCommit({
+  DoPush({
     required super.ggLog,
-    super.name = 'commit',
-    super.description = 'Commits the current directory.',
-    IsCommitted? isCommitted,
-    CanCommit? canCommit,
+    super.name = 'push',
+    super.description = 'Pushes the current state.',
+    IsPushed? isPushed,
+    CanPush? canPush,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     GgState? state,
   })  : _processWrapper = processWrapper,
-        _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
-        _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
+        _isPushedViaGit = isPushed ?? IsPushed(ggLog: ggLog),
+        _canPush = canPush ?? CanPush(ggLog: ggLog),
         state = state ?? GgState(ggLog: ggLog) {
     _addParam();
   }
@@ -37,19 +37,19 @@ class DoCommit extends DirCommand<void> {
   Future<void> exec({
     required Directory directory,
     required GgLog ggLog,
-    String? message,
+    bool? force,
   }) async {
     // Does directory exist?
     await check(directory: directory);
 
-    // Is everything committed?
-    final isCommittedViaGit = await _isGitCommitted.get(
+    // Is everything pushed?
+    final isPushedViaGit = await _isPushedViaGit.get(
       directory: directory,
       ggLog: ggLog,
     );
 
-    // Is didCommit already set?
-    if (isCommittedViaGit) {
+    // Is didPush already set?
+    if (isPushedViaGit) {
       final isDone = await state.readSuccess(
         directory: directory,
         key: stateKey,
@@ -57,39 +57,38 @@ class DoCommit extends DirCommand<void> {
       );
 
       if (isDone) {
-        ggLog(yellow('Already committed and checked.'));
+        ggLog(yellow('Already checked and pushed.'));
         return;
       }
     }
 
     // Is everything fine?
-    await _canCommit.exec(
+    await _canPush.exec(
       directory: directory,
       ggLog: ggLog,
     );
 
-    // Execute the commit
-    if (!isCommittedViaGit) {
-      message ??= _messageFromArgs();
-      await _add(directory, message);
-      await _commit(directory, message);
-      ggLog(yellow('Checks successful. Commit successful.'));
-    } else {
-      ggLog(yellow('Checks successful. Nothing to commit.'));
-    }
-
-    // Save the state
+    // Write success before pushing
     await state.writeSuccess(
       directory: directory,
       key: stateKey,
     );
+
+    // Execute the commit
+    if (!isPushedViaGit) {
+      force ??= _forceFromArgs();
+      await _gitPush(directory, force);
+      ggLog(yellow('Checks successful. Pushed successful.'));
+    } else {
+      ggLog(yellow('Checks successful. Nothing to push.'));
+    }
   }
 
   /// The state used to save the state of the command
   final GgState state;
 
   /// The key used to save the state of the command
-  final String stateKey = 'doCommit';
+  final String stateKey = 'doPush';
 
   // ######################
   // Private
@@ -97,57 +96,36 @@ class DoCommit extends DirCommand<void> {
 
   // ...........................................................................
   final GgProcessWrapper _processWrapper;
-  final IsCommitted _isGitCommitted;
-  final CanCommit _canCommit;
+  final IsPushed _isPushedViaGit;
+  final CanPush _canPush;
 
   // ...........................................................................
   void _addParam() {
-    argParser.addOption(
-      'message',
-      abbr: 'm',
-      help: 'The message for the commit.',
-      mandatory: true,
+    argParser.addFlag(
+      'force',
+      abbr: 'f',
+      help: 'Do a force push.',
+      defaultsTo: false,
+      negatable: true,
     );
   }
 
   // ...........................................................................
-  Future<void> _commit(Directory directory, String message) async {
+  Future<void> _gitPush(Directory directory, bool force) async {
     final result = await _processWrapper.run(
       'git',
-      ['commit', '-m', message],
+      ['push', if (force) '-f'],
       workingDirectory: directory.path,
     );
 
     if (result.exitCode != 0) {
-      throw Exception('git commit failed: ${result.stderr}');
+      throw Exception('git push failed: ${result.stderr}');
     }
   }
 
   // ...........................................................................
-  Future<void> _add(Directory directory, String message) async {
-    final result = await _processWrapper.run(
-      'git',
-      ['add', '.'],
-      workingDirectory: directory.path,
-    );
-
-    if (result.exitCode != 0) {
-      throw Exception('git add failed: ${result.stderr}');
-    }
-  }
-
-  // ...........................................................................
-  String _messageFromArgs() {
-    try {
-      final message = argResults!['message'] as String;
-      return message;
-    } catch (e) {
-      throw Exception(
-        red('Message missing.\n') +
-            darkGray('Run command again with ') +
-            yellow('--message ') +
-            blue('"your message"'),
-      );
-    }
+  bool _forceFromArgs() {
+    final force = argResults?['force'] as bool? ?? false;
+    return force;
   }
 }

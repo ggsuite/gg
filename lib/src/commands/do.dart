@@ -5,7 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:gg/src/commands/do/do_commit.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
@@ -34,6 +34,7 @@ class Do extends Command<void> {
   // ...........................................................................
   void _initSubCommands(DepsOfDo deps) {
     addSubcommand(deps.doCommit);
+    addSubcommand(deps.doPush);
   }
 }
 
@@ -44,11 +45,16 @@ class DepsOfDo {
   DepsOfDo({
     required this.ggLog,
     DoCommit? doCommit,
-  }) : doCommit = doCommit ?? DoCommit(ggLog: ggLog);
+    DoPush? doPush,
+  })  : doCommit = doCommit ?? DoCommit(ggLog: ggLog),
+        doPush = doPush ?? DoPush(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;
 
   /// The can commit command
   final DoCommit doCommit;
+
+  /// The can commit command
+  final DoPush doPush;
 }
