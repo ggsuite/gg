@@ -8,49 +8,55 @@ import 'dart:io';
 
 import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/can_publish.dart';
-import 'package:gg_git/gg_git.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
-import 'package:gg_version/gg_version.dart';
-
+import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 // .............................................................................
 void main() {
   late Directory d;
-  late Checks commands;
   final messages = <String>[];
-  late CanPublish publish;
+  final ggLog = messages.add;
+  late CanPublish canPublish;
+
+  // ...........................................................................
+  late Pana pana;
+  late DidCommit didCommit;
+  late IsVersionPrepared isVersionPrepared;
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.isPushed.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
-      messages.add('isPushed');
-    });
-    when(() => commands.isVersioned.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
-      messages.add('isVersioned');
-    });
-    when(() => commands.pana.exec(directory: d, ggLog: messages.add))
+    when(() => pana.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
       messages.add('pana');
+    });
+    when(() => didCommit.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
+      messages.add('didCommit');
+    });
+    when(() => isVersionPrepared.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
+      messages.add('isVersionPrepared');
     });
   }
 
   // ...........................................................................
   setUp(() async {
-    commands = Checks(
-      ggLog: messages.add,
-      isPushed: MockIsPushed(),
-      isVersioned: MockIsVersioned(),
-      pana: MockPana(),
-    );
+    pana = MockPana();
+    didCommit = MockDidCommit();
+    isVersionPrepared = MockIsVersionPrepared();
 
-    publish = CanPublish(ggLog: messages.add, checks: commands);
+    canPublish = CanPublish(
+      ggLog: ggLog,
+      pana: pana,
+      didCommit: didCommit,
+      isVersionPrepared: isVersionPrepared,
+    );
     d = Directory.systemTemp.createTempSync();
     await initGit(d);
-    mockCommands();
+    await addAndCommitSampleFile(d);
   });
 
   // ...........................................................................
@@ -59,25 +65,23 @@ void main() {
   });
 
   // ...........................................................................
-  group('Can', () {
-    group('constructor', () {
-      test('with defaults', () {
-        final c = CanPublish(ggLog: messages.add);
-        expect(c.name, 'publish');
-        expect(c.description, 'Checks if code is ready to be published.');
+  group('CanPublish', () {
+    group('run()', () {
+      test('should run the sub commands', () async {
+        mockCommands();
+        await canPublish.exec(directory: d, ggLog: ggLog);
+        expect(messages[0], yellow('Can publish?'));
+        expect(messages[1], 'isVersionPrepared');
+        expect(messages[2], 'didCommit');
+        expect(messages[3], 'pana');
       });
     });
 
-    group('Publish', () {
-      group('run(directory)', () {
-        test('should check if everything is upgraded and commited', () async {
-          await addAndCommitSampleFile(d);
-          await publish.exec(directory: d, ggLog: messages.add);
-          expect(messages[1], 'isPushed');
-          expect(messages[2], 'isVersioned');
-          expect(messages[3], 'pana');
-        });
-      });
+    test('should have a code coverage of 100%', () {
+      expect(
+        CanPublish(ggLog: ggLog),
+        isNotNull,
+      );
     });
   });
 }

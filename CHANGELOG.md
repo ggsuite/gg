@@ -1,6 +1,6 @@
 # Change Log
 
-## 1.1.0
+## 1.0.3
 
 - gg can commit
 - gg do commit
