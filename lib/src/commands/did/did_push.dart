@@ -11,10 +11,10 @@ class DidPush extends DidCommand {
   /// Constructor
   DidPush({
     super.name = 'push',
-    super.description = 'Informs if everything is pushed.',
-    super.shortDescription = 'Did run »gg do push?',
+    super.description = 'Informs if everything is checked and pushed.',
+    super.shortDescription = 'Everything checked and pushed?',
     super.suggestion = 'Please run »gg do push«.',
-    super.stateKey = 'did-push',
+    super.stateKey = 'doPush',
     required super.ggLog,
   });
 }
