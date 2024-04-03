@@ -35,6 +35,7 @@ class Do extends Command<void> {
   void _initSubCommands(DepsOfDo deps) {
     addSubcommand(deps.doCommit);
     addSubcommand(deps.doPush);
+    addSubcommand(deps.doPublish);
   }
 }
 
@@ -46,8 +47,10 @@ class DepsOfDo {
     required this.ggLog,
     DoCommit? doCommit,
     DoPush? doPush,
+    DoPublish? doPublish,
   })  : doCommit = doCommit ?? DoCommit(ggLog: ggLog),
-        doPush = doPush ?? DoPush(ggLog: ggLog);
+        doPush = doPush ?? DoPush(ggLog: ggLog),
+        doPublish = doPublish ?? DoPublish(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;
@@ -57,4 +60,7 @@ class DepsOfDo {
 
   /// The can commit command
   final DoPush doPush;
+
+  /// The do publish command
+  final DoPublish doPublish;
 }

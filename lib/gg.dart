@@ -23,6 +23,7 @@ export 'src/commands/can/can_commit.dart';
 export 'src/commands/do.dart';
 export 'src/commands/do/do_push.dart';
 export 'src/commands/do/do_commit.dart';
+export 'src/commands/do/do_publish.dart';
 
 // Did
 export 'src/commands/did.dart';
