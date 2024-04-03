@@ -49,7 +49,12 @@ void main() {
         } catch (e) {
           exception = e.toString();
         }
-        expect(exception, contains(colorize('Please run »gg do publish«.')));
+        expect(
+          exception,
+          contains(
+            colorize('Not yet published. Please run »gg do publish«.'),
+          ),
+        );
       });
     });
   });
