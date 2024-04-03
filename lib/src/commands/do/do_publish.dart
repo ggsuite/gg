@@ -6,6 +6,7 @@
 
 import 'dart:io';
 
+import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/can_publish.dart';
 import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_args/gg_args.dart';
@@ -25,10 +26,12 @@ class DoPublish extends DirCommand<void> {
     Publish? publish,
     GgState? state,
     AddVersionTag? addVersionTag,
+    DoPush? doPush,
   })  : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
         _publish = publish ?? Publish(ggLog: ggLog),
         _state = state ?? GgState(ggLog: ggLog),
-        _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog);
+        _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog),
+        _doPUsh = doPush ?? DoPush(ggLog: ggLog);
 
   // ...........................................................................
   /// The key used to save the state of the command
@@ -78,6 +81,12 @@ class DoPublish extends DirCommand<void> {
       directory: directory,
       ggLog: ggLog,
     );
+
+    // Push to remote
+    await _doPUsh.exec(
+      directory: directory,
+      ggLog: ggLog,
+    );
   }
 
   // ######################
@@ -89,4 +98,5 @@ class DoPublish extends DirCommand<void> {
   final CanPublish _canPublish;
   final GgState _state;
   final AddVersionTag _addVersionTag;
+  final DoPush _doPUsh;
 }

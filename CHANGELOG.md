@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.6
+
+- Push to remote after publishing
+
 ## 1.0.5
 
 - Add tag with version after publishing

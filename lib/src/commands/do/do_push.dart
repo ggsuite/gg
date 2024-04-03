@@ -13,6 +13,7 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Pushes the current state.
 class DoPush extends DirCommand<void> {
@@ -129,3 +130,6 @@ class DoPush extends DirCommand<void> {
     return force;
   }
 }
+
+/// Mock for [DoPush].
+class MockDoPush extends Mock implements DoPush {}

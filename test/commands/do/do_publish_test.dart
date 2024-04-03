@@ -26,6 +26,7 @@ void main() {
   late Publish publish;
   late GgState state;
   late AddVersionTag addVersionTag;
+  late DoPush doPush;
 
   // ...........................................................................
   void mockCanPublish(bool success) => when(
@@ -82,6 +83,15 @@ void main() {
         ggLog('Version tag was added.');
       });
 
+  void mockDoPush() => when(
+        () => doPush.exec(
+          directory: d,
+          ggLog: ggLog,
+        ),
+      ).thenAnswer((_) async {
+        ggLog('Did push.');
+      });
+
   // ...........................................................................
   setUp(() async {
     d = await Directory.systemTemp.createTemp();
@@ -91,6 +101,7 @@ void main() {
     publish = MockPublish();
     state = MockGgState();
     addVersionTag = MockAddVersionTag();
+    doPush = MockDoPush();
 
     doPublish = DoPublish(
       ggLog: ggLog,
@@ -98,6 +109,7 @@ void main() {
       publish: publish,
       state: state,
       addVersionTag: addVersionTag,
+      doPush: doPush,
     );
 
     // Mock the method to pass all methods by default
@@ -106,6 +118,7 @@ void main() {
     mockPublishIsSuccessful(true);
     mockWriteSuccess();
     mockAddVersionTag();
+    mockDoPush();
   });
 
   tearDown(() async {
@@ -123,24 +136,14 @@ void main() {
       });
     });
 
-    test('should check if publishing is possible', () async {
+    test('should perform a variety of steps before and after publishing',
+        () async {
       await doPublish.exec(directory: d, ggLog: ggLog);
       expect(messages[0], 'Can publish did pass.');
-    });
-
-    test('should publish when tests pass', () async {
-      await doPublish.exec(directory: d, ggLog: ggLog);
       expect(messages[1], 'Publishing was successful.');
-    });
-
-    test('should write the success state', () async {
-      await doPublish.exec(directory: d, ggLog: ggLog);
       expect(messages[2], 'State was written for key "doPublish".');
-    });
-
-    test('should add version tag after successful publishing', () async {
-      await doPublish.exec(directory: d, ggLog: ggLog);
       expect(messages[3], 'Version tag was added.');
+      expect(messages[4], 'Did push.');
     });
 
     test('should have a code coverage of 100%', () {
