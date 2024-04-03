@@ -58,7 +58,7 @@ void main() {
 
   group('DoCommit', () {
     group('exec(directory, ggLog, message)', () {
-      group('should log »Already committed and checked.«', () {
+      group('should log »Already checked and committed.«', () {
         test('when the command is executed the second time', () async {
           // Execute command the first time
           await doCommit.exec(
@@ -74,7 +74,7 @@ void main() {
             message: 'My commit 2',
           );
 
-          expect(messages.last, yellow('Already committed and checked.'));
+          expect(messages.last, yellow('Already checked and committed.'));
         });
       });
 

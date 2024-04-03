@@ -57,7 +57,7 @@ class DoCommit extends DirCommand<void> {
       );
 
       if (isDone) {
-        ggLog(yellow('Already committed and checked.'));
+        ggLog(yellow('Already checked and committed.'));
         return;
       }
     }
