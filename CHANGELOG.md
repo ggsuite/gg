@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.8
+
+- Push tags to remote
+
 ## 1.0.7
 
 - Fix issue with creating tags

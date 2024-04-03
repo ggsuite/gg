@@ -116,10 +116,11 @@ class DoPush extends DirCommand<void> {
   Future<void> gitPush({
     required Directory directory,
     required bool force,
+    bool pushTags = false,
   }) async {
     final result = await _processWrapper.run(
       'git',
-      ['push', if (force) '-f'],
+      ['push', if (force) '-f', if (pushTags) '--tags'],
       workingDirectory: directory.path,
     );
 

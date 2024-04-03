@@ -83,13 +83,24 @@ void main() {
         ggLog('Version tag was added.');
       });
 
-  void mockDoPush() => when(
+  void mockDoPushCommits() => when(
         () => doPush.gitPush(
           directory: d,
           force: false,
+          pushTags: false,
         ),
       ).thenAnswer((_) async {
-        ggLog('Did push.');
+        ggLog('Did push commits.');
+      });
+
+  void mockDoPushTags() => when(
+        () => doPush.gitPush(
+          directory: d,
+          force: false,
+          pushTags: true,
+        ),
+      ).thenAnswer((_) async {
+        ggLog('Did push tags.');
       });
 
   // ...........................................................................
@@ -118,7 +129,8 @@ void main() {
     mockPublishIsSuccessful(true);
     mockWriteSuccess();
     mockAddVersionTag();
-    mockDoPush();
+    mockDoPushCommits();
+    mockDoPushTags();
   });
 
   tearDown(() async {
@@ -143,7 +155,8 @@ void main() {
       expect(messages[1], 'Publishing was successful.');
       expect(messages[2], 'State was written for key "doPublish".');
       expect(messages[3], 'Version tag was added.');
-      expect(messages[4], 'Did push.');
+      expect(messages[4], 'Did push commits.');
+      expect(messages[5], 'Did push tags.');
     });
 
     test('should have a code coverage of 100%', () {

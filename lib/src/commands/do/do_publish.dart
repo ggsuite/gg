@@ -82,10 +82,17 @@ class DoPublish extends DirCommand<void> {
       ggLog: ggLog,
     );
 
-    // Push to remote
+    // Push commits to remote
     await _doPush.gitPush(
       directory: directory,
       force: false,
+    );
+
+    // Push tags to remote
+    await _doPush.gitPush(
+      directory: directory,
+      force: false,
+      pushTags: true,
     );
   }
 
