@@ -63,6 +63,12 @@ class DoPublish extends DirCommand<void> {
       directory: directory,
       ggLog: ggLog,
     );
+
+    // Save state
+    await _state.writeSuccess(
+      directory: directory,
+      key: stateKey,
+    );
   }
 
   // ######################

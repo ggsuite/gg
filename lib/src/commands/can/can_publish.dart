@@ -31,4 +31,4 @@ class CanPublish extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockPublish extends mocktail.Mock implements CanPublish {}
+class MockCanPublish extends mocktail.Mock implements CanPublish {}

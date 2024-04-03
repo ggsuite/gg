@@ -214,4 +214,4 @@ class GgState {
 }
 
 /// Mock for [GgState]
-class MockCheckState extends Mock implements GgState {}
+class MockGgState extends Mock implements GgState {}
