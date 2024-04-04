@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.9
+
+- Update to latest dependencies (fixes errors with deleted files)
+
 ## 1.0.8
 
 - Push tags to remote

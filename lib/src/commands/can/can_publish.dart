@@ -5,7 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg/gg.dart';
-import 'package:gg_publish/gg_publish.dart';
+import 'package:gg_version/gg_version.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 /// Checks if the changes can be published.
