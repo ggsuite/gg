@@ -91,21 +91,33 @@ class GgState {
     }
 
     // Get the hash of the current commit
-    final currentHash = await _lastChangesHash.get(
+    final hash = await currentHash(
       directory: directory,
       ggLog: ggLog,
-      ignoreFiles: ['.gg.json'],
     );
 
     // Write the hash to .gg.json
     await _ggJson.writeFile(
       file: _configFile(directory: directory),
       path: _hashPath(key).join('/'),
-      value: currentHash,
+      value: hash,
     );
 
     // Ammend changes to .gg.json
     await _commitOrAmmendStateChanges(directory);
+  }
+
+  // ...........................................................................
+  /// Returns the current hash of the last changes
+  Future<int> currentHash({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    return await _lastChangesHash.get(
+      directory: directory,
+      ggLog: ggLog,
+      ignoreFiles: ['.gg.json'],
+    );
   }
 
   // ######################

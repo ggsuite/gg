@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.11
+
+- DoPublish: Create a new version after pushing
+
 ## 1.0.10
 
 - Update to latest dependencies (fixes errors with deleted files)

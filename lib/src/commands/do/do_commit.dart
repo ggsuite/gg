@@ -13,6 +13,7 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Does a commit of the current directory.
 class DoCommit extends DirCommand<void> {
@@ -71,8 +72,7 @@ class DoCommit extends DirCommand<void> {
     // Execute the commit
     if (!isCommittedViaGit) {
       message ??= _messageFromArgs();
-      await _add(directory, message);
-      await _commit(directory, message);
+      await gitAddAndCommit(directory: directory, message: message);
       ggLog(yellow('Checks successful. Commit successful.'));
     } else {
       ggLog(yellow('Checks successful. Nothing to commit.'));
@@ -90,6 +90,16 @@ class DoCommit extends DirCommand<void> {
 
   /// The key used to save the state of the command
   final String stateKey = 'doCommit';
+
+  // ...........................................................................
+  /// Adds and commits the current directory.
+  Future<void> gitAddAndCommit({
+    required Directory directory,
+    required String message,
+  }) async {
+    await _gitAdd(directory, message);
+    await _gitCommit(directory: directory, message: message);
+  }
 
   // ######################
   // Private
@@ -111,20 +121,7 @@ class DoCommit extends DirCommand<void> {
   }
 
   // ...........................................................................
-  Future<void> _commit(Directory directory, String message) async {
-    final result = await _processWrapper.run(
-      'git',
-      ['commit', '-m', message],
-      workingDirectory: directory.path,
-    );
-
-    if (result.exitCode != 0) {
-      throw Exception('git commit failed: ${result.stderr}');
-    }
-  }
-
-  // ...........................................................................
-  Future<void> _add(Directory directory, String message) async {
+  Future<void> _gitAdd(Directory directory, String message) async {
     final result = await _processWrapper.run(
       'git',
       ['add', '.'],
@@ -133,6 +130,23 @@ class DoCommit extends DirCommand<void> {
 
     if (result.exitCode != 0) {
       throw Exception('git add failed: ${result.stderr}');
+    }
+  }
+
+  // ...........................................................................
+  /// Executes the git commit command.
+  Future<void> _gitCommit({
+    required Directory directory,
+    required String message,
+  }) async {
+    final result = await _processWrapper.run(
+      'git',
+      ['commit', '-m', message],
+      workingDirectory: directory.path,
+    );
+
+    if (result.exitCode != 0) {
+      throw Exception('git commit failed: ${result.stderr}');
     }
   }
 
@@ -151,3 +165,7 @@ class DoCommit extends DirCommand<void> {
     }
   }
 }
+
+// .............................................................................
+/// Mock for [DoCommit].
+class MockDoCommmit extends Mock implements DoCommit {}
