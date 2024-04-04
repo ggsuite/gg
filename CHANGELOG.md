@@ -1,5 +1,7 @@
 # Change Log
 
+## 1.0.13
+
 ## 1.0.12
 
 - DoPublish: Create a new version after pushing
