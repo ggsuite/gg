@@ -245,10 +245,10 @@ packages:
     dependency: "direct main"
     description:
       name: gg_test
-      sha256: db599389c8c6a7d7a0b9a46f94a7265f3b0bbf07618a678e0b28cd0a6d89e81f
+      sha256: "22744a4af0745c8e5863b22b5504a005fec4eea1ad7aa1c50242e82bde1288bd"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.7"
+    version: "1.0.9"
   gg_version:
     dependency: "direct main"
     description:

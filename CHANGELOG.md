@@ -1,6 +1,6 @@
 # Change Log
 
-## 1.0.9
+## 1.0.10
 
 - Update to latest dependencies (fixes errors with deleted files)
 

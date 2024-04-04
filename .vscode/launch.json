@@ -11,7 +11,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
       "args": ["can", "commit"],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}/../gg_publish"
     },
     {
       "name": "Current File",
