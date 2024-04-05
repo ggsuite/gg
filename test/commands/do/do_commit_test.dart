@@ -378,7 +378,7 @@ void main() {
           final runner = CommandRunner<void>('test', 'test');
           runner.addCommand(doCommit);
           await runner
-              .run(['commit', '-i', d.path, '-m', 'My commit', '-l', 'added']);
+              .run(['commit', '-i', d.path, '-m', 'My commit', '-t', 'added']);
           expect(
             messages.last,
             yellow('Checks successful. Commit successful.'),

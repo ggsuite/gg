@@ -150,7 +150,7 @@ class DoCommit extends DirCommand<void> {
 
     argParser.addOption(
       'log-type',
-      abbr: 'l',
+      abbr: 't',
       help: 'The type of the commit.',
       mandatory: true,
       allowed: _logTypes,

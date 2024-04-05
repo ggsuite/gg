@@ -6,6 +6,7 @@
 
 - Code to fix pipeline issues
 - --force flag to tests on pipeline
+- Renamed -l flag into -t for gg do commit
 
 ### Changed
 
