@@ -7,6 +7,10 @@
 - --save-state option for commands like gg can commit\n\nThis is needed to make GitHub pipelines work
 - Setup pipeline git username and email
 
+### Removed
+
+- Removed unused sample project
+
 ## [1.0.14] - 2024-04-05
 
 ### Added
