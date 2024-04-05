@@ -59,13 +59,13 @@ jobs:
         if: env.is_flutter == 'true'
         uses: subosito/flutter-action@v2
         with:
-          channel: "master"
+          channel: "stable"
 
       - name: Set up Dart SDK
         if: env.is_flutter == 'false'
-        uses: dart-lang/setup-dart@v1
+        uses: dart-lang/setup-dart@v1.6.2
         with:
-          sdk: "dev"
+          sdk: "stable"
 
       - name: Install dependencies
         run: |
