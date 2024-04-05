@@ -5,6 +5,7 @@
 ### Changed
 
 - Pipeline: Use globally installed version of gg
+- Kidney: Auto check all repos
 
 ## [1.0.16] - 2024-04-05
 
