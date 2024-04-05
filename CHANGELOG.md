@@ -6,6 +6,10 @@
 
 - Code to fix pipeline issues
 
+### Changed
+
+- Cleaned up pipeline
+
 ## [1.0.15] - 2024-04-05
 
 ### Added

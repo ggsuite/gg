@@ -35,27 +35,27 @@ jobs:
             echo "is_flutter=false" >> "$GITHUB_ENV"
           fi
 
-      # - name: Cache Flutter Dependencies
-      #   if: env.is_flutter == 'true'
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       ~/.pub-cache
-      #       **/pubspec.lock
-      #     key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-flutter-
-      #
-      # - name: Cache Dart Dependencies
-      #   if: env.is_flutter == 'false'
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       ~/.pub-cache
-      #       **/pubspec.lock
-      #     key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-dart-
+      - name: Cache Flutter Dependencies
+        if: env.is_flutter == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            **/pubspec.lock
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      - name: Cache Dart Dependencies
+        if: env.is_flutter == 'false'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            **/pubspec.lock
+          key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-dart-
 
       - name: Set up Flutter
         if: env.is_flutter == 'true'
@@ -77,20 +77,14 @@ jobs:
             dart pub get
           fi
 
-      # - name: Activate gg
-      #  run: dart pub global activate gg
+      - name: Activate gg
+        run: dart pub global activate gg
 
-      - name: git status 1
-        run: git show --name-only HEAD~0 --pretty=
-
-      - name: git status 2
-        run: git status -s
-
-      - name: gg did push
+      - name: Was »gg did push« executed?
         run: dart run gg did push
 
-      - name: Run tests
-        run: dart test
+      - name: Was »gg did commit« executed?
+        run: dart run gg did push
 
-      - name: Run Script
+      - name: Run detailed tests
         run: dart run gg can commit
