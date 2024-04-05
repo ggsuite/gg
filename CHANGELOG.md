@@ -13,6 +13,7 @@
 - Removed unused sample project
 - logStatus is replaced by GgStatusPrinter
 - isGitHub is replaced by gg\_is\_github
+- Pipeline: remove --no-save-state flag
 
 ## [1.0.14] - 2024-04-05
 

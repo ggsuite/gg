@@ -81,4 +81,4 @@ jobs:
         run: dart pub global activate gg
 
       - name: Run Script
-        run: dart run gg can commit --no-save-state
+        run: dart run gg can commit
