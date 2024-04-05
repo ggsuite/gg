@@ -7,7 +7,9 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
+import 'package:gg/src/commands/can/can_publish.dart';
 import 'package:gg/src/commands/did/did_publish.dart';
+import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
@@ -26,11 +28,14 @@ void main() {
   late Directory dRemote;
   late Directory Function() dMock;
   late DoPublish doPublish;
+  late CanPublish canPublish;
   late PublishedVersion publishedVersion;
+  late IsVersionPrepared isVersionPrepared;
 
   late int successHash;
   late int needsChangeHash;
   const ggJson = GgJson();
+  late Version publishedVersionValue;
 
   // ...........................................................................
   // Mocks
@@ -45,6 +50,7 @@ void main() {
         if (!success) {
           throw Exception('Publishing failed.');
         } else {
+          publishedVersionValue = Version.parse('1.2.4');
           ggLog('Publishing was successful.');
         }
       });
@@ -52,10 +58,10 @@ void main() {
   void mockPublishedVersion() => when(
         () => publishedVersion.get(
           directory: dMock(),
-          ggLog: ggLog,
+          ggLog: any(named: 'ggLog'),
         ),
       ).thenAnswer((_) async {
-        return Version.parse('1.2.3');
+        return publishedVersionValue;
       });
 
   // ...........................................................................
@@ -66,31 +72,28 @@ void main() {
     dRemote = await Directory.systemTemp.createTemp('remote');
     await initRemoteGit(dRemote);
     await addRemoteToLocal(local: d, remote: dRemote);
+    publishedVersionValue = Version.parse('1.2.3');
 
     // Clear messages
     messages.clear();
 
     // Setup a pubspec.yaml and a CHANGELOG.md with right versions
-    await addAndCommitVersions(
-      d,
-      pubspec: '1.2.3',
-      changeLog: '1.2.3',
-      gitHead: null,
+    await File(join(d.path, 'pubspec.yaml')).writeAsString(
+      'name: gg\n\nversion: 1.2.4\n'
+      'repository: https://github.com/inlavigo/gg.git',
+    );
+
+    // Prepare ChangeLog
+    await File(join(d.path, 'CHANGELOG.md')).writeAsString(
+      '# Changelog\n\n'
+      '## Unreleased\n'
+      '-Message 1\n'
+      '-Message 2\n'
+      '## 1.2.3 - 2024-04-05\n\n- First version',
     );
 
     // Create a .gg.json that has all preconditions for publishing
     needsChangeHash = 12345;
-    successHash =
-        await LastChangesHash(ggLog: ggLog).get(directory: d, ggLog: ggLog);
-
-    await File(join(d.path, '.gg.json')).writeAsString(
-      '{"canCommit":{"success":{"hash":$successHash}},'
-      '"doCommit":{"success":{"hash":$successHash}},'
-      '"canPush":{"success":{"hash":$successHash}},'
-      '"doPush":{"success":{"hash":$successHash}},'
-      '"canPublish":{"success":{"hash":$successHash}},'
-      '"doPublish":{"success":{"hash":$successHash}}}',
-    );
 
     // Mock publishing
     dMock = () => any(
@@ -99,7 +102,18 @@ void main() {
         );
     registerFallbackValue(d);
     publish = MockPublish();
+
     publishedVersion = MockPublishedVersion();
+
+    isVersionPrepared = IsVersionPrepared(
+      ggLog: ggLog,
+      publishedVersion: publishedVersion,
+    );
+
+    canPublish = CanPublish(
+      ggLog: ggLog,
+      isVersionPrepared: isVersionPrepared,
+    );
     mockPublishIsSuccessful(true);
     mockPublishedVersion();
 
@@ -111,6 +125,22 @@ void main() {
         ggLog: ggLog,
         publishedVersion: publishedVersion,
       ),
+      canPublish: canPublish,
+    );
+
+    successHash = await LastChangesHash(ggLog: ggLog).get(
+      directory: d,
+      ggLog: ggLog,
+      ignoreFiles: GgState.ignoreFiles,
+    );
+
+    await File(join(d.path, '.gg.json')).writeAsString(
+      '{"canCommit":{"success":{"hash":$successHash}},'
+      '"doCommit":{"success":{"hash":$successHash}},'
+      '"canPush":{"success":{"hash":$successHash}},'
+      '"doPush":{"success":{"hash":$successHash}},'
+      '"canPublish":{"success":{"hash":$successHash}},'
+      '"doPublish":{"success":{"hash":$successHash}}}',
     );
   });
 
@@ -154,25 +184,27 @@ void main() {
       );
 
       // Were the steps performed?
-      expect(messages[0], contains('Can publish?'));
-      expect(messages[1], contains('✅ Everything is fine.'));
-      expect(messages[2], contains('Publishing was successful.'));
-      expect(messages[3], contains('Tag 1.2.3 added.'));
-      expect(messages[4], contains('⌛️ Increase version'));
-      expect(messages[5], contains('✅ Increase version'));
+      var i = 0;
+      expect(messages[i++], contains('Can publish?'));
+      expect(messages[i++], contains('✅ Everything is fine.'));
+      expect(messages[i++], contains('There are staged but uncommitted'));
+      expect(messages[i++], contains('Publishing was successful.'));
+      expect(messages[i++], contains('Tag 1.2.4 added.'));
+      expect(messages[i++], contains('⌛️ Increase version'));
+      expect(messages[i++], contains('✅ Increase version'));
 
       // Was a new version created?
       final pubspec = await File(join(d.path, 'pubspec.yaml')).readAsString();
       final changeLog = await File(join(d.path, 'CHANGELOG.md')).readAsString();
-      expect(pubspec, contains('1.2.4'));
-      expect(changeLog, contains('## 1.2.4'));
+      expect(pubspec, contains('version: 1.2.5'));
+      expect(changeLog, contains('## [1.2.4] -'));
 
       // Was the new version checked in?
       final headMessage = await HeadMessage(ggLog: ggLog).get(
         directory: d,
         ggLog: ggLog,
       );
-      expect(headMessage, 'Prepare next version 1.2.4');
+      expect(headMessage, 'Prepare development of version 1.2.5');
 
       // Was .gg.json updated in a way that didCommit, didPush and didPublish
       // return true?

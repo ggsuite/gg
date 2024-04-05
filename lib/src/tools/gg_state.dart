@@ -38,6 +38,10 @@ class GgState {
   final GgLog ggLog;
 
   // ...........................................................................
+  /// The file that might be ignored while reading the hash
+  static const ignoreFiles = ['.gg.json', 'CHANGELOG.md'];
+
+  // ...........................................................................
   /// Returns previously set value
   Future<bool> readSuccess({
     required Directory directory,
@@ -48,7 +52,7 @@ class GgState {
     final changesHash = await _lastChangesHash.get(
       directory: directory,
       ggLog: ggLog,
-      ignoreFiles: ['.gg.json'],
+      ignoreFiles: ignoreFiles,
     );
 
     // If no config file exists, return false
@@ -116,8 +120,30 @@ class GgState {
     return await _lastChangesHash.get(
       directory: directory,
       ggLog: ggLog,
-      ignoreFiles: ['.gg.json'],
+      ignoreFiles: ignoreFiles,
     );
+  }
+
+  // ...........................................................................
+  /// Replaces the hash in .gg.json with the current hash
+  Future<void> updateHash({
+    required int hash,
+    required Directory directory,
+  }) async {
+    final current = await currentHash(directory: directory, ggLog: ggLog);
+    if (current == hash) {
+      return;
+    }
+
+    final ggJsonFile = File(join('${directory.path}/.gg.json'));
+
+    if (!await ggJsonFile.exists()) {
+      return;
+    }
+
+    final ggJSonFileContent =
+        (await ggJsonFile.readAsString()).replaceAll('$hash', '$current');
+    await ggJsonFile.writeAsString(ggJSonFileContent);
   }
 
   // ######################

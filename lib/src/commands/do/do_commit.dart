@@ -9,12 +9,16 @@ import 'dart:io';
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_changelog/gg_changelog.dart' as cl;
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
 
+final _logTypes = cl.LogType.values.map((e) => e.name);
+
+// .............................................................................
 /// Does a commit of the current directory.
 class DoCommit extends DirCommand<void> {
   /// Constructor
@@ -24,12 +28,16 @@ class DoCommit extends DirCommand<void> {
     super.description = 'Commits the current directory.',
     IsCommitted? isCommitted,
     CanCommit? canCommit,
+    Commit? commit,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     GgState? state,
+    cl.Add? addToChangeLog,
   })  : _processWrapper = processWrapper,
         _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
         _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
-        state = state ?? GgState(ggLog: ggLog) {
+        _commit = commit ?? Commit(ggLog: ggLog),
+        state = state ?? GgState(ggLog: ggLog),
+        _addToChangeLog = addToChangeLog ?? cl.Add(ggLog: ggLog) {
     _addParam();
   }
 
@@ -39,9 +47,15 @@ class DoCommit extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     String? message,
+    cl.LogType? logType,
   }) async {
     // Does directory exist?
     await check(directory: directory);
+
+    // Check needed options
+    message ??= _messageFromArgs();
+    logType ??= _logTypeFromArgs();
+    final repoUrl = await _repositoryUrl(directory);
 
     // Is everything committed?
     final isCommittedViaGit = await _isGitCommitted.get(
@@ -69,10 +83,22 @@ class DoCommit extends DirCommand<void> {
       ggLog: ggLog,
     );
 
+    // Write message into README.md
+    await _writeMessageIntoChangeLog(
+      directory: directory,
+      message: message,
+      logType: logType,
+      repoUrl: repoUrl,
+      commit: isCommittedViaGit,
+    );
+
     // Execute the commit
     if (!isCommittedViaGit) {
-      message ??= _messageFromArgs();
-      await gitAddAndCommit(directory: directory, message: message);
+      await gitAddAndCommit(
+        directory: directory,
+        message: message,
+        logType: logType,
+      );
       ggLog(yellow('Checks successful. Commit successful.'));
     } else {
       ggLog(yellow('Checks successful. Nothing to commit.'));
@@ -96,9 +122,10 @@ class DoCommit extends DirCommand<void> {
   Future<void> gitAddAndCommit({
     required Directory directory,
     required String message,
+    required cl.LogType logType,
   }) async {
     await _gitAdd(directory, message);
-    await _gitCommit(directory: directory, message: message);
+    await _gitCommit(directory: directory, message: message, logType: logType);
   }
 
   // ######################
@@ -109,6 +136,8 @@ class DoCommit extends DirCommand<void> {
   final GgProcessWrapper _processWrapper;
   final IsCommitted _isGitCommitted;
   final CanCommit _canCommit;
+  final Commit _commit;
+  final cl.Add _addToChangeLog;
 
   // ...........................................................................
   void _addParam() {
@@ -117,6 +146,14 @@ class DoCommit extends DirCommand<void> {
       abbr: 'm',
       help: 'The message for the commit.',
       mandatory: true,
+    );
+
+    argParser.addOption(
+      'log-type',
+      abbr: 'l',
+      help: 'The type of the commit.',
+      mandatory: true,
+      allowed: _logTypes,
     );
   }
 
@@ -138,7 +175,19 @@ class DoCommit extends DirCommand<void> {
   Future<void> _gitCommit({
     required Directory directory,
     required String message,
+    required cl.LogType logType,
   }) async {
+    const logTypeToEmoji = {
+      cl.LogType.added: 'Add',
+      cl.LogType.changed: 'Modify',
+      cl.LogType.deprecated: 'Deprecate',
+      cl.LogType.fixed: 'Fix',
+      cl.LogType.removed: 'Remove',
+      cl.LogType.security: 'Secure',
+    };
+
+    message = '${logTypeToEmoji[logType]}: $message';
+
     final result = await _processWrapper.run(
       'git',
       ['commit', '-m', message],
@@ -157,12 +206,83 @@ class DoCommit extends DirCommand<void> {
       return message;
     } catch (e) {
       throw Exception(
-        red('Message missing.\n') +
-            darkGray('Run command again with ') +
-            yellow('--message ') +
-            blue('"your message"'),
+        yellow('Run again with ') + blue('-m "yourMessage"'),
       );
     }
+  }
+
+  // ...........................................................................
+  cl.LogType _logTypeFromArgs() {
+    try {
+      final logTypeString = argResults!['log-type'] as String;
+      return cl.LogType.values.firstWhere(
+        (element) => element.name == logTypeString,
+      );
+    } catch (e) {
+      throw Exception(
+        yellow('Run again with ') + blue('-l ${_logTypes.join(' | ')}'),
+      );
+    }
+  }
+
+  // ...........................................................................
+  Future<String> _repositoryUrl(Directory directory) async {
+    final pubspec = await File('${directory.path}/pubspec.yaml').readAsString();
+    RegExp regExp = RegExp(r'^\s*repository:\s*(.+)$', multiLine: true);
+    Match? match = regExp.firstMatch(pubspec);
+    String? repositoryUrl = match?.group(1)?.replaceAll(RegExp(r'/$'), '');
+    if (repositoryUrl == null) {
+      throw Exception('No »repository:« found in pubspec.yaml');
+    }
+    return repositoryUrl;
+  }
+
+  // ...........................................................................
+  Future<bool> _writeMessageIntoChangeLog({
+    required Directory directory,
+    required String message,
+    required cl.LogType logType,
+    required String repoUrl,
+    required bool commit,
+  }) async {
+    // Check if message is already in CHANGELOG.md
+    final changeLog =
+        await File('${directory.path}/CHANGELOG.md').readAsString();
+
+    if (changeLog.contains(message)) {
+      return false;
+    }
+
+    // Remember hash before
+    final hashBefore = await state.currentHash(
+      directory: directory,
+      ggLog: ggLog,
+    );
+
+    // Use cider to write into CHANGELOG.md
+    await _addToChangeLog.exec(
+      directory: directory,
+      ggLog: ggLog,
+      message: message,
+      logType: logType,
+    );
+
+    // Replace previous hash by new hash in .gg.json
+    // Thus »gg can commit|push|publish« will not start from beginning
+    await state.updateHash(hash: hashBefore, directory: directory);
+
+    // If everything was committed before, commit the new changes also
+    if (commit) {
+      await _commit.commit(
+        ggLog: (_) {}, // coverage:ignore-line
+        directory: directory,
+        doStage: true,
+        message: message,
+        ammendWhenNotPushed: true,
+      );
+    }
+
+    return true;
   }
 }
 

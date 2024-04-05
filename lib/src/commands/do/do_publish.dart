@@ -10,12 +10,13 @@ import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/can_publish.dart';
 import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_changelog/gg_changelog.dart' as changelog;
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:gg_version/gg_version.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:path/path.dart';
 
 /// Publishes the current directory.
 class DoPublish extends DirCommand<void> {
@@ -28,19 +29,21 @@ class DoPublish extends DirCommand<void> {
     Publish? publish,
     GgState? state,
     AddVersionTag? addVersionTag,
-    DoCommit? doCommit,
+    Commit? commit,
     DoPush? doPush,
     PrepareNextVersion? prepareNextVersion,
     FromPubspec? fromPubspec,
+    changelog.Release? release,
   })  : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
         _publish = publish ?? Publish(ggLog: ggLog),
         _state = state ?? GgState(ggLog: ggLog),
         _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog),
-        _doCommit = doCommit ?? DoCommit(ggLog: ggLog),
+        _commit = commit ?? Commit(ggLog: ggLog),
         _doPush = doPush ?? DoPush(ggLog: ggLog),
         _prepareNextVersion =
             prepareNextVersion ?? PrepareNextVersion(ggLog: ggLog),
-        _fromPubspec = fromPubspec ?? FromPubspec(ggLog: ggLog);
+        _fromPubspec = fromPubspec ?? FromPubspec(ggLog: ggLog),
+        _releaseChangelog = release ?? changelog.Release(ggLog: ggLog);
 
   // ...........................................................................
   /// The key used to save the state of the command
@@ -54,6 +57,7 @@ class DoPublish extends DirCommand<void> {
   }) async {
     // Does directory exist?
     await check(directory: directory);
+    void noLog(_) {}
 
     // Did already publish?
     final isDone = await _state.readSuccess(
@@ -71,6 +75,12 @@ class DoPublish extends DirCommand<void> {
     await _canPublish.exec(
       directory: directory,
       ggLog: ggLog,
+    );
+
+    // Publish change log using cider
+    await _prepareChangelog(
+      directory: directory,
+      ggLog: noLog,
     );
 
     // Publish
@@ -118,21 +128,54 @@ class DoPublish extends DirCommand<void> {
   final GgState _state;
   final AddVersionTag _addVersionTag;
   final DoPush _doPush;
-  final DoCommit _doCommit;
+  final Commit _commit;
   final PrepareNextVersion _prepareNextVersion;
   final FromPubspec _fromPubspec;
+  final changelog.Release _releaseChangelog;
 
   // ...........................................................................
-
-  Future<void> _addNextVersion(Directory directory, GgLog ggLog) async {
+  Future<void> _prepareChangelog({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
     // Remember current hash
     final hashBefore = await _state.currentHash(
       directory: directory,
       ggLog: ggLog,
     );
 
+    // Release the changelog
+    await _releaseChangelog.exec(
+      directory: directory,
+      ggLog: ggLog,
+    );
+
+    // Update state
+    await _state.updateHash(
+      hash: hashBefore,
+      directory: directory,
+    );
+
+    // Commit changes to change log
+    await _commit.commit(
+      ggLog: ggLog,
+      directory: directory,
+      doStage: true,
+      message: 'Prepare changelog for release',
+      ammendWhenNotPushed: true,
+    );
+  }
+
+  // ...........................................................................
+  Future<void> _addNextVersion(Directory directory, GgLog ggLog) async {
     // Define increment
     const increment = VersionIncrement.patch;
+
+    // Remember current hash
+    final hashBefore = await _state.currentHash(
+      directory: directory,
+      ggLog: ggLog,
+    );
 
     // Prepare the next version
     await _prepareNextVersion.exec(
@@ -141,10 +184,10 @@ class DoPublish extends DirCommand<void> {
       increment: increment,
     );
 
-    // Get the new hash
-    final hashAfter = await _state.currentHash(
+    // Update state
+    await _state.updateHash(
+      hash: hashBefore,
       directory: directory,
-      ggLog: ggLog,
     );
 
     // Get new version
@@ -152,18 +195,19 @@ class DoPublish extends DirCommand<void> {
       directory: directory,
     );
 
-    // Replace previous hash by new hash in .gg.json
-    // Thus »gg can commit|push|publish« will not start from beginning
-    final ggJsonFile = File(join('${directory.path}/.gg.json'));
-    final ggJSonFileContent = (await ggJsonFile.readAsString())
-        .replaceAll('$hashBefore', '$hashAfter');
-    await ggJsonFile.writeAsString(ggJSonFileContent);
-
-    // Commit all changes
-
-    await _doCommit.gitAddAndCommit(
+    // Commit changes to change log
+    await _commit.commit(
+      ggLog: ggLog,
       directory: directory,
-      message: 'Prepare next version $newVersion',
+      doStage: true,
+      message: 'Prepare development of version $newVersion',
+      ammendWhenNotPushed: false,
+    );
+
+    // Push commits to remote
+    await _doPush.gitPush(
+      directory: directory,
+      force: false,
     );
   }
 }

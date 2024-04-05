@@ -8,10 +8,12 @@ import 'dart:io';
 
 import 'package:gg/gg.dart';
 import 'package:gg/src/commands/can/can_publish.dart';
+import 'package:gg_changelog/gg_changelog.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_version/gg_version.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 // .............................................................................
@@ -25,6 +27,7 @@ void main() {
   late Pana pana;
   late DidCommit didCommit;
   late IsVersionPrepared isVersionPrepared;
+  late HasRightFormat hasRightFormat;
 
   // ...........................................................................
   void mockCommands() {
@@ -40,6 +43,11 @@ void main() {
         .thenAnswer((_) async {
       messages.add('isVersionPrepared');
     });
+
+    when(() => hasRightFormat.exec(directory: d, ggLog: messages.add))
+        .thenAnswer((_) async {
+      messages.add('hasRightFormat');
+    });
   }
 
   // ...........................................................................
@@ -47,6 +55,7 @@ void main() {
     pana = MockPana();
     didCommit = MockDidCommit();
     isVersionPrepared = MockIsVersionPrepared();
+    hasRightFormat = MockHasRightFormat();
 
     canPublish = CanPublish(
       ggLog: ggLog,
@@ -57,6 +66,8 @@ void main() {
     d = Directory.systemTemp.createTempSync();
     await initGit(d);
     await addAndCommitSampleFile(d);
+    File(join(d.path, 'pubspec.yaml'))
+        .writeAsStringSync('name: test\nrepository: https://foo.com');
   });
 
   // ...........................................................................
@@ -70,10 +81,13 @@ void main() {
       test('should run the sub commands', () async {
         mockCommands();
         await canPublish.exec(directory: d, ggLog: ggLog);
-        expect(messages[0], yellow('Can publish?'));
-        expect(messages[1], 'isVersionPrepared');
-        expect(messages[2], 'didCommit');
-        expect(messages[3], 'pana');
+        var count = 0;
+        expect(messages[count++], yellow('Can publish?'));
+        expect(messages[count++], 'isVersionPrepared');
+        expect(messages[count++], contains('⌛️ CHANGELOG.md has right format'));
+        expect(messages[count++], contains('✅ CHANGELOG.md has right format'));
+        expect(messages[count++], 'didCommit');
+        expect(messages[count++], 'pana');
       });
     });
 

@@ -332,5 +332,62 @@ void main() {
         });
       });
     });
+
+    group('updateHash()', () {
+      group('replaces the hash in .gg.json with the current hash', () {
+        test('when current hash is different', () async {
+          // Get last changes hash
+          final hash = await LastChangesHash(ggLog: messages.add).get(
+            directory: dLocal,
+            ggLog: messages.add,
+          );
+
+          // Set the state
+          await ggState.writeSuccess(
+            directory: dLocal,
+            key: 'can-commit',
+          );
+
+          // Change the file
+          await addAndCommitSampleFile(dLocal);
+
+          // Because of the change, ggState.readSuccess should return false
+          final result = await ggState.readSuccess(
+            directory: dLocal,
+            ggLog: messages.add,
+            key: 'can-commit',
+          );
+          expect(result, isFalse);
+
+          // Update the previous hash
+          await ggState.updateHash(
+            hash: hash,
+            directory: dLocal,
+          );
+
+          // Now ggState.readSuccess should return true again
+          final result1 = await ggState.readSuccess(
+            directory: dLocal,
+            ggLog: messages.add,
+            key: 'can-commit',
+          );
+          expect(result1, isTrue);
+        });
+
+        test('but not when the hash has not changed', () async {
+          // Get last changes hash
+          final hash = await LastChangesHash(ggLog: messages.add).get(
+            directory: dLocal,
+            ggLog: messages.add,
+          );
+
+          // Update the previous hash
+          await ggState.updateHash(
+            hash: hash,
+            directory: dLocal,
+          );
+        });
+      });
+    });
   });
 }
