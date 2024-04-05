@@ -10,6 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup git user
+        run: |
+          git config --global user.email "githubaction@inlavigo.com"
+          git config --global user.name "Github Action"
+
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
