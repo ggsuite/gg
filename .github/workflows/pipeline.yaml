@@ -74,6 +74,8 @@ jobs:
           else
             dart pub get
           fi
+      - name: Run tests
+        run: dart test
 
       - name: Activate gg
         run: dart pub global activate gg
