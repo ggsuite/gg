@@ -29,6 +29,7 @@ class CanCommit extends CommandCluster {
     required Directory directory,
     required GgLog ggLog,
     bool? force,
+    bool? saveState,
   }) async {
     // Execute commands.
     await super.exec(directory: directory, ggLog: ggLog, force: force);

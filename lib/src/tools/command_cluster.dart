@@ -40,6 +40,7 @@ class CommandCluster extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? force,
+    bool? saveState,
   }) async {
     ggLog(yellow(shortDescription));
 
@@ -56,10 +57,13 @@ class CommandCluster extends DirCommand<void> {
       }
 
       // Save success
-      await _state.writeSuccess(
-        directory: directory,
-        key: stateKey,
-      );
+      saveState ??= argResults?['save-state'] as bool? ?? true;
+      if (saveState) {
+        await _state.writeSuccess(
+          directory: directory,
+          key: stateKey,
+        );
+      }
     } catch (e) {
       rethrow;
     }
@@ -82,6 +86,14 @@ class CommandCluster extends DirCommand<void> {
       negatable: false,
       help: 'Executes the commands also if they were successful before.',
       defaultsTo: false,
+    );
+
+    argParser.addFlag(
+      'save-state',
+      abbr: 's',
+      negatable: true,
+      help: 'Saves success state for later reuse.',
+      defaultsTo: true,
     );
   }
 

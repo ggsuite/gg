@@ -12,6 +12,7 @@ import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -138,6 +139,39 @@ void main() {
             expect(messages[7], 'isUpgraded');
           },
         );
+      });
+
+      group('with save-state == true or (false)', () {
+        test('should (not) save the success state', () async {
+          await addAndCommitSampleFile(d, fileName: 'file1.txt');
+
+          final ggJson = await File(join(d.path, '.gg.json')).create();
+          final ggJsonBefore = await ggJson.readAsString();
+
+          // Run the command with save-state == false
+          await commandCluster.exec(
+            directory: d,
+            ggLog: ggLog,
+            force: true,
+            saveState: false,
+          );
+
+          // State should not be saved
+          final ggJsonAfterWithoutSave = await ggJson.readAsString();
+          expect(ggJsonAfterWithoutSave, ggJsonBefore);
+
+          // Run the command with save-state == true
+          await commandCluster.exec(
+            directory: d,
+            ggLog: ggLog,
+            force: true,
+            saveState: true,
+          );
+
+          // State should be saved
+          final ggJsonAfterWithSave = await ggJson.readAsString();
+          expect(ggJsonBefore, isNot(ggJsonAfterWithSave));
+        });
       });
     });
   });
