@@ -5,6 +5,7 @@
 ### Added
 
 - Code to fix pipeline issues
+- --force flag to tests on pipeline
 
 ### Changed
 
