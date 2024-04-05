@@ -11,6 +11,7 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_status_printer/gg_status_printer.dart';
 import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
@@ -33,7 +34,12 @@ class Format extends DirCommand<void> {
   }) async {
     await check(directory: directory);
 
-    _logState(LogState.running);
+    final statusPrinter = GgStatusPrinter<ProcessResult>(
+      ggLog: ggLog,
+      message: 'Running "dart format"',
+    );
+
+    statusPrinter.logStatus(GgStatusPrinterStatus.running);
 
     final result = await processWrapper.run(
       'dart',
@@ -42,7 +48,7 @@ class Format extends DirCommand<void> {
     );
 
     if (result.exitCode == 0) {
-      _logState(LogState.success);
+      statusPrinter.logStatus(GgStatusPrinterStatus.success);
     }
 
     if (result.exitCode != 0) {
@@ -54,7 +60,7 @@ class Format extends DirCommand<void> {
 
       // When running on git hub, log the file that have been changed
       if (isGitHub && files.isNotEmpty) {
-        _logState(LogState.error);
+        statusPrinter.logStatus(GgStatusPrinterStatus.error);
 
         // Log hint
         ggLog(yellow('The following files were formatted:'));
@@ -68,23 +74,16 @@ class Format extends DirCommand<void> {
 
       // When no files have changed, but an error occurred log the error
       if (files.isEmpty) {
-        _logState(LogState.error);
+        statusPrinter.logStatus(GgStatusPrinterStatus.error);
         ggLog(brightBlack('std'));
         throw Exception(
           'dart format failed.',
         );
       }
 
-      _logState(LogState.success);
+      statusPrinter.logStatus(GgStatusPrinterStatus.success);
     }
   }
-
-  // .........................................................................
-  void _logState(LogState state) => logState(
-        ggLog: ggLog,
-        state: state,
-        message: 'Running "dart format"',
-      );
 
   /// The process wrapper used to execute shell processes
   final GgProcessWrapper processWrapper;

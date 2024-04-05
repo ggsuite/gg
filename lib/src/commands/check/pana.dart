@@ -8,10 +8,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_status_printer/gg_status_printer.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
@@ -39,14 +39,19 @@ class Pana extends DirCommand<void> {
   }) async {
     await check(directory: directory);
 
+    final statusPrinter = GgStatusPrinter<ProcessResult>(
+      ggLog: ggLog,
+      message: 'Running "dart pana"',
+    );
+
     // Announce the command
-    _logState(LogState.running);
+    statusPrinter.logStatus(GgStatusPrinterStatus.running);
     final result = await _task(directory);
     final (code, messages, errors) = result;
     final success = code == 0;
 
-    _logState(
-      success ? LogState.success : LogState.error,
+    statusPrinter.logStatus(
+      success ? GgStatusPrinterStatus.success : GgStatusPrinterStatus.error,
     );
 
     if (!success) {
@@ -59,13 +64,6 @@ class Pana extends DirCommand<void> {
       );
     }
   }
-
-  // ...........................................................................
-  void _logState(LogState state) => logState(
-        ggLog: ggLog,
-        state: state,
-        message: 'Running "dart pana"',
-      );
 
   /// The process wrapper used to execute shell processes
   final GgProcessWrapper processWrapper;
