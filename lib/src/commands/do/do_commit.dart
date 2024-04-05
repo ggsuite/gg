@@ -262,7 +262,7 @@ class DoCommit extends DirCommand<void> {
     // Use cider to write into CHANGELOG.md
     await _addToChangeLog.exec(
       directory: directory,
-      ggLog: ggLog,
+      ggLog: (_) {}, // coverage:ignore-line
       message: message,
       logType: logType,
     );
