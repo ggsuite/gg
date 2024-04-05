@@ -173,10 +173,10 @@ packages:
     dependency: "direct main"
     description:
       name: gg_changelog
-      sha256: "3b36687645769de0b9fe6905b9e6918c37143c0f439f98b95bbbe22d84c5e43a"
+      sha256: fe1ddf939f7da23f6b5c9d428898e8dc41d96277c9ba645fdea70534b2f5389f
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.4"
   gg_console_colors:
     dependency: "direct main"
     description:
@@ -189,10 +189,10 @@ packages:
     dependency: "direct main"
     description:
       name: gg_git
-      sha256: "4e54c41cc14ec1475823c8fd4292cde9ce6afa9e4885dfab4c7ee813d8e9e004"
+      sha256: "6499bb9ce84a74d7e54eb164e6052425cc4ca77d527e0d18d85e24fd7ec5e6cf"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.1"
+    version: "2.5.2"
   gg_install_gg:
     dependency: "direct dev"
     description:

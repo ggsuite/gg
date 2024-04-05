@@ -187,7 +187,6 @@ void main() {
       var i = 0;
       expect(messages[i++], contains('Can publish?'));
       expect(messages[i++], contains('✅ Everything is fine.'));
-      expect(messages[i++], contains('There are staged but uncommitted'));
       expect(messages[i++], contains('Publishing was successful.'));
       expect(messages[i++], contains('Tag 1.2.4 added.'));
       expect(messages[i++], contains('⌛️ Increase version'));
