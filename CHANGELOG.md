@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Code to fix pipeline issues
+
 ## [1.0.15] - 2024-04-05
 
 ### Added
@@ -31,6 +37,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/1.0.15...HEAD
 [1.0.15]: https://github.com/inlavigo/gg/compare/1.0.14...1.0.15
 [1.0.14]: https://github.com/inlavigo/gg/compare/1.0.12...1.0.14
 [1.0.12]: https://github.com/inlavigo/gg/releases/tag/1.0.12
