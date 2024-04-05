@@ -11,6 +11,7 @@
 ### Changed
 
 - Cleaned up pipeline
+- Prepare publishing
 
 ## [1.0.15] - 2024-04-05
 
