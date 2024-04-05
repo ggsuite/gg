@@ -1,12 +1,13 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.15] - 2024-04-05
 
 ### Added
 
 - --save-state option for commands like gg can commit\n\nThis is needed to make GitHub pipelines work
 - Setup pipeline git username and email
 - pubspec.lock to .gitignore
+- Add various outputs to test pipeline issues
 
 ### Removed
 
@@ -30,6 +31,6 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/1.0.14...HEAD
+[1.0.15]: https://github.com/inlavigo/gg/compare/1.0.14...1.0.15
 [1.0.14]: https://github.com/inlavigo/gg/compare/1.0.12...1.0.14
 [1.0.12]: https://github.com/inlavigo/gg/releases/tag/1.0.12
