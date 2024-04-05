@@ -210,7 +210,7 @@ packages:
     source: hosted
     version: "1.0.3"
   gg_is_github:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: gg_is_github
       sha256: "4f049c1d077ae2fc702761f545007c1601db9bd565da1b1192031938cd67f704"
