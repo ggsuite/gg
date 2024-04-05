@@ -6,6 +6,7 @@
 
 - --save-state option for commands like gg can commit\n\nThis is needed to make GitHub pipelines work
 - Setup pipeline git username and email
+- pubspec.lock to .gitignore
 
 ### Removed
 
