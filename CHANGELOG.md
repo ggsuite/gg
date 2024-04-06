@@ -1,12 +1,13 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0] - 2024-04-06
 
 ### Added
 
 - New sub command »gg info modified-files and »gg info »last-changes-hash«
 - DoCommit: When everything is committed, no message an log type are needed.
 - Option --no-log to allow committing without change CHANGELOG.md
+- Pipeline: Print modified files + changes hash
 
 ### Changed
 
@@ -63,7 +64,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/1.0.16...HEAD
+[2.0.0]: https://github.com/inlavigo/gg/compare/1.0.16...2.0.0
 [1.0.16]: https://github.com/inlavigo/gg/compare/1.0.15...1.0.16
 [1.0.15]: https://github.com/inlavigo/gg/compare/1.0.14...1.0.15
 [1.0.14]: https://github.com/inlavigo/gg/compare/1.0.12...1.0.14
