@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Pipeline: Improve order and description of tasks
+
 ## [2.0.0] - 2024-04-06
 
 ### Added
@@ -64,6 +70,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/2.0.0...HEAD
 [2.0.0]: https://github.com/inlavigo/gg/compare/1.0.16...2.0.0
 [1.0.16]: https://github.com/inlavigo/gg/compare/1.0.15...1.0.16
 [1.0.15]: https://github.com/inlavigo/gg/compare/1.0.14...1.0.15

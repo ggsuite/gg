@@ -77,19 +77,19 @@ jobs:
             dart pub get
           fi
 
-      - name: Activate gg
+      - name: Install the gg developer command line
         run: dart pub global activate gg
 
-      - name: Last changes hash & modified files
+      - name: What was changed in the last commit?
         run: |
           gg info last-changes-hash
           gg info modified-files --force
 
-      - name: Did you execute »gg did push«?
+      - name: Did you execute »gg do commit«?
+        run: gg did commit
+
+      - name: Did you execute »gg do push«?
         run: gg did push
 
-      - name: Did you execute »gg did commit«?
-        run: gg did push
-
-      - name: Run »gg can commit --force«
+      - name: Will the tests pass on Ubuntu also?
         run: gg can commit --force
