@@ -5,7 +5,6 @@
 // found in the LICENSE file in the root of this package.
 
 import 'dart:io';
-
 import 'package:args/command_runner.dart';
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/commands/do/do_commit.dart';
@@ -77,52 +76,71 @@ void main() {
 
   group('DoCommit', () {
     group('exec(directory, ggLog, message)', () {
-      group('should log »Already checked and committed.«', () {
-        test('when the command is executed the second time', () async {
-          // Execute command the first time
-          await doCommit.exec(
-            directory: d,
-            ggLog: ggLog,
-            message: 'My commit',
-            logType: LogType.added,
-          );
+      group('should succeed', () {
+        group('and log »Already checked and committed.«', () {
+          test('when the command is executed the second time', () async {
+            // Execute command the first time
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: 'My commit',
+              logType: LogType.added,
+            );
 
-          // Execute command the second time
-          await doCommit.exec(
-            directory: d,
-            ggLog: ggLog,
-            message: 'My commit 2',
-            logType: LogType.added,
-          );
+            // Execute command the second time
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: 'My commit 2',
+              logType: LogType.added,
+            );
 
-          expect(messages.last, yellow('Already checked and committed.'));
+            expect(messages.last, yellow('Already checked and committed.'));
+          });
         });
-      });
 
-      group('should log »Checks successful. Nothing to commit.«', () {
-        test(
-            'when the command is executed the first time '
-            'but nothing needs to be committed.', () async {
-          // Execute command the first time
-          await doCommit.exec(
-            directory: d,
-            ggLog: ggLog,
-            message: 'My commit',
-            logType: LogType.added,
-          );
+        group('and log »Checks successful. Nothing to commit.«', () {
+          test(
+              'when the command is executed the first time '
+              'but nothing needs to be committed.', () async {
+            // Execute command the first time
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: 'My commit',
+              logType: LogType.added,
+            );
 
-          expect(
-            messages.last,
-            yellow('Checks successful. Nothing to commit.'),
-          );
+            expect(
+              messages.last,
+              yellow('Checks successful. Nothing to commit.'),
+            );
+          });
         });
-      });
 
-      group('should commit and log »Checks successful. Commit successful.«',
-          () {
-        test(
-            'when the command is executed the first time '
-            'and uncommitted changes were committed.', () async {
+        group('and commit and log »Checks successful. Commit successful.«', () {
+          test(
+              'when the command is executed the first time '
+              'and uncommitted changes were committed.', () async {
+            // Add uncommitted file
+            await addFileWithoutCommitting(d);
+
+            // Execute command the first time
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: 'My commit',
+              logType: LogType.added,
+            );
+
+            expect(
+              messages.last,
+              yellow('Checks successful. Commit successful.'),
+            );
+          });
+        });
+
+        test('write the message and the log type to CHANGELOG.md', () async {
           // Add uncommitted file
           await addFileWithoutCommitting(d);
 
@@ -130,36 +148,81 @@ void main() {
           await doCommit.exec(
             directory: d,
             ggLog: ggLog,
-            message: 'My commit',
+            message: 'My very special commit message',
             logType: LogType.added,
           );
 
-          expect(
-            messages.last,
-            yellow('Checks successful. Commit successful.'),
-          );
+          // Check CHANGELOG.md
+          final changelog = await File('${d.path}/CHANGELOG.md').readAsString();
+          expect(changelog, contains('# Changelog\n'));
+          expect(changelog, contains('## Unreleased\n'));
+          expect(changelog, contains('## Added\n'));
+          expect(changelog, contains('My very special commit message\n'));
         });
-      });
 
-      test('should write the message and the log type to CHANGELOG.md',
-          () async {
-        // Add uncommitted file
-        await addFileWithoutCommitting(d);
+        group('and allow to execute from cli', () {
+          test('with message', () async {
+            await addFileWithoutCommitting(d);
 
-        // Execute command the first time
-        await doCommit.exec(
-          directory: d,
-          ggLog: ggLog,
-          message: 'My very special commit message',
-          logType: LogType.added,
-        );
+            final runner = CommandRunner<void>('test', 'test');
+            runner.addCommand(doCommit);
+            await runner.run(
+              ['commit', '-i', d.path, '-m', 'My commit', '-t', 'added'],
+            );
+            expect(
+              messages.last,
+              yellow('Checks successful. Commit successful.'),
+            );
+          });
+        });
+        test('and have 100% code coverage', () {
+          final instance = DoCommit(ggLog: ggLog);
+          expect(instance, isNotNull);
+        });
 
-        // Check CHANGELOG.md
-        final changelog = await File('${d.path}/CHANGELOG.md').readAsString();
-        expect(changelog, contains('# Changelog\n'));
-        expect(changelog, contains('## Unreleased\n'));
-        expect(changelog, contains('## Added\n'));
-        expect(changelog, contains('My very special commit message\n'));
+        group('when no commit message and no log type is provided', () {
+          test('but everything is already committed', () async {
+            // Add uncommitted file
+            await addFileWithoutCommitting(d);
+
+            // Execute command without messsage and log type.
+            // It should fail, because we have uncommitted changes
+            late String exception;
+
+            try {
+              await doCommit.exec(
+                directory: d,
+                ggLog: ggLog,
+                message: null,
+                logType: null,
+              );
+            } catch (e) {
+              exception = e.toString();
+            }
+            expect(
+              exception,
+              'Exception: ${yellow('Run again with ')}'
+              '${blue('-m "yourMessage"')}',
+            );
+
+            // Commit everything.
+            // Run the command again without message and log type.
+            // It should succeed, because everything is already committed.
+            await commitFile(d, sampleFileName, message: 'Message');
+
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: null,
+              logType: null,
+            );
+
+            expect(
+              messages.last,
+              yellow('Checks successful. Nothing to commit.'),
+            );
+          });
+        });
       });
 
       group('should throw', () {
@@ -369,25 +432,6 @@ void main() {
             'Exception: No »repository:« found in pubspec.yaml',
           );
         });
-      });
-
-      group('should allow to execute from cli', () {
-        test('with message', () async {
-          await addFileWithoutCommitting(d);
-
-          final runner = CommandRunner<void>('test', 'test');
-          runner.addCommand(doCommit);
-          await runner
-              .run(['commit', '-i', d.path, '-m', 'My commit', '-t', 'added']);
-          expect(
-            messages.last,
-            yellow('Checks successful. Commit successful.'),
-          );
-        });
-      });
-      test('should have 100% code coverage', () {
-        final instance = DoCommit(ggLog: ggLog);
-        expect(instance, isNotNull);
       });
     });
   });

@@ -52,11 +52,6 @@ class DoCommit extends DirCommand<void> {
     // Does directory exist?
     await check(directory: directory);
 
-    // Check needed options
-    message ??= _messageFromArgs();
-    logType ??= _logTypeFromArgs();
-    final repoUrl = await _repositoryUrl(directory);
-
     // Is everything committed?
     final isCommittedViaGit = await _isGitCommitted.get(
       directory: directory,
@@ -77,27 +72,34 @@ class DoCommit extends DirCommand<void> {
       }
     }
 
+    // Check needed options
+    message ??= _messageFromArgs(isCommittedViaGit);
+    logType ??= _logTypeFromArgs(isCommittedViaGit);
+    final repoUrl = await _repositoryUrl(directory);
+
     // Is everything fine?
     await _canCommit.exec(
       directory: directory,
       ggLog: ggLog,
     );
 
-    // Write message into README.md
-    await _writeMessageIntoChangeLog(
-      directory: directory,
-      message: message,
-      logType: logType,
-      repoUrl: repoUrl,
-      commit: isCommittedViaGit,
-    );
+    // Update changelog when a message is given
+    if (message != null && logType != null) {
+      await _writeMessageIntoChangeLog(
+        directory: directory,
+        message: message,
+        logType: logType,
+        repoUrl: repoUrl,
+        commit: isCommittedViaGit,
+      );
+    }
 
     // Execute the commit
     if (!isCommittedViaGit) {
       await gitAddAndCommit(
         directory: directory,
-        message: message,
-        logType: logType,
+        message: message!,
+        logType: logType!,
       );
       ggLog(yellow('Checks successful. Commit successful.'));
     } else {
@@ -200,11 +202,16 @@ class DoCommit extends DirCommand<void> {
   }
 
   // ...........................................................................
-  String _messageFromArgs() {
+  String? _messageFromArgs(bool everythingIsCommitted) {
     try {
       final message = argResults!['message'] as String;
       return message;
     } catch (e) {
+      // If everything is committed, we do not need a commit message
+      if (everythingIsCommitted) {
+        return null;
+      }
+
       throw Exception(
         yellow('Run again with ') + blue('-m "yourMessage"'),
       );
@@ -212,13 +219,18 @@ class DoCommit extends DirCommand<void> {
   }
 
   // ...........................................................................
-  cl.LogType _logTypeFromArgs() {
+  cl.LogType? _logTypeFromArgs(bool everythingIsCommitted) {
     try {
       final logTypeString = argResults!['log-type'] as String;
       return cl.LogType.values.firstWhere(
         (element) => element.name == logTypeString,
       );
     } catch (e) {
+      // If everything is committed, we do not need a log type
+      if (everythingIsCommitted) {
+        return null;
+      }
+
       throw Exception(
         yellow('Run again with ') + blue('-l ${_logTypes.join(' | ')}'),
       );
