@@ -6,6 +6,7 @@
 
 - New sub command »gg info modified-files and »gg info »last-changes-hash«
 - DoCommit: When everything is committed, no message an log type are needed.
+- Option --no-log to allow committing without change CHANGELOG.md
 
 ### Changed
 

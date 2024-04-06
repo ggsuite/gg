@@ -48,6 +48,7 @@ class DoCommit extends DirCommand<void> {
     required GgLog ggLog,
     String? message,
     cl.LogType? logType,
+    bool? updateChangeLog,
   }) async {
     // Does directory exist?
     await check(directory: directory);
@@ -84,7 +85,8 @@ class DoCommit extends DirCommand<void> {
     );
 
     // Update changelog when a message is given
-    if (message != null && logType != null) {
+    updateChangeLog ??= argResults?['log'] as bool? ?? true;
+    if (updateChangeLog && message != null && logType != null) {
       await _writeMessageIntoChangeLog(
         directory: directory,
         message: message,
@@ -156,6 +158,14 @@ class DoCommit extends DirCommand<void> {
       help: 'The type of the commit.',
       mandatory: true,
       allowed: _logTypes,
+    );
+
+    argParser.addFlag(
+      'log',
+      abbr: 'l',
+      help: 'Do not add message to CHANGELOG.md.',
+      negatable: true,
+      defaultsTo: true,
     );
   }
 

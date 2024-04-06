@@ -20,6 +20,7 @@ void main() {
   late DoCommit doCommit;
   final messages = <String>[];
   final ggLog = messages.add;
+  late CommandRunner<void> runner;
 
   late CanCommit canCommit;
 
@@ -67,6 +68,10 @@ void main() {
       ggLog: ggLog,
       canCommit: canCommit,
     );
+
+    // Create runner
+    runner = CommandRunner<void>('test', 'test');
+    runner.addCommand(doCommit);
   });
 
   // ...........................................................................
@@ -140,32 +145,166 @@ void main() {
           });
         });
 
-        test('write the message and the log type to CHANGELOG.md', () async {
-          // Add uncommitted file
-          await addFileWithoutCommitting(d);
+        group('and update CHANGELOG.md', () {
+          group('when »updateChangeLog«', () {
+            group('is not specified', () {
+              test('programmatically', () async {
+                // Add uncommitted file
+                await addFileWithoutCommitting(d);
 
-          // Execute command the first time
-          await doCommit.exec(
-            directory: d,
-            ggLog: ggLog,
-            message: 'My very special commit message',
-            logType: LogType.added,
-          );
+                // Execute command
+                await doCommit.exec(
+                  directory: d,
+                  ggLog: ggLog,
+                  message: 'My very special commit message',
+                  logType: LogType.added,
+                );
 
-          // Check CHANGELOG.md
-          final changelog = await File('${d.path}/CHANGELOG.md').readAsString();
-          expect(changelog, contains('# Changelog\n'));
-          expect(changelog, contains('## Unreleased\n'));
-          expect(changelog, contains('## Added\n'));
-          expect(changelog, contains('My very special commit message\n'));
+                // Check CHANGELOG.md
+                final changelog =
+                    await File('${d.path}/CHANGELOG.md').readAsString();
+                expect(changelog, contains('# Changelog\n'));
+                expect(changelog, contains('## Unreleased\n'));
+                expect(changelog, contains('## Added\n'));
+                expect(changelog, contains('My very special commit message\n'));
+              });
+
+              test('via CLI', () async {
+                // Add uncommitted file
+                await addFileWithoutCommitting(d);
+
+                // Execute command
+                await runner.run([
+                  'commit',
+                  '-i',
+                  d.path,
+                  '-m',
+                  'My very special commit message',
+                  '-t',
+                  'add',
+                ]);
+
+                // Check CHANGELOG.md
+                final changelog =
+                    await File('${d.path}/CHANGELOG.md').readAsString();
+                expect(changelog, contains('# Changelog\n'));
+                expect(changelog, contains('## Unreleased\n'));
+                expect(changelog, contains('## Added\n'));
+                expect(
+                  changelog,
+                  contains('My very special commit message\n'),
+                );
+              });
+            });
+            test('is true', () async {
+              // Add uncommitted file
+              await addFileWithoutCommitting(d);
+
+              // Execute command the first time
+              await doCommit.exec(
+                directory: d,
+                ggLog: ggLog,
+                message: 'My very special commit message',
+                logType: LogType.added,
+                updateChangeLog: true,
+              );
+
+              // Check CHANGELOG.md
+              final changelog =
+                  await File('${d.path}/CHANGELOG.md').readAsString();
+              expect(changelog, contains('# Changelog\n'));
+              expect(changelog, contains('## Unreleased\n'));
+              expect(changelog, contains('## Added\n'));
+              expect(changelog, contains('My very special commit message\n'));
+            });
+          });
+        });
+
+        group('and not update CHANGELOG.md', () {
+          test('when »updateChangeLog« is false', () async {
+            // Add uncommitted file
+            await addFileWithoutCommitting(d);
+
+            // Check CHANGELOG.md before
+            final changelogFile = File('${d.path}/CHANGELOG.md');
+            final changeLogBefore = await changelogFile.readAsString();
+
+            // ..........................................
+            // Execute command with updateCHangeLog false
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: 'My very special commit message',
+              logType: LogType.added,
+              updateChangeLog: false,
+            );
+
+            // Check CHANGELOG.md should not have changed
+            final changeLogAfter = await changelogFile.readAsString();
+            expect(changeLogBefore, changeLogAfter);
+
+            // ..........................................
+            // Execute command with updateCHangeLog true
+            await updateAndCommitSampleFile(d);
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: 'My very special commit message',
+              logType: LogType.added,
+              updateChangeLog: true,
+            );
+
+            // CHANGELOG.md should have changed
+            final changeLogAfter1 = await changelogFile.readAsString();
+            expect(changeLogAfter1, isNot(changeLogBefore));
+          });
+
+          test('when command is executed with --no-log option', () async {
+            // Add uncommitted file
+            await addFileWithoutCommitting(d);
+
+            // Check CHANGELOG.md before
+            final changelogFile = File('${d.path}/CHANGELOG.md');
+            final changeLogBefore = await changelogFile.readAsString();
+
+            // ....................................
+            // Execute command with --no-log option
+            await runner.run([
+              'commit',
+              '-i',
+              d.path,
+              '-m',
+              'My commit',
+              '-t' 'added',
+              '--no-log',
+            ]);
+
+            // Check CHANGELOG.md should not have changed
+            final changeLogAfter = await changelogFile.readAsString();
+            expect(changeLogBefore, changeLogAfter);
+
+            // ..........................................
+            // Execute command with --log option
+            await updateAndCommitSampleFile(d);
+            await runner.run([
+              'commit',
+              '-i',
+              d.path,
+              '-m',
+              'My commit',
+              '-t' 'added',
+              '--log',
+            ]);
+
+            // CHANGELOG.md should have changed
+            final changeLogAfter1 = await changelogFile.readAsString();
+            expect(changeLogAfter1, isNot(changeLogBefore));
+          });
         });
 
         group('and allow to execute from cli', () {
           test('with message', () async {
             await addFileWithoutCommitting(d);
-
-            final runner = CommandRunner<void>('test', 'test');
-            runner.addCommand(doCommit);
             await runner.run(
               ['commit', '-i', d.path, '-m', 'My commit', '-t', 'added'],
             );
