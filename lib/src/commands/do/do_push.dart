@@ -46,7 +46,7 @@ class DoPush extends DirCommand<void> {
     // Is everything pushed?
     final isPushedViaGit = await _isPushedViaGit.get(
       directory: directory,
-      ggLog: ggLog,
+      ggLog: (_) {}, // coverage:ignore-line
     );
 
     // Is didPush already set?
