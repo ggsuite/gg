@@ -12,6 +12,7 @@
 
 - Pipeline: Use globally installed version of gg
 - Kidney: Auto check all repos
+- Breaking change: Renamed log type values into add \| change \| deprecate \| fix \| remove \| secure
 
 ## [1.0.16] - 2024-04-05
 

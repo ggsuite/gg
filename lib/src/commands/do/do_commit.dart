@@ -16,7 +16,41 @@ import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
 
-final _logTypes = cl.LogType.values.map((e) => e.name);
+final _logTypes = cl.LogType.values.map((e) {
+  switch (e) {
+    case cl.LogType.added:
+      return 'add';
+    case cl.LogType.changed:
+      return 'change';
+    case cl.LogType.deprecated:
+      return 'deprecate';
+    case cl.LogType.fixed:
+      return 'fix';
+    case cl.LogType.removed:
+      return 'remove';
+    case cl.LogType.security:
+      return 'secure';
+  }
+});
+
+cl.LogType _stringToLogType(String e) {
+  switch (e) {
+    case 'add':
+      return cl.LogType.added;
+    case 'change':
+      return cl.LogType.changed;
+    case 'deprecate':
+      return cl.LogType.deprecated;
+    case 'fix':
+      return cl.LogType.fixed;
+    case 'remove':
+      return cl.LogType.removed;
+    case 'secure':
+      return cl.LogType.security;
+    default:
+      throw Exception('Unknown log type: $e'); // coverage:ignore-line
+  }
+}
 
 // .............................................................................
 /// Does a commit of the current directory.
@@ -232,9 +266,7 @@ class DoCommit extends DirCommand<void> {
   cl.LogType? _logTypeFromArgs(bool everythingIsCommitted) {
     try {
       final logTypeString = argResults!['log-type'] as String;
-      return cl.LogType.values.firstWhere(
-        (element) => element.name == logTypeString,
-      );
+      return _stringToLogType(logTypeString);
     } catch (e) {
       // If everything is committed, we do not need a log type
       if (everythingIsCommitted) {

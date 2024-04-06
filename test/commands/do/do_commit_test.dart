@@ -275,7 +275,7 @@ void main() {
               d.path,
               '-m',
               'My commit',
-              '-t' 'added',
+              '-t' 'add',
               '--no-log',
             ]);
 
@@ -292,7 +292,7 @@ void main() {
               d.path,
               '-m',
               'My commit',
-              '-t' 'added',
+              '-t' 'add',
               '--log',
             ]);
 
@@ -306,7 +306,7 @@ void main() {
           test('with message', () async {
             await addFileWithoutCommitting(d);
             await runner.run(
-              ['commit', '-i', d.path, '-m', 'My commit', '-t', 'added'],
+              ['commit', '-i', d.path, '-m', 'My commit', '-t', 'add'],
             );
             expect(
               messages.last,
@@ -536,12 +536,64 @@ void main() {
           final part0 = yellow('Run again with ');
 
           final part1 = blue(
-            '-l added | changed | deprecated | fixed | removed | security',
+            '-l add | change | deprecate | fix | remove | secure',
           );
 
           expect(
             exception,
             'Exception: $part0$part1',
+          );
+        });
+
+        test('when an unknown log-type is provided', () async {
+          // Add an uncommitted file
+          await addFileWithoutCommitting(d);
+
+          // Execute the command with known log types
+          // It should not throw.
+          for (final logType in [
+            'add',
+            'change',
+            'deprecate',
+            'fix',
+            'remove',
+            'secure',
+          ]) {
+            await updateSampleFileWithoutCommitting(d);
+            await runner.run([
+              'commit',
+              '-i',
+              d.path,
+              '-m',
+              'My commit',
+              '-t',
+              logType,
+            ]);
+          }
+
+          // Execute the command with an unknown log type
+          // It should throw.
+          await updateSampleFileWithoutCommitting(d);
+
+          late String exception;
+
+          try {
+            await runner.run([
+              'commit',
+              '-i',
+              d.path,
+              '-m',
+              'My commit',
+              '-t',
+              'unknown',
+            ]);
+          } catch (e) {
+            exception = e.toString();
+          }
+
+          expect(
+            exception,
+            contains('"unknown" is not an allowed value for option "log-type'),
           );
         });
 
