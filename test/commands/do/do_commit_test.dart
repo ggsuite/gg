@@ -536,7 +536,7 @@ void main() {
           final part0 = yellow('Run again with ');
 
           final part1 = blue(
-            '-l add | change | deprecate | fix | remove | secure',
+            '-t add | change | deprecate | fix | remove | secure',
           );
 
           expect(

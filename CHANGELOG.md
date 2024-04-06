@@ -14,6 +14,10 @@
 - Kidney: Auto check all repos
 - Breaking change: Renamed log type values into add \| change \| deprecate \| fix \| remove \| secure
 
+### Fixed
+
+- Wrong option in command line output
+
 ## [1.0.16] - 2024-04-05
 
 ### Added

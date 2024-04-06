@@ -274,7 +274,7 @@ class DoCommit extends DirCommand<void> {
       }
 
       throw Exception(
-        yellow('Run again with ') + blue('-l ${_logTypes.join(' | ')}'),
+        yellow('Run again with ') + blue('-t ${_logTypes.join(' | ')}'),
       );
     }
   }
