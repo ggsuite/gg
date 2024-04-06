@@ -17,6 +17,7 @@
 ### Fixed
 
 - Wrong option in command line output
+- An error which can lead to sporadic test fails
 
 ## [1.0.16] - 2024-04-05
 

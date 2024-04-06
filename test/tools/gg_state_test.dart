@@ -23,11 +23,11 @@ void main() {
   late ModifiedFiles modifiedFiles;
 
   // ...........................................................................
-  void initCommand() {
+  Future<void> initCommand() async {
     ggState = GgState(
       ggLog: messages.add,
     );
-    initGit(dLocal);
+    await initGit(dLocal);
   }
 
   // ...........................................................................
@@ -39,7 +39,7 @@ void main() {
     await initGit(dLocal);
     await initRemoteGit(dRemote);
 
-    initCommand();
+    await initCommand();
     await addPubspecFileWithoutCommitting(dLocal, version: '1.0.0');
     await commitPubspecFile(dLocal);
 
