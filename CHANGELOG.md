@@ -6,6 +6,10 @@
 
 - Pipeline: Improve order and description of tasks
 
+### Fixed
+
+- doPush did not push success state result when state was pushed before
+
 ## [2.0.0] - 2024-04-06
 
 ### Added

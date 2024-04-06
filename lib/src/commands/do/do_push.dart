@@ -75,13 +75,17 @@ class DoPush extends DirCommand<void> {
       key: stateKey,
     );
 
+    // Did .gg.json change? Is a new push needed?
+    final isPushedViaGitAfterWritingSuccess = await _isPushedViaGit.get(
+      directory: directory,
+      ggLog: ggLog,
+    );
+
     // Execute the commit
-    if (!isPushedViaGit) {
+    if (!isPushedViaGitAfterWritingSuccess) {
       force ??= _forceFromArgs();
       await gitPush(directory: directory, force: force);
       ggLog(yellow('Checks successful. Pushed successful.'));
-    } else {
-      ggLog(yellow('Checks successful. Nothing to push.'));
     }
   }
 
