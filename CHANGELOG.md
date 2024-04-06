@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Changes were not correctly submitted on publish
+
 ## [2.0.1] - 2024-04-06
 
 ### Changed
@@ -75,6 +81,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/2.0.1...HEAD
 [2.0.1]: https://github.com/inlavigo/gg/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/inlavigo/gg/compare/1.0.16...2.0.0
 [1.0.16]: https://github.com/inlavigo/gg/compare/1.0.15...1.0.16
