@@ -34,3 +34,6 @@ export 'src/commands/did/did_commit.dart';
 export 'src/tools/carriage_return.dart';
 export 'src/tools/command_cluster.dart';
 export 'src/tools/checks.dart';
+
+// Info
+export 'src/commands/info.dart';

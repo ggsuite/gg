@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- New sub command »gg info modified-files and »gg info »last-changes-hash«
+
 ### Changed
 
 - Pipeline: Use globally installed version of gg
