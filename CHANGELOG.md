@@ -5,6 +5,7 @@
 ### Changed
 
 - Pipeline: Improve order and description of tasks
+- Commit message of .gg.json commit
 
 ### Fixed
 
