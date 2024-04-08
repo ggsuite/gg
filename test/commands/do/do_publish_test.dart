@@ -15,7 +15,6 @@ import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_json/gg_json.dart';
 import 'package:gg_publish/gg_publish.dart';
-import 'package:gg_version/gg_version.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
 import 'package:pub_semver/pub_semver.dart';
