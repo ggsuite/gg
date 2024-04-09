@@ -17,6 +17,7 @@ import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:gg_version/gg_version.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart';
 
 /// Publishes the current directory.
 class DoPublish extends DirCommand<void> {
@@ -33,9 +34,11 @@ class DoPublish extends DirCommand<void> {
     DoPush? doPush,
     PrepareNextVersion? prepareNextVersion,
     FromPubspec? fromPubspec,
+    IsPublished? isPublished,
     changelog.Release? release,
+    PublishTo? publishTo,
   })  : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
-        _publish = publish ?? Publish(ggLog: ggLog),
+        _publishToPubDev = publish ?? Publish(ggLog: ggLog),
         _state = state ?? GgState(ggLog: ggLog),
         _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog),
         _commit = commit ?? Commit(ggLog: ggLog),
@@ -43,7 +46,10 @@ class DoPublish extends DirCommand<void> {
         _prepareNextVersion =
             prepareNextVersion ?? PrepareNextVersion(ggLog: ggLog),
         _fromPubspec = fromPubspec ?? FromPubspec(ggLog: ggLog),
-        _releaseChangelog = release ?? changelog.Release(ggLog: ggLog);
+        _releaseChangelog = release ?? changelog.Release(ggLog: ggLog),
+        _isPublished = isPublished ?? IsPublished(ggLog: ggLog) {
+    _addArgs();
+  }
 
   // ...........................................................................
   /// The key used to save the state of the command
@@ -54,6 +60,7 @@ class DoPublish extends DirCommand<void> {
   Future<void> exec({
     required Directory directory,
     required GgLog ggLog,
+    bool? askBeforePublishing,
   }) async {
     // Does directory exist?
     await check(directory: directory);
@@ -83,11 +90,21 @@ class DoPublish extends DirCommand<void> {
       ggLog: noLog,
     );
 
-    // Publish
-    await _publish.exec(
-      directory: directory,
-      ggLog: ggLog,
+    // Publish on pub.dev
+    final publishToPubDev = await _shouldPublishToPubDev(directory, ggLog);
+    askBeforePublishing = await _shouldAskBeforePublishing(
+      directory,
+      ggLog,
+      askBeforePublishing,
     );
+
+    if (publishToPubDev) {
+      await _publishToPubDev.exec(
+        directory: directory,
+        ggLog: ggLog,
+        askBeforePublishing: askBeforePublishing,
+      );
+    }
 
     // Save state
     await _state.writeSuccess(
@@ -124,7 +141,7 @@ class DoPublish extends DirCommand<void> {
   // ######################
 
   // ...........................................................................
-  final Publish _publish;
+  final Publish _publishToPubDev;
   final CanPublish _canPublish;
   final GgState _state;
   final AddVersionTag _addVersionTag;
@@ -133,6 +150,7 @@ class DoPublish extends DirCommand<void> {
   final PrepareNextVersion _prepareNextVersion;
   final FromPubspec _fromPubspec;
   final changelog.Release _releaseChangelog;
+  final IsPublished _isPublished;
 
   // ...........................................................................
   Future<void> _prepareChangelog({
@@ -209,6 +227,68 @@ class DoPublish extends DirCommand<void> {
     await _doPush.gitPush(
       directory: directory,
       force: false,
+    );
+  }
+
+  // ...........................................................................
+  Future<bool> _shouldAskBeforePublishing(
+    Directory directory,
+    GgLog ggLog,
+    bool? askBeforePublishing,
+  ) async {
+    askBeforePublishing ??= _askBeforePublishingFromParam;
+
+    // Check package was published before
+    final wasPublishedBefore = await _isPublished.get(
+      directory: directory,
+      ggLog: ggLog,
+    );
+
+    // When --ask-for-confirmation is true, always ask
+    if (askBeforePublishing) {
+      return true;
+    }
+
+    // When --ask-for-confirmation is false,
+    // don't ask, when package is already published
+    if (wasPublishedBefore) {
+      return false;
+    }
+
+    /// If the package was never published before,
+    /// and askBeforePublishing is false,
+    /// throw an exception.
+    /// Before publishing the package the first time,
+    /// always ask.
+    throw Exception(
+      'The package was never published to pub.dev before. '
+      'Please call »gg do push« with »--ask-before-publishing« '
+      'when publishing the first time.',
+    );
+  }
+
+  // ...........................................................................
+  Future<bool> _shouldPublishToPubDev(
+    Directory directory,
+    GgLog ggLog,
+  ) async {
+    final pubspecFile = File(join(directory.path, 'pubspec.yaml'));
+    final pubspec = await pubspecFile.readAsString();
+    return !pubspec.contains(RegExp(r'publish_to:'));
+  }
+
+  // ...........................................................................
+  bool get _askBeforePublishingFromParam =>
+      argResults?['ask-before-publishing'] as bool? ?? true;
+
+  // ...........................................................................
+  void _addArgs() {
+    argParser.addFlag(
+      'ask-before-publishing',
+      abbr: 'a',
+      help: 'Ask for confirmation before publishing to pub.dev.',
+      defaultsTo: true,
+      negatable: true,
     );
   }
 }

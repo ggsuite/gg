@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Handle unpublished packages as well packages that are not published to pub.dev
+
 ### Changed
 
 - Update latest changes on gg\_publish and gg\_git
