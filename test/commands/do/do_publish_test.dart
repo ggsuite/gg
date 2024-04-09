@@ -149,8 +149,8 @@ void main() {
   });
 
   group('DoPublish', () {
-    group('should log', () {
-      group('»Current state is already published.«', () {
+    group('exec(directory)', () {
+      group('should not publish', () {
         test('when publishing was already successful', () async {
           await ggJson.writeFile(
             file: File(join(d.path, '.gg.json')),
@@ -165,61 +165,65 @@ void main() {
           expect(messages[0], yellow('Current state is already published.'));
         });
       });
-    });
+      group('should publish', () {
+        group('to pub.dev', () {
+          test('when no »publish_to: none« is found in pubspec.yaml', () async {
+            // Mock needing publish
+            await ggJson.writeFile(
+              file: File(join(d.path, '.gg.json')),
+              path: 'doPublish/success/hash',
+              value: needsChangeHash,
+            );
 
-    test('should perform a variety of steps before and after publishing',
-        () async {
-      // Mock needing publish
-      await ggJson.writeFile(
-        file: File(join(d.path, '.gg.json')),
-        path: 'doPublish/success/hash',
-        value: needsChangeHash,
-      );
+            // Publish
+            await doPublish.exec(
+              directory: d,
+              ggLog: ggLog,
+            );
 
-      // Publish
-      await doPublish.exec(
-        directory: d,
-        ggLog: ggLog,
-      );
+            // Were the steps performed?
+            var i = 0;
+            expect(messages[i++], contains('Can publish?'));
+            expect(messages[i++], contains('✅ Everything is fine.'));
+            expect(messages[i++], contains('Publishing was successful.'));
+            expect(messages[i++], contains('Tag 1.2.4 added.'));
+            expect(messages[i++], contains('⌛️ Increase version'));
+            expect(messages[i++], contains('✅ Increase version'));
 
-      // Were the steps performed?
-      var i = 0;
-      expect(messages[i++], contains('Can publish?'));
-      expect(messages[i++], contains('✅ Everything is fine.'));
-      expect(messages[i++], contains('Publishing was successful.'));
-      expect(messages[i++], contains('Tag 1.2.4 added.'));
-      expect(messages[i++], contains('⌛️ Increase version'));
-      expect(messages[i++], contains('✅ Increase version'));
+            // Was a new version created?
+            final pubspec =
+                await File(join(d.path, 'pubspec.yaml')).readAsString();
+            final changeLog =
+                await File(join(d.path, 'CHANGELOG.md')).readAsString();
+            expect(pubspec, contains('version: 1.2.5'));
+            expect(changeLog, contains('## [1.2.4] -'));
 
-      // Was a new version created?
-      final pubspec = await File(join(d.path, 'pubspec.yaml')).readAsString();
-      final changeLog = await File(join(d.path, 'CHANGELOG.md')).readAsString();
-      expect(pubspec, contains('version: 1.2.5'));
-      expect(changeLog, contains('## [1.2.4] -'));
+            // Was the new version checked in?
+            final headMessage = await HeadMessage(ggLog: ggLog).get(
+              directory: d,
+              ggLog: ggLog,
+            );
+            expect(headMessage, 'Prepare development of version 1.2.5');
 
-      // Was the new version checked in?
-      final headMessage = await HeadMessage(ggLog: ggLog).get(
-        directory: d,
-        ggLog: ggLog,
-      );
-      expect(headMessage, 'Prepare development of version 1.2.5');
+            // Was .gg.json updated in a way that didCommit,
+            // didPush and didPublish return true?
+            expect(
+              await DidCommit(ggLog: ggLog).get(directory: d, ggLog: ggLog),
+              isTrue,
+            );
 
-      // Was .gg.json updated in a way that didCommit, didPush and didPublish
-      // return true?
-      expect(
-        await DidCommit(ggLog: ggLog).get(directory: d, ggLog: ggLog),
-        isTrue,
-      );
+            expect(
+              await DidPush(ggLog: ggLog).get(directory: d, ggLog: ggLog),
+              isTrue,
+            );
 
-      expect(
-        await DidPush(ggLog: ggLog).get(directory: d, ggLog: ggLog),
-        isTrue,
-      );
-
-      expect(
-        await DidPublish(ggLog: ggLog).get(directory: d, ggLog: ggLog),
-        isTrue,
-      );
+            expect(
+              await DidPublish(ggLog: ggLog).get(directory: d, ggLog: ggLog),
+              isTrue,
+            );
+          });
+        });
+      });
     });
 
     test('should have a code coverage of 100%', () {

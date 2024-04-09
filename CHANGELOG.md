@@ -5,6 +5,7 @@
 ### Changed
 
 - Update latest changes on gg\_publish and gg\_git
+- Refactor tests
 
 ## [2.0.2] - 2024-04-06
 
