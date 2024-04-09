@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Removed
+
+- Pipeline: Disable cache
+
 ## [2.0.4] - 2024-04-09
 
 ### Changed
@@ -102,6 +108,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/2.0.4...HEAD
 [2.0.4]: https://github.com/inlavigo/gg/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/inlavigo/gg/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/inlavigo/gg/compare/2.0.1...2.0.2
