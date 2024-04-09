@@ -64,7 +64,7 @@ class DoPublish extends DirCommand<void> {
   }) async {
     // Does directory exist?
     await check(directory: directory);
-    void noLog(_) {}
+    void noLog(_) {} // coverage:ignore-line
 
     // Did already publish?
     final isDone = await _state.readSuccess(
