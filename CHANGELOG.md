@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.3] - 2024-04-09
 
 ### Added
 
@@ -92,7 +92,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/2.0.2...HEAD
+[2.0.3]: https://github.com/inlavigo/gg/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/inlavigo/gg/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/inlavigo/gg/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/inlavigo/gg/compare/1.0.16...2.0.0
