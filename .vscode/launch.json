@@ -10,8 +10,8 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
-      "args": ["can", "commit"],
-      "cwd": "${workspaceFolder}/../gg_publish"
+      "args": ["do", "publish"],
+      "cwd": "${workspaceFolder}/../aud_ab"
     },
     {
       "name": "Current File",
