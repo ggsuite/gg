@@ -9,8 +9,10 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -28,6 +30,8 @@ void main() {
     pana = Pana(ggLog: messages.add, processWrapper: processWrapper);
     runner = CommandRunner('test', 'test')..addCommand(pana);
     d = await Directory.systemTemp.createTemp('gg_test');
+    await initGit(d);
+    await addAndCommitPubspecFile(d);
   });
 
   // ...........................................................................
@@ -92,8 +96,23 @@ void main() {
         expect(messages[1], contains('✅ Running "dart pana"'));
       });
 
-      // .......................................................................
-      test('should fail when 140 pubpoints are not reached', () async {
+      group('when package is not published to pub.dev', () {
+        test('and publishedOnly is set to true', () async {
+          // Add publish_to: none
+          await File(join(d.path, 'pubspec.yaml'))
+              .writeAsString('publish_to: none');
+
+          // Run pana
+          await runner.run(['pana', '--input', d.path, '--published-only']);
+
+          // Check result
+          expect(messages[0], contains('✅ Running "dart pana"'));
+        });
+      });
+    });
+
+    group('should fail ', () {
+      test('when 140 pubpoints are not reached', () async {
         // Mock an success report
         final notSuccessReport =
             File('test/data/pana_not_success_report.json').readAsStringSync();

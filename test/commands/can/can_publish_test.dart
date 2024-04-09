@@ -31,8 +31,12 @@ void main() {
 
   // ...........................................................................
   void mockCommands() {
-    when(() => pana.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
+    when(
+      () => pana.exec(
+        directory: d,
+        ggLog: messages.add,
+      ),
+    ).thenAnswer((_) async {
       messages.add('pana');
     });
     when(() => didCommit.exec(directory: d, ggLog: messages.add))

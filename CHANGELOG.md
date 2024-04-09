@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Don't check pana on packages not published to pub.dev
+
 ## [2.0.3] - 2024-04-09
 
 ### Added
@@ -92,6 +98,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/2.0.3...HEAD
 [2.0.3]: https://github.com/inlavigo/gg/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/inlavigo/gg/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/inlavigo/gg/compare/2.0.0...2.0.1

@@ -31,7 +31,11 @@ class CanPublish extends CommandCluster {
                 ),
             changeLogHasRightFormat ?? HasRightFormat(ggLog: ggLog),
             didCommit ?? DidCommit(ggLog: ggLog),
-            pana ?? Pana(ggLog: ggLog),
+            pana ??
+                Pana(
+                  ggLog: ggLog,
+                  publishedOnly: true,
+                ),
           ],
         );
 }

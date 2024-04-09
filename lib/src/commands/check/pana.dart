@@ -11,6 +11,7 @@ import 'package:gg_args/gg_args.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_publish/gg_publish.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
@@ -25,10 +26,16 @@ class Pana extends DirCommand<void> {
   Pana({
     required super.ggLog,
     this.processWrapper = const GgProcessWrapper(),
-  }) : super(
+    PublishTo? publishTo,
+    bool? publishedOnly,
+  })  : _publishTo = publishTo ?? PublishTo(ggLog: ggLog),
+        _publishedOnlyFromConstructor = publishedOnly,
+        super(
           name: 'pana',
           description: 'Runs »dart run pana«.',
-        );
+        ) {
+    _addArgs();
+  }
 
   // ...........................................................................
   /// Executes the command
@@ -36,13 +43,26 @@ class Pana extends DirCommand<void> {
   Future<void> exec({
     required Directory directory,
     required GgLog ggLog,
+    bool? publishedOnly,
   }) async {
     await check(directory: directory);
+    publishedOnly ??=
+        _publishedOnlyFromArgs ?? _publishedOnlyFromConstructor ?? false;
 
     final statusPrinter = GgStatusPrinter<ProcessResult>(
       ggLog: ggLog,
       message: 'Running "dart pana"',
     );
+
+    // Pana will only run if the package is to be published to pub.dev
+    if (publishedOnly) {
+      final isPublished =
+          await _publishTo.fromDirectory(directory) == 'pub.dev';
+      if (!isPublished) {
+        statusPrinter.logStatus(GgStatusPrinterStatus.success);
+        return;
+      }
+    }
 
     // Announce the command
     statusPrinter.logStatus(GgStatusPrinterStatus.running);
@@ -67,6 +87,12 @@ class Pana extends DirCommand<void> {
 
   /// The process wrapper used to execute shell processes
   final GgProcessWrapper processWrapper;
+
+  // ######################
+  // Private
+  // ######################
+
+  final PublishTo _publishTo;
 
   // ...........................................................................
   void _logErrors(List<String> messages, List<String> errors) {
@@ -152,6 +178,21 @@ class Pana extends DirCommand<void> {
     } catch (e) {
       return (1, ['Error parsing pana output: $e'], <String>[]);
     }
+  }
+
+  // ...........................................................................
+  bool? get _publishedOnlyFromArgs => argResults?['published-only'] as bool?;
+
+  // ...........................................................................
+  final bool? _publishedOnlyFromConstructor;
+
+  // ...........................................................................
+  void _addArgs() {
+    argParser.addFlag(
+      'published-only',
+      help: 'Check only packages published to pub.dev.',
+      negatable: true,
+    );
   }
 }
 
