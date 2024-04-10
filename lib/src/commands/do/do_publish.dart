@@ -47,7 +47,8 @@ class DoPublish extends DirCommand<void> {
             prepareNextVersion ?? PrepareNextVersion(ggLog: ggLog),
         _fromPubspec = fromPubspec ?? FromPubspec(ggLog: ggLog),
         _releaseChangelog = release ?? changelog.Release(ggLog: ggLog),
-        _isPublished = isPublished ?? IsPublished(ggLog: ggLog) {
+        _isPublished = isPublished ?? IsPublished(ggLog: ggLog),
+        _publishTo = publishTo ?? PublishTo(ggLog: ggLog) {
     _addArgs();
   }
 
@@ -78,6 +79,13 @@ class DoPublish extends DirCommand<void> {
       return;
     }
 
+    // Should ask before publishing?
+    askBeforePublishing = await _shouldAskBeforePublishing(
+      directory,
+      ggLog,
+      askBeforePublishing,
+    );
+
     // Can publish?
     await _canPublish.exec(
       directory: directory,
@@ -92,11 +100,6 @@ class DoPublish extends DirCommand<void> {
 
     // Publish on pub.dev
     final publishToPubDev = await _shouldPublishToPubDev(directory, ggLog);
-    askBeforePublishing = await _shouldAskBeforePublishing(
-      directory,
-      ggLog,
-      askBeforePublishing,
-    );
 
     if (publishToPubDev) {
       await _publishToPubDev.exec(
@@ -112,17 +115,17 @@ class DoPublish extends DirCommand<void> {
       key: stateKey,
     );
 
-    // Add git version tag
-    await _addVersionTag.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
-
     // Push commits to remote
     await _doPush.exec(
       directory: directory,
       ggLog: (_) {}, // coverage:ignore-line
       force: false,
+    );
+
+    // Add git version tag
+    await _addVersionTag.exec(
+      directory: directory,
+      ggLog: ggLog,
     );
 
     // Push tags to remote
@@ -151,6 +154,7 @@ class DoPublish extends DirCommand<void> {
   final FromPubspec _fromPubspec;
   final changelog.Release _releaseChangelog;
   final IsPublished _isPublished;
+  final PublishTo _publishTo;
 
   // ...........................................................................
   Future<void> _prepareChangelog({
@@ -237,6 +241,13 @@ class DoPublish extends DirCommand<void> {
     bool? askBeforePublishing,
   ) async {
     askBeforePublishing ??= _askBeforePublishingFromParam;
+
+    // Where should the package be published?
+    final target = await _publishTo.fromDirectory(directory);
+    final publishToNone = target == 'none';
+    if (publishToNone) {
+      return false;
+    }
 
     // Check package was published before
     final wasPublishedBefore = await _isPublished.get(

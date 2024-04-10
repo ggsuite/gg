@@ -11,7 +11,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
       "args": ["do", "publish"],
-      "cwd": "${workspaceFolder}/../aud_ab"
+      "cwd": "${workspaceFolder}/../gg_cache"
     },
     {
       "name": "Current File",
