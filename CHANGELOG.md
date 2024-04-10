@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Parentheses are not necessary anymore
+
 ## [3.0.0] - 2024-04-10
 
 ### Changed
@@ -115,6 +121,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.0...HEAD
 [3.0.0]: https://github.com/inlavigo/gg/compare/2.0.5...3.0.0
 [2.0.5]: https://github.com/inlavigo/gg/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/inlavigo/gg/compare/2.0.3...2.0.4

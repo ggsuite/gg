@@ -190,21 +190,6 @@ class DoCommit extends DirCommand<void> {
 
   // ...........................................................................
   void _addParam() {
-    // argParser.addOption(
-    //   'message',
-    //   abbr: 'm',
-    //   help: 'The message for the commit.',
-    //   mandatory: true,
-    // );
-//
-    // argParser.addOption(
-    //   'log-type',
-    //   abbr: 't',
-    //   help: 'The type of the commit.',
-    //   mandatory: true,
-    //   allowed: _logTypes,
-    // );
-
     argParser.addFlag(
       'log',
       abbr: 'l',
@@ -306,7 +291,7 @@ class DoCommit extends DirCommand<void> {
       throw Exception(helpOnMissingMessage(logType));
     }
 
-    final message = argResults!.rest[1];
+    final message = argResults!.rest.sublist(1).join(' ');
     return message;
   }
 
