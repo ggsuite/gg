@@ -178,10 +178,8 @@ void main() {
                   'commit',
                   '-i',
                   d.path,
-                  '-m',
-                  'My very special commit message',
-                  '-t',
                   'add',
+                  'My very special commit message',
                 ]);
 
                 // Check CHANGELOG.md
@@ -273,9 +271,8 @@ void main() {
               'commit',
               '-i',
               d.path,
-              '-m',
+              'add',
               'My commit',
-              '-t' 'add',
               '--no-log',
             ]);
 
@@ -290,9 +287,8 @@ void main() {
               'commit',
               '-i',
               d.path,
-              '-m',
+              'add',
               'My commit',
-              '-t' 'add',
               '--log',
             ]);
 
@@ -306,7 +302,7 @@ void main() {
           test('with message', () async {
             await addFileWithoutCommitting(d);
             await runner.run(
-              ['commit', '-i', d.path, '-m', 'My commit', '-t', 'add'],
+              ['commit', '-i', d.path, 'add', 'My commit'],
             );
             expect(
               messages.last,
@@ -340,8 +336,7 @@ void main() {
             }
             expect(
               exception,
-              'Exception: ${yellow('Run again with ')}'
-              '${blue('-m "yourMessage"')}',
+              contains(doCommit.helpOnMissingTypeAndMessage),
             );
 
             // Commit everything.
@@ -505,8 +500,7 @@ void main() {
 
           expect(
             exception,
-            'Exception: ${yellow('Run again with ')}'
-            '${blue('-m "yourMessage"')}',
+            'Exception: ${doCommit.helpOnMissingMessage(LogType.added)}',
           );
         });
 
@@ -533,15 +527,9 @@ void main() {
             exception = e.toString();
           }
 
-          final part0 = yellow('Run again with ');
-
-          final part1 = blue(
-            '-t add | change | deprecate | fix | remove | secure',
-          );
-
           expect(
             exception,
-            'Exception: $part0$part1',
+            'Exception: ${doCommit.helpOnMissingTypeAndMessage}',
           );
         });
 
@@ -564,10 +552,8 @@ void main() {
               'commit',
               '-i',
               d.path,
-              '-m',
-              'My commit',
-              '-t',
               logType,
+              'My commit',
             ]);
           }
 
@@ -582,10 +568,8 @@ void main() {
               'commit',
               '-i',
               d.path,
-              '-m',
-              'My commit',
-              '-t',
               'unknown',
+              'My commit',
             ]);
           } catch (e) {
             exception = e.toString();
@@ -593,7 +577,7 @@ void main() {
 
           expect(
             exception,
-            contains('"unknown" is not an allowed value for option "log-type'),
+            contains(doCommit.helpOnWrongLogType(wrongType: 'unknown')),
           );
         });
 

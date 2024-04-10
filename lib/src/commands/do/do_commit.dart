@@ -108,8 +108,19 @@ class DoCommit extends DirCommand<void> {
     }
 
     // Check needed options
-    message ??= _messageFromArgs(isCommittedViaGit);
-    logType ??= _logTypeFromArgs(isCommittedViaGit);
+    try {
+      logType ??= _getLogTypeFromArgs(isCommittedViaGit);
+      message ??= _getMessageFromArgs(isCommittedViaGit, logType);
+    } catch (e) {
+      // type and message are only needed when there are uncommitted changes.
+      if (!isCommittedViaGit) {
+        rethrow;
+      } else {
+        logType = cl.LogType.changed;
+        message = '';
+      }
+    }
+
     final repoUrl = await _repositoryUrl(directory);
 
     // Is everything fine?
@@ -120,7 +131,7 @@ class DoCommit extends DirCommand<void> {
 
     // Update changelog when a message is given
     updateChangeLog ??= argResults?['log'] as bool? ?? true;
-    if (updateChangeLog && message != null && logType != null) {
+    if (updateChangeLog) {
       await _writeMessageIntoChangeLog(
         directory: directory,
         message: message,
@@ -134,8 +145,8 @@ class DoCommit extends DirCommand<void> {
     if (!isCommittedViaGit) {
       await gitAddAndCommit(
         directory: directory,
-        message: message!,
-        logType: logType!,
+        message: message,
+        logType: logType,
       );
       ggLog(yellow('Checks successful. Commit successful.'));
     } else {
@@ -179,20 +190,20 @@ class DoCommit extends DirCommand<void> {
 
   // ...........................................................................
   void _addParam() {
-    argParser.addOption(
-      'message',
-      abbr: 'm',
-      help: 'The message for the commit.',
-      mandatory: true,
-    );
-
-    argParser.addOption(
-      'log-type',
-      abbr: 't',
-      help: 'The type of the commit.',
-      mandatory: true,
-      allowed: _logTypes,
-    );
+    // argParser.addOption(
+    //   'message',
+    //   abbr: 'm',
+    //   help: 'The message for the commit.',
+    //   mandatory: true,
+    // );
+//
+    // argParser.addOption(
+    //   'log-type',
+    //   abbr: 't',
+    //   help: 'The type of the commit.',
+    //   mandatory: true,
+    //   allowed: _logTypes,
+    // );
 
     argParser.addFlag(
       'log',
@@ -246,37 +257,57 @@ class DoCommit extends DirCommand<void> {
   }
 
   // ...........................................................................
-  String? _messageFromArgs(bool everythingIsCommitted) {
-    try {
-      final message = argResults!['message'] as String;
-      return message;
-    } catch (e) {
-      // If everything is committed, we do not need a commit message
-      if (everythingIsCommitted) {
-        return null;
-      }
+  /// The help text printed when type and message are missing.
+  String get helpOnMissingTypeAndMessage {
+    final part0 = red('Run again with type and message.\n');
+    final part1 =
+        blue('gg do commit ${yellow('<type>')} ${yellow('<message>')}');
+    return '$part0$part1';
+  }
 
+  // ...........................................................................
+  /// The help text printed when message is missing.
+  String helpOnMissingMessage(cl.LogType type) {
+    final typeString = _logTypes.elementAt(type.index);
+
+    final part0 = red('Run again with message.\n');
+    final part1 = blue('gg do commit $typeString ${yellow('<message>')}');
+    return '$part0$part1';
+  }
+
+  // ...........................................................................
+  /// The help text printed when type is invalid.
+  String helpOnWrongLogType({required String wrongType}) {
+    return red('Type ${red(wrongType)} is not valid. Allowed:\n') +
+        _logTypes.map((e) => yellow(e)).join(' ');
+  }
+
+  // ...........................................................................
+  cl.LogType _getLogTypeFromArgs(bool everythingIsCommitted) {
+    if ((argResults?.rest.length ?? 0) < 1) {
       throw Exception(
-        yellow('Run again with ') + blue('-m "yourMessage"'),
+        helpOnMissingTypeAndMessage,
+      );
+    }
+
+    final logTypeString = argResults!.rest[0];
+    try {
+      return _stringToLogType(logTypeString);
+    } catch (e) {
+      throw Exception(
+        helpOnWrongLogType(wrongType: logTypeString),
       );
     }
   }
 
   // ...........................................................................
-  cl.LogType? _logTypeFromArgs(bool everythingIsCommitted) {
-    try {
-      final logTypeString = argResults!['log-type'] as String;
-      return _stringToLogType(logTypeString);
-    } catch (e) {
-      // If everything is committed, we do not need a log type
-      if (everythingIsCommitted) {
-        return null;
-      }
-
-      throw Exception(
-        yellow('Run again with ') + blue('-t ${_logTypes.join(' | ')}'),
-      );
+  String _getMessageFromArgs(bool everythingIsCommitted, cl.LogType logType) {
+    if ((argResults?.rest.length ?? 0) < 2) {
+      throw Exception(helpOnMissingMessage(logType));
     }
+
+    final message = argResults!.rest[1];
+    return message;
   }
 
   // ...........................................................................

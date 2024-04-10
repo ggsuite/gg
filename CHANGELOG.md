@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- BREAKING CHANGE: Interface of »gg do commit« has changed.
+
 ## [2.0.5] - 2024-04-10
 
 ### Fixed
@@ -109,6 +115,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/2.0.5...HEAD
 [2.0.5]: https://github.com/inlavigo/gg/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/inlavigo/gg/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/inlavigo/gg/compare/2.0.2...2.0.3
