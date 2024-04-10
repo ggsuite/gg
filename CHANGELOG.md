@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.5] - 2024-04-10
 
 ### Fixed
 
@@ -25,7 +25,7 @@
 
 ### Changed
 
-- Update latest changes on gg_publish and gg_git
+- Update latest changes on gg\_publish and gg\_git
 - Refactor tests
 
 ## [2.0.2] - 2024-04-06
@@ -91,7 +91,7 @@
 
 - Removed unused sample project
 - logStatus is replaced by GgStatusPrinter
-- isGitHub is replaced by gg_is_github
+- isGitHub is replaced by gg\_is\_github
 - Pipeline: remove --no-save-state flag
 
 ## [1.0.14] - 2024-04-05
@@ -109,7 +109,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/2.0.5...HEAD
+[2.0.5]: https://github.com/inlavigo/gg/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/inlavigo/gg/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/inlavigo/gg/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/inlavigo/gg/compare/2.0.1...2.0.2
