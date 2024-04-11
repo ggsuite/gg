@@ -20,6 +20,8 @@ class CanUpgrade extends CommandCluster {
     DidPublish? didPublish,
   }) : super(
           commands: [
+            // »gg do upgrade« will also publish the package automatically
+
             didPublish ?? DidPublish(ggLog: ggLog),
           ],
         );

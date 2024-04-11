@@ -13,7 +13,6 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
-import 'package:mocktail/mocktail.dart';
 
 /// Pushes the current state.
 class DoPush extends DirCommand<void> {
@@ -36,6 +35,19 @@ class DoPush extends DirCommand<void> {
   // ...........................................................................
   @override
   Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+    bool? force,
+  }) =>
+      get(
+        directory: directory,
+        ggLog: ggLog,
+        force: force,
+      );
+
+  // ...........................................................................
+  @override
+  Future<void> get({
     required Directory directory,
     required GgLog ggLog,
     bool? force,
@@ -141,4 +153,4 @@ class DoPush extends DirCommand<void> {
 }
 
 /// Mock for [DoPush].
-class MockDoPush extends Mock implements DoPush {}
+class MockDoPush extends MockDirCommand<void> implements DoPush {}

@@ -26,6 +26,7 @@ void main() {
     when(() => commands.isCommitted.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
       messages.add('did commit');
+      return true;
     });
   }
 

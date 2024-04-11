@@ -59,32 +59,4 @@ void main() {
       );
     });
   });
-
-  group('MockDidPublish', () {
-    group('mockSuccess', () {
-      test('true', () async {
-        // ..................................
-        // Mock the command to succeed
-        final didPublish = MockDidPublish();
-        didPublish.mockSuccess(success: true, directory: d, ggLog: ggLog);
-        await didPublish.exec(directory: d, ggLog: ggLog);
-        expect(messages, contains('✅ Published'));
-      });
-
-      test('false', () async {
-        // ..................................
-        // Mock the command to succeed
-        final didPublish = MockDidPublish();
-        didPublish.mockSuccess(success: false, directory: d, ggLog: ggLog);
-        late String exception;
-        try {
-          await didPublish.exec(directory: d, ggLog: ggLog);
-        } catch (e) {
-          exception = e.toString();
-        }
-
-        expect(exception, contains('❌ Published'));
-      });
-    });
-  });
 }

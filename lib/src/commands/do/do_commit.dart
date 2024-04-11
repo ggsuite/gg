@@ -14,7 +14,6 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
-import 'package:mocktail/mocktail.dart';
 
 final _logTypes = cl.LogType.values.map((e) {
   switch (e) {
@@ -78,6 +77,23 @@ class DoCommit extends DirCommand<void> {
   // ...........................................................................
   @override
   Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+    String? message,
+    cl.LogType? logType,
+    bool? updateChangeLog,
+  }) =>
+      get(
+        directory: directory,
+        ggLog: ggLog,
+        message: message,
+        logType: logType,
+        updateChangeLog: updateChangeLog,
+      );
+
+  // ...........................................................................
+  @override
+  Future<void> get({
     required Directory directory,
     required GgLog ggLog,
     String? message,
@@ -358,4 +374,4 @@ class DoCommit extends DirCommand<void> {
 
 // .............................................................................
 /// Mock for [DoCommit].
-class MockDoCommmit extends Mock implements DoCommit {}
+class MockDoCommmit extends MockDirCommand<void> implements DoCommit {}

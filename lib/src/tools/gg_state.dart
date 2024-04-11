@@ -135,7 +135,7 @@ class GgState {
       return;
     }
 
-    final ggJsonFile = File(join('${directory.path}/.gg.json'));
+    final ggJsonFile = _configFile(directory: directory);
 
     if (!await ggJsonFile.exists()) {
       return;
@@ -144,6 +144,12 @@ class GgState {
     final ggJSonFileContent =
         (await ggJsonFile.readAsString()).replaceAll('$hash', '$current');
     await ggJsonFile.writeAsString(ggJSonFileContent);
+  }
+
+  // ...........................................................................
+  /// Resets the success state
+  Future<void> reset({required Directory directory}) async {
+    await _configFile(directory: directory).writeAsString('{}');
   }
 
   // ######################

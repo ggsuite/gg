@@ -52,13 +52,16 @@ void main() {
     when(() => isCommitted.exec(directory: d, ggLog: ggLog))
         .thenAnswer((_) async {
       ggLog('isCommitted');
+      return true;
     });
     when(() => isPushed.exec(directory: d, ggLog: ggLog)).thenAnswer((_) async {
       ggLog('isPushed');
+      return true;
     });
     when(() => isUpgraded.exec(directory: d, ggLog: ggLog))
         .thenAnswer((_) async {
       ggLog('isUpgraded');
+      return true;
     });
   });
 

@@ -7,6 +7,7 @@
 - mocks for DidPush, DidPublish
 - DidUpgrade
 - CanUpgrade, Improve mocks
+- upgrade dependencies and make tests work again
 
 ### Changed
 

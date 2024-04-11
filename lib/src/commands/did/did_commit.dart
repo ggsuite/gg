@@ -5,7 +5,6 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg/src/tools/did_command.dart';
-import 'package:mocktail/mocktail.dart';
 
 /// Are all changes committed?
 class DidCommit extends DidCommand {
@@ -21,4 +20,4 @@ class DidCommit extends DidCommand {
 }
 
 /// Mock for [DidCommit]
-class MockDidCommit extends Mock implements DidCommit {}
+class MockDidCommit extends MockDidCommand implements DidCommit {}

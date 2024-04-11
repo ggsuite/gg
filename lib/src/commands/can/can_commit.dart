@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
-import 'package:mocktail/mocktail.dart' as mocktail;
+import 'package:mocktail/mocktail.dart';
 
 /// Are the last changes ready for »git commit«?
 class CanCommit extends CommandCluster {
@@ -25,14 +25,14 @@ class CanCommit extends CommandCluster {
 
   // ...........................................................................
   @override
-  Future<void> exec({
+  Future<void> get({
     required Directory directory,
     required GgLog ggLog,
     bool? force,
     bool? saveState,
   }) async {
     // Execute commands.
-    await super.exec(directory: directory, ggLog: ggLog, force: force);
+    await super.get(directory: directory, ggLog: ggLog, force: force);
   }
 
   // ...........................................................................
@@ -52,4 +52,4 @@ class CanCommit extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockCanCommit extends mocktail.Mock implements CanCommit {}
+class MockCanCommit extends Mock implements CanCommit {}

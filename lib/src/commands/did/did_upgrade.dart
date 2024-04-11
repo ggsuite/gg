@@ -7,34 +7,49 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
-import 'package:gg_args/gg_args.dart';
+import 'package:gg/src/tools/did_command.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
-import 'package:mocktail/mocktail.dart';
 
 /// Are the dependencies of the package upgraded?
-class DidUpgrade extends DirCommand<void> {
+class DidUpgrade extends DidCommand {
   /// Constructor
   DidUpgrade({
+    required super.ggLog,
     super.name = 'upgrade',
     super.description = 'Are the dependencies of the package upgraded?',
-    required super.ggLog,
+    super.shortDescription = 'Everything is upgraded',
+    super.suggestion = 'Not upgraded yet. Please run »gg do upgrade.«',
+    super.stateKey = 'doCommit',
     IsUpgraded? isUpgraded,
     DidPublish? didPublish,
   })  : _isUpgraded = isUpgraded ?? IsUpgraded(ggLog: ggLog),
         _didPublish = didPublish ?? DidPublish(ggLog: ggLog);
 
   // ...........................................................................
+  /// Returns previously set value
   @override
-  Future<void> exec({
+  Future<bool> get({
     required Directory directory,
     required GgLog ggLog,
   }) async {
     /// Is everything upgraded?
-    await _isUpgraded.exec(directory: directory, ggLog: ggLog);
+    final isUpgraded = await _isUpgraded.get(
+      directory: directory,
+      ggLog: ggLog,
+    );
+
+    if (!isUpgraded) {
+      return false;
+    }
 
     /// Is everything published?
-    await _didPublish.exec(directory: directory, ggLog: ggLog);
+    final didPublish = await _didPublish.get(
+      directory: directory,
+      ggLog: ggLog,
+    );
+
+    return didPublish;
   }
 
   // ######################
@@ -46,4 +61,4 @@ class DidUpgrade extends DirCommand<void> {
 }
 
 /// Mock for [DidUpgrade]
-class MockDidUpgrade extends Mock implements DidUpgrade {}
+class MockDidUpgrade extends MockDidCommand implements DidUpgrade {}

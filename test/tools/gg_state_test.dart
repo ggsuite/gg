@@ -389,5 +389,37 @@ void main() {
         });
       });
     });
+
+    group('reset(directory)', () {
+      test('should reset success state', () async {
+        // Set the state
+        await ggState.writeSuccess(
+          directory: dLocal,
+          key: 'can-commit',
+        );
+
+        expect(
+          await ggState.readSuccess(
+            directory: dLocal,
+            ggLog: messages.add,
+            key: 'can-commit',
+          ),
+          isTrue,
+        );
+
+        // Reset the state
+        await ggState.reset(directory: dLocal);
+
+        // Check the file
+        expect(
+          await ggState.readSuccess(
+            directory: dLocal,
+            ggLog: messages.add,
+            key: 'can-commit',
+          ),
+          isFalse,
+        );
+      });
+    });
   });
 }

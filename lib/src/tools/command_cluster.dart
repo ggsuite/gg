@@ -41,6 +41,21 @@ class CommandCluster extends DirCommand<void> {
     required GgLog ggLog,
     bool? force,
     bool? saveState,
+  }) =>
+      get(
+        directory: directory,
+        ggLog: ggLog,
+        force: force,
+        saveState: saveState,
+      );
+
+  // ...........................................................................
+  @override
+  Future<void> get({
+    required Directory directory,
+    required GgLog ggLog,
+    bool? force,
+    bool? saveState,
   }) async {
     ggLog(yellow(shortDescription));
 

@@ -49,17 +49,22 @@ void main() {
           true,
           false,
         ]) {
-          test(viaCli ? 'via CLI' : 'programmatically', () async {
-            didPublish.mockSuccess(success: true, directory: d, ggLog: ggLog);
-            isUpgraded.mockSuccess(success: true, directory: d, ggLog: ggLog);
+          test('via CLI and programmatically', () async {
+            isUpgraded.mockGet(
+              result: true,
+            );
+
+            didPublish.mockGet(
+              result: true,
+            );
 
             if (viaCli == false) {
               await didUpgrade.exec(directory: d, ggLog: ggLog);
             } else {
               await runner.run(['upgrade', '-i', d.path]);
             }
-            expect(messages[0], '✅ Upgraded');
-            expect(messages[1], '✅ Published');
+            expect(messages[0], contains('⌛️ Everything is upgraded'));
+            expect(messages[1], contains('✅ Everything is upgraded'));
           });
         }
       });

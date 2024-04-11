@@ -12,10 +12,9 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
 import 'package:meta/meta.dart';
-import 'package:mocktail/mocktail.dart';
 
 /// Base class for all did commands
-class DidCommand extends DirCommand<void> {
+class DidCommand extends DirCommand<bool> {
   /// Constructor
   DidCommand({
     required super.name,
@@ -30,7 +29,7 @@ class DidCommand extends DirCommand<void> {
   // ...........................................................................
   @override
   @mustCallSuper
-  Future<void> exec({
+  Future<bool> exec({
     required Directory directory,
     required GgLog ggLog,
   }) async {
@@ -52,10 +51,13 @@ class DidCommand extends DirCommand<void> {
 
       throw Exception(printedMessages.join('\n'));
     }
+
+    return result;
   }
 
   // ...........................................................................
   /// Returns previously set value
+  @override
   Future<bool> get({
     required Directory directory,
     required GgLog ggLog,
@@ -133,4 +135,4 @@ class DidCommand extends DirCommand<void> {
 }
 
 /// Mock for [DidCommand]
-class MockDidCommand extends Mock implements DidCommand {}
+class MockDidCommand extends MockDirCommand<bool> implements DidCommand {}

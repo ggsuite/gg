@@ -15,7 +15,6 @@ import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:gg_version/gg_version.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
 
 /// Publishes the current directory.
@@ -58,6 +57,19 @@ class DoPublish extends DirCommand<void> {
   // ...........................................................................
   @override
   Future<void> exec({
+    required Directory directory,
+    required GgLog ggLog,
+    bool? askBeforePublishing,
+  }) =>
+      get(
+        directory: directory,
+        ggLog: ggLog,
+        askBeforePublishing: askBeforePublishing,
+      );
+
+  // ...........................................................................
+  @override
+  Future<void> get({
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
@@ -199,11 +211,17 @@ class DoPublish extends DirCommand<void> {
       ggLog: ggLog,
     );
 
+    // Get version in pubspec.yaml
+    final publishedVersion = await _fromPubspec.fromDirectory(
+      directory: directory,
+    );
+
     // Prepare the next version
     await _prepareNextVersion.exec(
       directory: directory,
       ggLog: ggLog,
       increment: increment,
+      publishedVersion: publishedVersion,
     );
 
     // Update state
@@ -304,4 +322,4 @@ class DoPublish extends DirCommand<void> {
 }
 
 /// Mock for [DoPublish].
-class MockDoPublish extends Mock implements DoPublish {}
+class MockDoPublish extends MockDirCommand<void> implements DoPublish {}

@@ -41,15 +41,18 @@ void main() {
     when(() => didCommit.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
       messages.add('didCommit');
+      return true;
     });
     when(() => isVersionPrepared.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
       messages.add('isVersionPrepared');
+      return true;
     });
 
     when(() => hasRightFormat.exec(directory: d, ggLog: messages.add))
         .thenAnswer((_) async {
       messages.add('hasRightFormat');
+      return true;
     });
   }
 
