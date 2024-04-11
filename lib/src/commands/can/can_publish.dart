@@ -9,13 +9,13 @@ import 'package:gg_changelog/gg_changelog.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
-/// Checks if the changes can be published.
+/// Are the last changes ready to be published?
 class CanPublish extends CommandCluster {
   /// Constructor
   CanPublish({
     required super.ggLog,
     super.name = 'publish',
-    super.description = 'Checks if code is ready to be published.',
+    super.description = 'Are the last changes ready to be published?',
     super.shortDescription = 'Can publish?',
     super.stateKey = 'canPublish',
     DidCommit? didCommit,

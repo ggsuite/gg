@@ -11,14 +11,14 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
-/// Checks if the changes can be committed.
+/// Are the last changes ready for »git commit«?
 class CanCommit extends CommandCluster {
   /// Constructor
   CanCommit({
     required super.ggLog,
     Checks? checks,
     super.name = 'commit',
-    super.description = 'Checks if code is ready to commit.',
+    super.description = 'Are the last changes ready for »git commit«?',
     super.shortDescription = 'Can commit?',
     super.stateKey = 'canCommit',
   }) : super(commands: _checks(checks, ggLog));

@@ -11,6 +11,7 @@
 
 - Parentheses are not necessary anymore
 - improved comments of DidCommit, DidPublish and DidPush
+- Improved help for CanCommit, CanPush, CanPublish
 
 ### Removed
 

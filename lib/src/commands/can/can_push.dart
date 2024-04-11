@@ -9,7 +9,7 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:mocktail/mocktail.dart';
 
-/// Checks if the changes can be pushed.
+/// Are the last changes ready for »git push«?
 class CanPush extends CommandCluster {
   /// Constructor
   CanPush({
@@ -17,7 +17,7 @@ class CanPush extends CommandCluster {
     Checks? checkCommands,
     super.name = 'push',
     super.shortDescription = 'Can push?',
-    super.description = 'Checks if code is ready to push.',
+    super.description = 'Are the last changes ready for »git push«?',
     super.stateKey = 'canPush',
   }) : super(commands: _checks(checkCommands, ggLog));
 
