@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:gg/gg.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_log/gg_log.dart';
+import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// Are the dependencies of the package upgraded?
@@ -18,8 +19,10 @@ class DidUpgrade extends DirCommand<void> {
     super.name = 'upgrade',
     super.description = 'Are the dependencies of the package upgraded?',
     required super.ggLog,
+    IsUpgraded? isUpgraded,
     DidPublish? didPublish,
-  }) : _didPublish = didPublish ?? DidPublish(ggLog: ggLog);
+  })  : _isUpgraded = isUpgraded ?? IsUpgraded(ggLog: ggLog),
+        _didPublish = didPublish ?? DidPublish(ggLog: ggLog);
 
   // ...........................................................................
   @override
@@ -27,6 +30,10 @@ class DidUpgrade extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
   }) async {
+    /// Is everything upgraded?
+    await _isUpgraded.exec(directory: directory, ggLog: ggLog);
+
+    /// Is everything published?
     await _didPublish.exec(directory: directory, ggLog: ggLog);
   }
 
@@ -35,6 +42,7 @@ class DidUpgrade extends DirCommand<void> {
   // ######################
 
   final DidPublish _didPublish;
+  final IsUpgraded _isUpgraded;
 }
 
 /// Mock for [DidUpgrade]

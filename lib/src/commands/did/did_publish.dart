@@ -4,7 +4,11 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:io';
+
 import 'package:gg/src/tools/did_command.dart';
+import 'package:gg_log/gg_log.dart';
+import 'package:matcher/expect.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// Everything is published to pub.dev or git?
@@ -24,18 +28,28 @@ class DidPublish extends DidCommand {
 class MockDidPublish extends Mock implements DidPublish {
   // ...........................................................................
   /// Makes [exec] successful or not
-  void mockSuccess(bool result) {
+  /// Makes [exec] successful or not
+  void mockSuccess({
+    required bool success,
+    required GgLog ggLog,
+    required Directory directory,
+  }) {
     when(
       () => exec(
-        directory: any(named: 'directory'),
+        directory: any(
+          named: 'directory',
+          that: predicate<Directory>(
+            (d) => d.path == directory.path,
+          ),
+        ),
         ggLog: any(named: 'ggLog'),
       ),
     ).thenAnswer((invocation) async {
-      if (!result) {
-        throw Exception('❌ Everything is published');
+      if (!success) {
+        throw Exception('❌ Published');
       } else {
         final ggLog = invocation.namedArguments[const Symbol('ggLog')];
-        ggLog('✅ Everything is published');
+        ggLog('✅ Published');
       }
       return;
     });

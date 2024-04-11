@@ -43,7 +43,7 @@ void main() {
       group('when not everything is published', () {
         for (final way in ['programmatically', 'via CLI']) {
           test(way, () async {
-            didPublish.mockSuccess(false);
+            didPublish.mockSuccess(success: false, directory: d, ggLog: ggLog);
             late String exception;
             try {
               if (way == 'programmatically') {
@@ -54,7 +54,7 @@ void main() {
             } catch (e) {
               exception = e.toString();
             }
-            expect(exception, contains('❌ Everything is published'));
+            expect(exception, contains('❌ Published'));
           });
         }
       });
@@ -64,9 +64,9 @@ void main() {
       group('when everything is published', () {
         for (final way in ['programmatically', 'via CLI']) {
           test(way, () async {
-            didPublish.mockSuccess(true);
+            didPublish.mockSuccess(success: true, directory: d, ggLog: ggLog);
             await canUpgrade.exec(directory: d, ggLog: ggLog);
-            expect(messages.last, '✅ Everything is published');
+            expect(messages.last, '✅ Published');
           });
         }
       });

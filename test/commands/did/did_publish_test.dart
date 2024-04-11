@@ -65,25 +65,25 @@ void main() {
       test('true', () async {
         // ..................................
         // Mock the command to succeed
-        final mockDidPublish = MockDidPublish();
-        mockDidPublish.mockSuccess(true);
-        await mockDidPublish.exec(directory: d, ggLog: ggLog);
-        expect(messages, contains('✅ Everything is published'));
+        final didPublish = MockDidPublish();
+        didPublish.mockSuccess(success: true, directory: d, ggLog: ggLog);
+        await didPublish.exec(directory: d, ggLog: ggLog);
+        expect(messages, contains('✅ Published'));
       });
 
       test('false', () async {
         // ..................................
         // Mock the command to succeed
-        final mockDidPublish = MockDidPublish();
-        mockDidPublish.mockSuccess(false);
+        final didPublish = MockDidPublish();
+        didPublish.mockSuccess(success: false, directory: d, ggLog: ggLog);
         late String exception;
         try {
-          await mockDidPublish.exec(directory: d, ggLog: ggLog);
+          await didPublish.exec(directory: d, ggLog: ggLog);
         } catch (e) {
           exception = e.toString();
         }
 
-        expect(exception, contains('❌ Everything is published'));
+        expect(exception, contains('❌ Published'));
       });
     });
   });

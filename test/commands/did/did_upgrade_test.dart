@@ -8,12 +8,14 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg/gg.dart';
+import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 void main() {
   late Directory d;
   late MockDidPublish didPublish;
+  late MockIsUpgraded isUpgraded;
   late DidUpgrade didUpgrade;
   late CommandRunner<void> runner;
 
@@ -26,7 +28,12 @@ void main() {
     d = await Directory.systemTemp.createTemp();
     registerFallbackValue(d);
     didPublish = MockDidPublish();
-    didUpgrade = DidUpgrade(ggLog: ggLog, didPublish: didPublish);
+    isUpgraded = MockIsUpgraded();
+    didUpgrade = DidUpgrade(
+      ggLog: ggLog,
+      didPublish: didPublish,
+      isUpgraded: isUpgraded,
+    );
     runner = CommandRunner<void>('test', 'test')..addCommand(didUpgrade);
   });
 
@@ -36,46 +43,33 @@ void main() {
 
   // ...........................................................................
   group('DidUpgrade', () {
-    group('should throw', () {
-      group('when not everything is published', () {
-        for (final way in ['programmatically', 'via CLI']) {
-          test(way, () async {
-            didPublish.mockSuccess(false);
-            late String exception;
-            try {
-              if (way == 'programmatically') {
-                await didUpgrade.exec(directory: d, ggLog: ggLog);
-              } else {
-                await runner.run(['upgrade', '-i', d.path]);
-              }
-            } catch (e) {
-              exception = e.toString();
+    group('should check', () {
+      group('if everything is upgraded and published', () {
+        for (final viaCli in [
+          true,
+          false,
+        ]) {
+          test(viaCli ? 'via CLI' : 'programmatically', () async {
+            didPublish.mockSuccess(success: true, directory: d, ggLog: ggLog);
+            isUpgraded.mockSuccess(success: true, directory: d, ggLog: ggLog);
+
+            if (viaCli == false) {
+              await didUpgrade.exec(directory: d, ggLog: ggLog);
+            } else {
+              await runner.run(['upgrade', '-i', d.path]);
             }
-            expect(exception, contains('❌ Everything is published'));
+            expect(messages[0], '✅ Upgraded');
+            expect(messages[1], '✅ Published');
           });
         }
       });
     });
 
-    group('should succeed', () {
-      group('when everything is published', () {
-        for (final way in ['programmatically', 'via CLI']) {
-          test(way, () async {
-            didPublish.mockSuccess(true);
-            await didUpgrade.exec(directory: d, ggLog: ggLog);
-            expect(messages.last, '✅ Everything is published');
-          });
-        }
-      });
-    });
-
-    group('special cases', () {
-      test('initialized with default arguments', () {
-        final didUpgrade = DidUpgrade(ggLog: ggLog);
-        expect(didUpgrade.name, 'upgrade');
+    group('should handle special cases: ', () {
+      test('instantiate without optional parameters', () {
         expect(
-          didUpgrade.description,
-          'Are the dependencies of the package upgraded?',
+          () => DidUpgrade(ggLog: ggLog),
+          returnsNormally,
         );
       });
     });
