@@ -27,10 +27,6 @@ void main() {
         .thenAnswer((_) async {
       messages.add('did commit');
     });
-    when(() => commands.isUpgraded.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
-      messages.add('did upgrade');
-    });
   }
 
   // ...........................................................................
@@ -67,8 +63,7 @@ void main() {
           await addAndCommitSampleFile(d);
           await push.exec(directory: d, ggLog: messages.add);
           expect(messages[0], contains('Can push?'));
-          expect(messages[1], 'did upgrade');
-          expect(messages[2], 'did commit');
+          expect(messages[1], 'did commit');
         });
       });
     });

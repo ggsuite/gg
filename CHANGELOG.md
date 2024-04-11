@@ -12,6 +12,10 @@
 - Parentheses are not necessary anymore
 - improved comments of DidCommit, DidPublish and DidPush
 
+### Removed
+
+- Upgrade check before pushing
+
 ## [3.0.0] - 2024-04-10
 
 ### Changed

@@ -28,7 +28,6 @@ class CanPush extends CommandCluster {
   ) {
     checks ??= Checks(ggLog: ggLog);
     return [
-      checks.isUpgraded,
       checks.isCommitted,
     ];
   }
