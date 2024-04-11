@@ -30,6 +30,7 @@ export 'src/commands/did.dart';
 export 'src/commands/did/did_push.dart';
 export 'src/commands/did/did_commit.dart';
 export 'src/commands/did/did_publish.dart';
+export 'src/commands/did/did_upgrade.dart';
 
 // Tools
 export 'src/tools/carriage_return.dart';

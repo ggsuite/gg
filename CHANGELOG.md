@@ -5,6 +5,7 @@
 ### Added
 
 - mocks for DidPush, DidPublish
+- DidUpgrade
 
 ### Changed
 
