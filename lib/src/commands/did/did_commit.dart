@@ -7,14 +7,14 @@
 import 'package:gg/src/tools/did_command.dart';
 import 'package:mocktail/mocktail.dart';
 
-/// Saves the current state of the source code
+/// Are all changes committed?
 class DidCommit extends DidCommand {
   /// Constructor
   DidCommit({
     required super.ggLog,
     super.name = 'commit',
-    super.description = 'Informs if everything is committed.',
-    super.shortDescription = 'Did commit',
+    super.description = 'Are all changes committed?',
+    super.shortDescription = 'All changes are committed',
     super.suggestion = 'Not committed yet. Please run »gg do commit«.',
     super.stateKey = 'doCommit',
   });

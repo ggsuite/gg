@@ -6,13 +6,13 @@
 
 import 'package:gg/src/tools/did_command.dart';
 
-/// Saves the current state of the source code
+/// Everything is published to pub.dev or git?
 class DidPublish extends DidCommand {
   /// Constructor
   DidPublish({
     super.name = 'publish',
-    super.description = 'Informs if everything is published.',
-    super.shortDescription = 'Did publish',
+    super.description = 'Everything is published to pub.dev or git?',
+    super.shortDescription = 'Package is published',
     super.suggestion = 'Not yet published. Please run »gg do publish«.',
     super.stateKey = 'doPublish',
     required super.ggLog,

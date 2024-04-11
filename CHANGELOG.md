@@ -5,6 +5,7 @@
 ### Changed
 
 - Parentheses are not necessary anymore
+- improved comments of DidCommit, DidPublish and DidPush
 
 ## [3.0.0] - 2024-04-10
 

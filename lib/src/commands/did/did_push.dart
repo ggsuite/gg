@@ -6,13 +6,13 @@
 
 import 'package:gg/src/tools/did_command.dart';
 
-/// Saves the current state of the source code
+/// Are all changes pushed to the remote repository?
 class DidPush extends DidCommand {
   /// Constructor
   DidPush({
     super.name = 'push',
-    super.description = 'Informs if everything is checked and pushed.',
-    super.shortDescription = 'Everything checked and pushed',
+    super.description = 'Are all changes pushed to the remote repository?',
+    super.shortDescription = 'Changes are pushed to the git remote',
     super.suggestion = 'Please run »gg do push«.',
     super.stateKey = 'doPush',
     required super.ggLog,
