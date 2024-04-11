@@ -10,6 +10,7 @@ import 'package:gg/src/commands/did/did_publish.dart';
 import 'package:gg/src/tools/did_command.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_log/gg_log.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -25,6 +26,8 @@ void main() {
       await d.delete(recursive: true);
     }
     await d.create();
+    registerFallbackValue(d);
+
     await initGit(d);
     await addAndCommitGitIgnoreFile(d, content: '.check.json');
     await addAndCommitSampleFile(d, fileName: 'pubspec.yaml');
@@ -35,26 +38,52 @@ void main() {
     await d.delete(recursive: true);
   });
 
-  group('did', () {
-    group('Publish', () {
-      test('should work fine ', () async {
-        const colorize = DidCommand.colorizeSuggestion;
+  group('DidPublish', () {
+    test('should work fine ', () async {
+      const colorize = DidCommand.colorizeSuggestion;
 
+      // ..................................
+      // Initally the command should throw,
+      // because we did not commit yet
+      late String exception;
+      try {
+        await didPublish.exec(directory: d, ggLog: ggLog);
+      } catch (e) {
+        exception = e.toString();
+      }
+      expect(
+        exception,
+        contains(
+          colorize('Not yet published. Please run »gg do publish«.'),
+        ),
+      );
+    });
+  });
+
+  group('MockDidPublish', () {
+    group('mockSuccess', () {
+      test('true', () async {
         // ..................................
-        // Initally the command should throw,
-        // because we did not commit yet
+        // Mock the command to succeed
+        final mockDidPublish = MockDidPublish();
+        mockDidPublish.mockSuccess(true);
+        await mockDidPublish.exec(directory: d, ggLog: ggLog);
+        expect(messages, contains('✅ Everything is published'));
+      });
+
+      test('false', () async {
+        // ..................................
+        // Mock the command to succeed
+        final mockDidPublish = MockDidPublish();
+        mockDidPublish.mockSuccess(false);
         late String exception;
         try {
-          await didPublish.exec(directory: d, ggLog: ggLog);
+          await mockDidPublish.exec(directory: d, ggLog: ggLog);
         } catch (e) {
           exception = e.toString();
         }
-        expect(
-          exception,
-          contains(
-            colorize('Not yet published. Please run »gg do publish«.'),
-          ),
-        );
+
+        expect(exception, contains('❌ Everything is published'));
       });
     });
   });

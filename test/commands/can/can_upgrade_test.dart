@@ -8,13 +8,14 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg/gg.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 void main() {
   late Directory d;
   late MockDidPublish didPublish;
-  late DidUpgrade didUpgrade;
+  late CanUpgrade canUpgrade;
   late CommandRunner<void> runner;
 
   final messages = <String>[];
@@ -24,10 +25,12 @@ void main() {
   setUp(() async {
     messages.clear();
     d = await Directory.systemTemp.createTemp();
+    await initGit(d);
+    await addAndCommitSampleFile(d);
     registerFallbackValue(d);
     didPublish = MockDidPublish();
-    didUpgrade = DidUpgrade(ggLog: ggLog, didPublish: didPublish);
-    runner = CommandRunner<void>('test', 'test')..addCommand(didUpgrade);
+    canUpgrade = CanUpgrade(ggLog: ggLog, didPublish: didPublish);
+    runner = CommandRunner<void>('test', 'test')..addCommand(canUpgrade);
   });
 
   tearDown(() async {
@@ -35,7 +38,7 @@ void main() {
   });
 
   // ...........................................................................
-  group('DidUpgrade', () {
+  group('CanUpgrade', () {
     group('should throw', () {
       group('when not everything is published', () {
         for (final way in ['programmatically', 'via CLI']) {
@@ -44,7 +47,7 @@ void main() {
             late String exception;
             try {
               if (way == 'programmatically') {
-                await didUpgrade.exec(directory: d, ggLog: ggLog);
+                await canUpgrade.exec(directory: d, ggLog: ggLog);
               } else {
                 await runner.run(['upgrade', '-i', d.path]);
               }
@@ -62,7 +65,7 @@ void main() {
         for (final way in ['programmatically', 'via CLI']) {
           test(way, () async {
             didPublish.mockSuccess(true);
-            await didUpgrade.exec(directory: d, ggLog: ggLog);
+            await canUpgrade.exec(directory: d, ggLog: ggLog);
             expect(messages.last, '✅ Everything is published');
           });
         }
@@ -71,11 +74,11 @@ void main() {
 
     group('special cases', () {
       test('initialized with default arguments', () {
-        final didUpgrade = DidUpgrade(ggLog: ggLog);
-        expect(didUpgrade.name, 'upgrade');
+        final canUpgrade = CanUpgrade(ggLog: ggLog);
+        expect(canUpgrade.name, 'upgrade');
         expect(
-          didUpgrade.description,
-          'Are the dependencies of the package upgraded?',
+          canUpgrade.description,
+          'Is the package ready to get a dependeny upgrade?',
         );
       });
     });

@@ -21,4 +21,23 @@ class DidPublish extends DidCommand {
 }
 
 /// Mock for [DidPublish]
-class MockDidPublish extends Mock implements DidPublish {}
+class MockDidPublish extends Mock implements DidPublish {
+  // ...........................................................................
+  /// Makes [exec] successful or not
+  void mockSuccess(bool result) {
+    when(
+      () => exec(
+        directory: any(named: 'directory'),
+        ggLog: any(named: 'ggLog'),
+      ),
+    ).thenAnswer((invocation) async {
+      if (!result) {
+        throw Exception('❌ Everything is published');
+      } else {
+        final ggLog = invocation.namedArguments[const Symbol('ggLog')];
+        ggLog('✅ Everything is published');
+      }
+      return;
+    });
+  }
+}

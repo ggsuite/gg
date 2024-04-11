@@ -18,6 +18,8 @@ export 'src/commands/check/pana.dart';
 export 'src/commands/can.dart';
 export 'src/commands/can/can_push.dart';
 export 'src/commands/can/can_commit.dart';
+export 'src/commands/can/can_publish.dart';
+export 'src/commands/can/can_upgrade.dart';
 
 // Do
 export 'src/commands/do.dart';

@@ -6,6 +6,7 @@
 
 - mocks for DidPush, DidPublish
 - DidUpgrade
+- CanUpgrade, Improve mocks
 
 ### Changed
 
