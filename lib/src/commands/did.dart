@@ -5,9 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:gg/src/commands/did/did_commit.dart';
-import 'package:gg/src/commands/did/did_publish.dart';
-import 'package:gg/src/commands/did/did_push.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................

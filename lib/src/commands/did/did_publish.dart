@@ -5,6 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg/src/tools/did_command.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Everything is published to pub.dev or git?
 class DidPublish extends DidCommand {
@@ -18,3 +19,6 @@ class DidPublish extends DidCommand {
     required super.ggLog,
   });
 }
+
+/// Mock for [DidPublish]
+class MockDidPublish extends Mock implements DidPublish {}

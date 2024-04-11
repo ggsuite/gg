@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- mocks for DidPush, DidPublish
+
 ### Changed
 
 - Parentheses are not necessary anymore

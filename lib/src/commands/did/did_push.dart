@@ -5,6 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg/src/tools/did_command.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Are all changes pushed to the remote repository?
 class DidPush extends DidCommand {
@@ -18,3 +19,6 @@ class DidPush extends DidCommand {
     required super.ggLog,
   });
 }
+
+/// Mock for [DidPush]
+class MockDidPush extends Mock implements DidPush {}
