@@ -20,6 +20,7 @@
 ### Removed
 
 - Upgrade check before pushing
+- dependency to gg\_install\_gg, remove ./check script
 
 ## [3.0.0] - 2024-04-10
 
