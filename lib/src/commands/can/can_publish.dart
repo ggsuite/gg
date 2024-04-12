@@ -5,9 +5,9 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg/gg.dart';
+import 'package:gg_args/gg_args.dart';
 import 'package:gg_changelog/gg_changelog.dart';
 import 'package:gg_publish/gg_publish.dart';
-import 'package:mocktail/mocktail.dart';
 
 /// Are the last changes ready to be published?
 class CanPublish extends CommandCluster {
@@ -42,4 +42,4 @@ class CanPublish extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockCanPublish extends Mock implements CanPublish {}
+class MockCanPublish extends MockDirCommand<void> implements CanPublish {}

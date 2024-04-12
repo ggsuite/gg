@@ -6,10 +6,10 @@
 
 import 'dart:io';
 
+import 'package:gg_args/gg_args.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_json/gg_json.dart';
 import 'package:gg_log/gg_log.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
 
 /// Stores and retrieves the state of the check commands
@@ -258,4 +258,4 @@ class GgState {
 }
 
 /// Mock for [GgState]
-class MockGgState extends Mock implements GgState {}
+class MockGgState extends MockDirCommand<void> implements GgState {}

@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   args: ^2.4.2
-  gg_args: ^2.0.1
+  gg_args: ^2.0.2
   gg_console_colors: ^2.0.1
   gg_git: ^2.5.10
   gg_is_flutter: ^1.0.6

@@ -7,7 +7,6 @@
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
-import 'package:mocktail/mocktail.dart';
 
 /// Are the last changes ready for »git push«?
 class CanPush extends CommandCluster {
@@ -35,4 +34,4 @@ class CanPush extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockCanPush extends Mock implements CanPush {}
+class MockCanPush extends MockDirCommand<void> implements CanPush {}

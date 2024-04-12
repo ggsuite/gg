@@ -374,4 +374,4 @@ class DoCommit extends DirCommand<void> {
 
 // .............................................................................
 /// Mock for [DoCommit].
-class MockDoCommmit extends MockDirCommand<void> implements DoCommit {}
+class MockDoCommit extends MockDirCommand<void> implements DoCommit {}

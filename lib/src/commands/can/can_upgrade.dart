@@ -5,7 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg/gg.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:gg_args/gg_args.dart';
 
 /// Is the package ready to get a dependeny upgrade?
 class CanUpgrade extends CommandCluster {
@@ -29,4 +29,4 @@ class CanUpgrade extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockCanUpgrade extends Mock implements CanUpgrade {}
+class MockCanUpgrade extends MockDirCommand<void> implements CanUpgrade {}

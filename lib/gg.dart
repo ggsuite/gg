@@ -26,6 +26,7 @@ export 'src/commands/do.dart';
 export 'src/commands/do/do_push.dart';
 export 'src/commands/do/do_commit.dart';
 export 'src/commands/do/do_publish.dart';
+export 'src/commands/do/do_upgrade.dart';
 
 // Did
 export 'src/commands/did.dart';
@@ -38,6 +39,7 @@ export 'src/commands/did/did_upgrade.dart';
 export 'src/tools/carriage_return.dart';
 export 'src/tools/command_cluster.dart';
 export 'src/tools/checks.dart';
+export 'src/tools/gg_state.dart';
 
 // Info
 export 'src/commands/info.dart';

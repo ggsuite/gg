@@ -8,6 +8,7 @@
 - DidUpgrade
 - CanUpgrade, Improve mocks
 - upgrade dependencies and make tests work again
+- Tests for DoUpgrade
 
 ### Changed
 

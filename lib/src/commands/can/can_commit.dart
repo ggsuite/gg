@@ -9,7 +9,6 @@ import 'dart:io';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
-import 'package:mocktail/mocktail.dart';
 
 /// Are the last changes ready for »git commit«?
 class CanCommit extends CommandCluster {
@@ -52,4 +51,4 @@ class CanCommit extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockCanCommit extends Mock implements CanCommit {}
+class MockCanCommit extends MockDirCommand<void> implements CanCommit {}
