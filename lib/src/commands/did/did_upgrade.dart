@@ -6,7 +6,6 @@
 
 import 'dart:io';
 
-import 'package:gg/gg.dart';
 import 'package:gg/src/tools/did_command.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
@@ -22,9 +21,7 @@ class DidUpgrade extends DidCommand {
     super.suggestion = 'Not upgraded yet. Please run »gg do upgrade.«',
     super.stateKey = 'doCommit',
     IsUpgraded? isUpgraded,
-    DidPublish? didPublish,
-  })  : _isUpgraded = isUpgraded ?? IsUpgraded(ggLog: ggLog),
-        _didPublish = didPublish ?? DidPublish(ggLog: ggLog);
+  }) : _isUpgraded = isUpgraded ?? IsUpgraded(ggLog: ggLog);
 
   // ...........................................................................
   /// Returns previously set value
@@ -39,24 +36,13 @@ class DidUpgrade extends DidCommand {
       ggLog: ggLog,
     );
 
-    if (!isUpgraded) {
-      return false;
-    }
-
-    /// Is everything published?
-    final didPublish = await _didPublish.get(
-      directory: directory,
-      ggLog: ggLog,
-    );
-
-    return didPublish;
+    return isUpgraded;
   }
 
   // ######################
   // Private
   // ######################
 
-  final DidPublish _didPublish;
   final IsUpgraded _isUpgraded;
 }
 

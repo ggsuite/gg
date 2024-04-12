@@ -9,6 +9,7 @@
 - CanUpgrade, Improve mocks
 - upgrade dependencies and make tests work again
 - Tests for DoUpgrade
+- did upgrade only checks if changes are available on pub.dev
 
 ### Changed
 

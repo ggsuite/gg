@@ -14,7 +14,6 @@ import 'package:test/test.dart';
 
 void main() {
   late Directory d;
-  late MockDidPublish didPublish;
   late MockIsUpgraded isUpgraded;
   late DidUpgrade didUpgrade;
   late CommandRunner<void> runner;
@@ -27,11 +26,9 @@ void main() {
     messages.clear();
     d = await Directory.systemTemp.createTemp();
     registerFallbackValue(d);
-    didPublish = MockDidPublish();
     isUpgraded = MockIsUpgraded();
     didUpgrade = DidUpgrade(
       ggLog: ggLog,
-      didPublish: didPublish,
       isUpgraded: isUpgraded,
     );
     runner = CommandRunner<void>('test', 'test')..addCommand(didUpgrade);
@@ -44,17 +41,13 @@ void main() {
   // ...........................................................................
   group('DidUpgrade', () {
     group('should check', () {
-      group('if everything is upgraded and published', () {
+      group('if everything is upgraded', () {
         for (final viaCli in [
           true,
           false,
         ]) {
           test('via CLI and programmatically', () async {
             isUpgraded.mockGet(
-              result: true,
-            );
-
-            didPublish.mockGet(
               result: true,
             );
 
