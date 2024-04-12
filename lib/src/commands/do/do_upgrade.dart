@@ -8,7 +8,6 @@ import 'dart:io';
 
 import 'package:gg/gg.dart';
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_changelog/gg_changelog.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
@@ -26,15 +25,11 @@ class DoUpgrade extends DirCommand<void> {
     CanUpgrade? canUpgrade,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     CanCommit? canCommit,
-    DoCommit? doCommit,
-    DoPublish? doPublish,
   })  : _state = state ?? GgState(ggLog: ggLog),
         _processWrapper = processWrapper,
         _didUpgrade = didUpgrade ?? DidUpgrade(ggLog: ggLog),
         _canUpgrade = canUpgrade ?? CanUpgrade(ggLog: ggLog),
-        _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
-        _doCommit = doCommit ?? DoCommit(ggLog: ggLog),
-        _doPublish = doPublish ?? DoPublish(ggLog: ggLog) {
+        _canCommit = canCommit ?? CanCommit(ggLog: ggLog) {
     _addParam();
   }
 
@@ -124,21 +119,6 @@ class DoUpgrade extends DirCommand<void> {
       ggLog(yellow('No changes after the upgrade.'));
       return;
     }
-
-    // Commit changes made by the update
-    await _doCommit.exec(
-      directory: directory,
-      ggLog: ggLog,
-      message: 'Upgraded package dependencies',
-      logType: LogType.changed,
-    );
-
-    // Publish the changes to pub.dev
-    await _doPublish.exec(
-      directory: directory,
-      ggLog: ggLog,
-      askBeforePublishing: false,
-    );
   }
 
   /// The key used to save the state of the command
@@ -154,8 +134,6 @@ class DoUpgrade extends DirCommand<void> {
   final DidUpgrade _didUpgrade;
   final CanUpgrade _canUpgrade;
   final CanCommit _canCommit;
-  final DoCommit _doCommit;
-  final DoPublish _doPublish;
 
   // ...........................................................................
   void _addParam() {

@@ -21,6 +21,7 @@
 
 - Upgrade check before pushing
 - dependency to gg\_install\_gg, remove ./check script
+- Upgrading does not trigger a commit and a publish
 
 ## [3.0.0] - 2024-04-10
 

@@ -8,7 +8,6 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg/gg.dart';
-import 'package:gg_changelog/gg_changelog.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_process/gg_process.dart';
@@ -28,8 +27,6 @@ void main() {
   late MockCanUpgrade canUpgrade;
   late MockGgProcessWrapper processWrapper;
   late MockCanCommit canCommit;
-  late MockDoCommit doCommit;
-  late MockDoPublish doPublish;
 
   // ...........................................................................
   void initMocks() {
@@ -39,8 +36,6 @@ void main() {
     canUpgrade = MockCanUpgrade();
     processWrapper = MockGgProcessWrapper();
     canCommit = MockCanCommit();
-    doCommit = MockDoCommit();
-    doPublish = MockDoPublish();
   }
 
   // ...........................................................................
@@ -52,8 +47,6 @@ void main() {
       canUpgrade: canUpgrade,
       processWrapper: processWrapper,
       canCommit: canCommit,
-      doCommit: doCommit,
-      doPublish: doPublish,
     );
 
     runner.addCommand(doUpgrade);
@@ -113,52 +106,11 @@ void main() {
   }
 
   // ...........................................................................
-  void mockDoCommit() {
-    when(
-      () => doCommit.exec(
-        directory: any(
-          named: 'directory',
-          that: predicate<Directory>((dir) => dir.path == d.path),
-        ),
-        ggLog: ggLog,
-        message: 'Upgraded package dependencies',
-        logType: LogType.changed,
-      ),
-    ).thenAnswer(
-      (_) async {
-        ggLog('✅ DoCommit');
-        return Future.value();
-      },
-    );
-  }
-
-  // ...........................................................................
-  void mockDoPublish() {
-    when(
-      () => doPublish.exec(
-        directory: any(
-          named: 'directory',
-          that: predicate<Directory>((dir) => dir.path == d.path),
-        ),
-        ggLog: ggLog,
-        askBeforePublishing: false,
-      ),
-    ).thenAnswer(
-      (_) async {
-        ggLog('✅ DoPublish');
-        return Future.value();
-      },
-    );
-  }
-
-  // ...........................................................................
   void initDefaultMocks() {
     didUpgrade.mockGet(result: false, directory: d, ggLog: null);
     canUpgrade.mockExec(result: null, directory: d, ggLog: ggLog);
     mockCanCommit();
-    mockDoCommit();
     mockDartPubUpgrade();
-    mockDoPublish();
   }
 
   // ...........................................................................
@@ -190,8 +142,6 @@ void main() {
           expect(messages[1], contains('⌛️ Run »dart pub upgrade«'));
           expect(messages[2], contains('✅ Run »dart pub upgrade«'));
           expect(messages[3], contains('✅ CanCommit'));
-          expect(messages[4], contains('✅ DoCommit'));
-          expect(messages[5], contains('✅ DoPublish'));
         }
 
         test('- programmatically', () async {

@@ -19,11 +19,7 @@ class CanUpgrade extends CommandCluster {
     super.stateKey = 'canUpgrade',
     DidPublish? didPublish,
   }) : super(
-          commands: [
-            // »gg do upgrade« will also publish the package automatically
-
-            didPublish ?? DidPublish(ggLog: ggLog),
-          ],
+          commands: [], // Currently we can upgrade always
         );
 }
 

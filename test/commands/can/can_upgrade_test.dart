@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:gg/gg.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -39,45 +40,25 @@ void main() {
 
   // ...........................................................................
   group('CanUpgrade', () {
-    group('should throw', () {
-      group('when not everything is published', () {
-        for (final way in ['programmatically', 'via CLI']) {
-          test(way, () async {
-            didPublish.mockExec(
-              directory: d,
-              ggLog: ggLog,
-              doThrow: true,
-              result: true,
-            );
-            late String exception;
-            try {
-              if (way == 'programmatically') {
-                await canUpgrade.exec(directory: d, ggLog: ggLog);
-              } else {
-                await runner.run(['upgrade', '-i', d.path]);
-              }
-            } catch (e) {
-              exception = e.toString();
-            }
-            expect(exception, contains('❌ DidPublish'));
-          });
-        }
-      });
-    });
-
     group('should succeed', () {
-      group('when everything is published', () {
-        for (final way in ['programmatically', 'via CLI']) {
-          test(way, () async {
-            didPublish.mockExec(
-              result: true,
-              directory: d,
-              ggLog: ggLog,
-            );
-            await canUpgrade.exec(directory: d, ggLog: ggLog);
-            expect(messages.last, '✅ DidPublish');
-          });
-        }
+      setUp(() {
+        didPublish.mockExec(
+          result: true,
+          directory: d,
+          ggLog: ggLog,
+        );
+      });
+
+      tearDown(() {
+        expect(messages[0], yellow('Can upgrade?'));
+      });
+
+      test('programmatically', () async {
+        await canUpgrade.exec(directory: d, ggLog: ggLog);
+      });
+
+      test('via CLI', () async {
+        await runner.run(['upgrade', d.path]);
       });
     });
 
