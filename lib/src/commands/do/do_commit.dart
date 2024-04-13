@@ -15,40 +15,24 @@ import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 
-final _logTypes = cl.LogType.values.map((e) {
-  switch (e) {
-    case cl.LogType.added:
-      return 'add';
-    case cl.LogType.changed:
-      return 'change';
-    case cl.LogType.deprecated:
-      return 'deprecate';
-    case cl.LogType.fixed:
-      return 'fix';
-    case cl.LogType.removed:
-      return 'remove';
-    case cl.LogType.security:
-      return 'secure';
-  }
-});
-
 cl.LogType _stringToLogType(String e) {
-  switch (e) {
-    case 'add':
-      return cl.LogType.added;
-    case 'change':
-      return cl.LogType.changed;
-    case 'deprecate':
-      return cl.LogType.deprecated;
-    case 'fix':
-      return cl.LogType.fixed;
-    case 'remove':
-      return cl.LogType.removed;
-    case 'secure':
-      return cl.LogType.security;
-    default:
-      throw Exception('Unknown log type: $e'); // coverage:ignore-line
+  e = e.toLowerCase();
+
+  if (e.startsWith('add')) {
+    return cl.LogType.added;
+  } else if (e.contains('change')) {
+    return cl.LogType.changed;
+  } else if (e.contains('deprecate')) {
+    return cl.LogType.deprecated;
+  } else if (e.contains('fix')) {
+    return cl.LogType.fixed;
+  } else if (e.contains('remove')) {
+    return cl.LogType.removed;
+  } else if (e.contains('secure')) {
+    return cl.LogType.security;
   }
+
+  return cl.LogType.changed;
 }
 
 // .............................................................................
@@ -258,36 +242,18 @@ class DoCommit extends DirCommand<void> {
   }
 
   // ...........................................................................
-  /// The help text printed when type and message are missing.
-  String get helpOnMissingTypeAndMessage {
-    final part0 = red('Run again with type and message.\n');
-    final part1 =
-        blue('gg do commit ${yellow('<type>')} ${yellow('<message>')}');
-    return '$part0$part1';
-  }
-
-  // ...........................................................................
   /// The help text printed when message is missing.
-  String helpOnMissingMessage(cl.LogType type) {
-    final typeString = _logTypes.elementAt(type.index);
-
+  String get helpOnMissingMessage {
     final part0 = red('Run again with message.\n');
-    final part1 = blue('gg do commit $typeString ${yellow('<message>')}');
+    final part1 = blue('gg do commit ${yellow('<your message>')}');
     return '$part0$part1';
-  }
-
-  // ...........................................................................
-  /// The help text printed when type is invalid.
-  String helpOnWrongLogType({required String wrongType}) {
-    return red('Type ${red(wrongType)} is not valid. Allowed:\n') +
-        _logTypes.map((e) => yellow(e)).join(' ');
   }
 
   // ...........................................................................
   cl.LogType _getLogTypeFromArgs(bool everythingIsCommitted) {
     if ((argResults?.rest.length ?? 0) < 1) {
       throw Exception(
-        helpOnMissingTypeAndMessage,
+        helpOnMissingMessage,
       );
     }
 
@@ -295,19 +261,17 @@ class DoCommit extends DirCommand<void> {
     try {
       return _stringToLogType(logTypeString);
     } catch (e) {
-      throw Exception(
-        helpOnWrongLogType(wrongType: logTypeString),
-      );
+      return cl.LogType.changed;
     }
   }
 
   // ...........................................................................
   String _getMessageFromArgs(bool everythingIsCommitted, cl.LogType logType) {
-    if ((argResults?.rest.length ?? 0) < 2) {
-      throw Exception(helpOnMissingMessage(logType));
+    if ((argResults?.rest.length ?? 0) < 1) {
+      throw Exception(helpOnMissingMessage);
     }
 
-    final message = argResults!.rest.sublist(1).join(' ');
+    final message = argResults!.rest.join(' ');
     return message;
   }
 

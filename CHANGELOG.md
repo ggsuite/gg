@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.4] - 2024-04-13
+
+### Removed
+
+- Removed neccessity to specify a log type when running »gg do commit«
+
 ## [3.0.3] - 2024-04-13
 
 ### Added
@@ -156,6 +162,7 @@
 
 - Initial version
 
+[3.0.4]: https://github.com/inlavigo/gg/compare/3.0.3...3.0.4
 [3.0.3]: https://github.com/inlavigo/gg/compare/3.0.2...3.0.3
 [3.0.2]: https://github.com/inlavigo/gg/compare/3.0.1...3.0.2
 [3.0.1]: https://github.com/inlavigo/gg/compare/3.0.0...3.0.1

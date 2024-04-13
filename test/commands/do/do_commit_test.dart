@@ -336,7 +336,7 @@ void main() {
             }
             expect(
               exception,
-              contains(doCommit.helpOnMissingTypeAndMessage),
+              contains(doCommit.helpOnMissingMessage),
             );
 
             // Commit everything.
@@ -500,7 +500,7 @@ void main() {
 
           expect(
             exception,
-            'Exception: ${doCommit.helpOnMissingMessage(LogType.added)}',
+            'Exception: ${doCommit.helpOnMissingMessage}',
           );
         });
 
@@ -529,55 +529,7 @@ void main() {
 
           expect(
             exception,
-            'Exception: ${doCommit.helpOnMissingTypeAndMessage}',
-          );
-        });
-
-        test('when an unknown log-type is provided', () async {
-          // Add an uncommitted file
-          await addFileWithoutCommitting(d);
-
-          // Execute the command with known log types
-          // It should not throw.
-          for (final logType in [
-            'add',
-            'change',
-            'deprecate',
-            'fix',
-            'remove',
-            'secure',
-          ]) {
-            await updateSampleFileWithoutCommitting(d);
-            await runner.run([
-              'commit',
-              '-i',
-              d.path,
-              logType,
-              'My commit',
-            ]);
-          }
-
-          // Execute the command with an unknown log type
-          // It should throw.
-          await updateSampleFileWithoutCommitting(d);
-
-          late String exception;
-
-          try {
-            await runner.run([
-              'commit',
-              '-i',
-              d.path,
-              'unknown',
-              'My commit',
-            ]);
-          } catch (e) {
-            exception = e.toString();
-          }
-
-          expect(
-            exception,
-            contains(doCommit.helpOnWrongLogType(wrongType: 'unknown')),
+            'Exception: ${doCommit.helpOnMissingMessage}',
           );
         });
 
@@ -606,6 +558,57 @@ void main() {
             exception,
             'Exception: No »repository:« found in pubspec.yaml',
           );
+        });
+      });
+
+      group('special cases', () {
+        group('- should be able to estimate log type from commit message', () {
+          Future<void> runTest({
+            required String keyWord,
+            required String resultingLogType,
+          }) async {
+            // Add uncommitted file
+            await addFileWithoutCommitting(d);
+
+            // Execute command the first time
+            await runner.run([
+              'commit',
+              '-i',
+              d.path,
+              'Did $keyWord something',
+            ]);
+
+            // Check CHANGELOG.md
+            final changelog =
+                await File('${d.path}/CHANGELOG.md').readAsString();
+            expect(changelog, contains('# Changelog\n'));
+            expect(changelog, contains('## Unreleased\n'));
+            expect(changelog, contains('## $resultingLogType\n'));
+          }
+
+          test('- unknown -> Changed', () async {
+            await runTest(keyWord: 'unknown', resultingLogType: 'Changed');
+          });
+
+          test('- Change -> Changed', () async {
+            await runTest(keyWord: 'Change', resultingLogType: 'Changed');
+          });
+
+          test('- Deprecate -> Deprecated', () async {
+            await runTest(keyWord: 'Deprecate', resultingLogType: 'Deprecated');
+          });
+
+          test('- Fix -> Fixed', () async {
+            await runTest(keyWord: 'Fix', resultingLogType: 'Fixed');
+          });
+
+          test('- Remove -> Removed', () async {
+            await runTest(keyWord: 'Remove', resultingLogType: 'Removed');
+          });
+
+          test('- Secure -> Security', () async {
+            await runTest(keyWord: 'Secure', resultingLogType: 'Security');
+          });
         });
       });
     });
