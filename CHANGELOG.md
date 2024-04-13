@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.3] - 2024-04-13
+
+### Added
+
+- missing ✅ for message Tag 1.2.3 added
+
 ## [3.0.2] - 2024-04-13
 
 ### Changed
@@ -150,6 +156,7 @@
 
 - Initial version
 
+[3.0.3]: https://github.com/inlavigo/gg/compare/3.0.2...3.0.3
 [3.0.2]: https://github.com/inlavigo/gg/compare/3.0.1...3.0.2
 [3.0.1]: https://github.com/inlavigo/gg/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/inlavigo/gg/compare/2.0.5...3.0.0

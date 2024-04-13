@@ -135,7 +135,7 @@ class DoPublish extends DirCommand<void> {
     // Add git version tag
     await _addVersionTag.exec(
       directory: directory,
-      ggLog: ggLog,
+      ggLog: (msg) => ggLog('✅ $msg'),
     );
 
     // Push tags to remote

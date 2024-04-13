@@ -215,7 +215,7 @@ void main() {
                           messages[i++],
                           contains('Publishing was successful.'),
                         );
-                        expect(messages[i++], contains('Tag 1.2.4 added.'));
+                        expect(messages[i++], contains('✅ Tag 1.2.4 added.'));
                         expect(messages[i++], contains('⌛️ Increase version'));
                         expect(messages[i++], contains('✅ Increase version'));
 
