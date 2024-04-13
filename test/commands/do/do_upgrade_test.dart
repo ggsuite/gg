@@ -84,30 +84,26 @@ void main() {
 
   // ...........................................................................
   void mockCanCommit({bool success = true}) {
-    when(
-      () => canCommit.exec(
-        directory: any(
-          named: 'directory',
-          that: predicate<Directory>((dir) => dir.path == d.path),
-        ),
-        ggLog: ggLog,
-        force: true,
-      ),
-    ).thenAnswer(
-      (_) async {
-        if (success) {
-          ggLog('✅ CanCommit');
-          return Future.value();
-        } else {
-          throw Exception('CanCommit failed.');
-        }
-      },
+    canCommit.mockExec(
+      result: null,
+      directory: d,
+      ggLog: ggLog,
+      doThrow: !success,
+      message: 'CanCommit failed.',
+      force: true,
+      saveState: null,
     );
   }
 
   // ...........................................................................
   void initDefaultMocks() {
-    didUpgrade.mockGet(result: false, directory: d, ggLog: null);
+    didUpgrade.mockGet(
+      result: false,
+      directory: d,
+      ggLog: null,
+      majorVersions: false,
+    );
+
     canUpgrade.mockExec(result: null, directory: d, ggLog: ggLog);
     mockCanCommit();
     mockDartPubUpgrade();
@@ -156,7 +152,7 @@ void main() {
       });
     });
 
-    group('- special cases', () {
+    group('- edge cases', () {
       group('- should fail', () {
         group('- when preconditions for can upgrade are not met', () {
           setUp(() {
@@ -217,7 +213,11 @@ void main() {
         group('- when everything is already upgraded', () {
           setUp(() {
             // Let's say didUpgrade returns true
-            didUpgrade.mockGet(result: true, directory: d);
+            didUpgrade.mockGet(
+              result: true,
+              directory: d,
+              majorVersions: false,
+            );
           });
 
           void check() {
@@ -274,6 +274,12 @@ void main() {
       group('- should allow to upgrade major versions', () {
         setUp(() {
           mockDartPubUpgrade(majorVersions: true);
+          didUpgrade.mockGet(
+            result: false,
+            directory: d,
+            ggLog: null,
+            majorVersions: true, // <- Major versions
+          );
         });
 
         tearDown(() {
@@ -303,6 +309,89 @@ void main() {
 
       test('- should init DoUpgrade with default params', () {
         expect(() => DoUpgrade(ggLog: ggLog), returnsNormally);
+      });
+    });
+  });
+
+  // #########################################################################
+  group('MockDoUpgrade', () {
+    group('mockExec', () {
+      group('should mock exec', () {
+        test('with ggLog', () async {
+          final didUpgrade = MockDoUpgrade();
+          didUpgrade.mockExec(
+            result: null,
+            directory: d,
+            ggLog: ggLog,
+            majorVersions: true,
+          );
+
+          await didUpgrade.exec(
+            directory: d,
+            ggLog: ggLog,
+            majorVersions: true,
+          );
+
+          expect(messages[0], contains('✅ DoUpgrade'));
+        });
+
+        test('without ggLog', () async {
+          final didUpgrade = MockDoUpgrade();
+          didUpgrade.mockExec(
+            result: null,
+            directory: d,
+            majorVersions: true,
+            ggLog: null, // <-- ggLog is null
+          );
+
+          await didUpgrade.exec(
+            directory: d,
+            majorVersions: true,
+            ggLog: (_) {},
+          );
+
+          expect(messages, isEmpty);
+        });
+      });
+    });
+
+    group('mockGet', () {
+      group('should mock get', () {
+        test('with ggLog', () async {
+          final didUpgrade = MockDoUpgrade();
+          didUpgrade.mockGet(
+            result: null,
+            directory: d,
+            ggLog: ggLog,
+            majorVersions: true,
+          );
+
+          await didUpgrade.get(
+            directory: d,
+            ggLog: ggLog,
+            majorVersions: true,
+          );
+
+          expect(messages[0], contains('✅ DoUpgrade'));
+        });
+
+        test('without ggLog', () async {
+          final didUpgrade = MockDoUpgrade();
+          didUpgrade.mockGet(
+            result: null,
+            directory: d,
+            majorVersions: true,
+            ggLog: null, // <-- ggLog is null
+          );
+
+          await didUpgrade.get(
+            directory: d,
+            majorVersions: true,
+            ggLog: (_) {},
+          );
+
+          expect(messages, isEmpty);
+        });
       });
     });
   });

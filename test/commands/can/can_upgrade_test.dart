@@ -62,7 +62,7 @@ void main() {
       });
     });
 
-    group('special cases', () {
+    group('edge cases', () {
       test('initialized with default arguments', () {
         final canUpgrade = CanUpgrade(ggLog: ggLog);
         expect(canUpgrade.name, 'upgrade');

@@ -9,6 +9,8 @@ import 'dart:io';
 import 'package:gg/src/tools/did_command.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
+import 'package:matcher/expect.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Are the dependencies of the package upgraded?
 class DidUpgrade extends DidCommand {
@@ -29,11 +31,13 @@ class DidUpgrade extends DidCommand {
   Future<bool> get({
     required Directory directory,
     required GgLog ggLog,
+    bool? majorVersions,
   }) async {
     /// Is everything upgraded?
     final isUpgraded = await _isUpgraded.get(
       directory: directory,
       ggLog: ggLog,
+      majorVersions: majorVersions,
     );
 
     return isUpgraded;
@@ -47,4 +51,36 @@ class DidUpgrade extends DidCommand {
 }
 
 /// Mock for [DidUpgrade]
-class MockDidUpgrade extends MockDidCommand implements DidUpgrade {}
+class MockDidUpgrade extends MockDidCommand implements DidUpgrade {
+  // ...........................................................................
+  /// Mocks the result of the get command
+  @override
+  void mockGet({
+    required bool result,
+    Directory? directory,
+    GgLog? ggLog,
+    bool? majorVersions,
+    bool doThrow = false,
+    String? message,
+  }) {
+    when(
+      () => get(
+        ggLog: ggLog ?? any(named: 'ggLog'),
+        directory: any(
+          named: 'directory',
+          that: predicate<Directory>(
+            (d) => directory == null || d.path == directory.path,
+          ),
+        ),
+        majorVersions: majorVersions,
+      ),
+    ).thenAnswer((invocation) async {
+      return defaultReaction(
+        doThrow: doThrow,
+        invocation: invocation,
+        result: result,
+        message: message,
+      );
+    });
+  }
+}

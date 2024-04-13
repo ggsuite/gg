@@ -9,6 +9,8 @@ import 'dart:io';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
+import 'package:matcher/expect.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Are the last changes ready for »git commit«?
 class CanCommit extends CommandCluster {
@@ -51,4 +53,71 @@ class CanCommit extends CommandCluster {
 
 // .............................................................................
 /// A mocktail mock
-class MockCanCommit extends MockDirCommand<void> implements CanCommit {}
+class MockCanCommit extends MockDirCommand<void> implements CanCommit {
+  /// Makes [exec] successful or not
+  @override
+  void mockExec({
+    required void result,
+    Directory? directory,
+    GgLog? ggLog,
+    bool? force,
+    bool? saveState,
+    bool doThrow = false,
+    String? message,
+  }) {
+    when(
+      () => exec(
+        directory: any(
+          named: 'directory',
+          that: predicate<Directory>(
+            (d) => directory == null || d.path == directory.path,
+          ),
+        ),
+        ggLog: ggLog ?? any(named: 'ggLog'),
+        force: force,
+        saveState: saveState,
+      ),
+    ).thenAnswer((invocation) async {
+      return defaultReaction(
+        doThrow: doThrow,
+        invocation: invocation,
+        result: null,
+        message: message,
+      );
+    });
+  }
+
+  // ...........................................................................
+  /// Mocks the result of the get command
+  @override
+  void mockGet({
+    required void result,
+    Directory? directory,
+    GgLog? ggLog,
+    bool? force,
+    bool? saveState,
+    bool doThrow = false,
+    String? message,
+  }) {
+    when(
+      () => get(
+        ggLog: ggLog ?? any(named: 'ggLog'),
+        directory: any(
+          named: 'directory',
+          that: predicate<Directory>(
+            (d) => directory == null || d.path == directory.path,
+          ),
+        ),
+        saveState: saveState,
+        force: force,
+      ),
+    ).thenAnswer((invocation) async {
+      return defaultReaction(
+        doThrow: doThrow,
+        invocation: invocation,
+        result: null,
+        message: message,
+      );
+    });
+  }
+}

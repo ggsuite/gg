@@ -37,6 +37,7 @@ class Do extends Command<void> {
     addSubcommand(deps.doPush);
     addSubcommand(deps.doPublish);
     addSubcommand(deps.doUpgrade);
+    addSubcommand(DoMaintain(ggLog: ggLog));
   }
 }
 

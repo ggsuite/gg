@@ -48,7 +48,9 @@ void main() {
     commit = CanCommit(ggLog: messages.add, checks: commands);
     d = Directory.systemTemp.createTempSync();
     await initGit(d);
+    registerFallbackValue(d);
     mockCommands();
+    messages.clear();
   });
 
   // ...........................................................................
@@ -75,6 +77,70 @@ void main() {
           expect(messages[1], 'did analyze');
           expect(messages[2], 'did format');
           expect(messages[3], 'did cover');
+        });
+      });
+    });
+  });
+
+  group('MockCanCommit', () {
+    group('mockExec', () {
+      group('should mock exec', () {
+        Future<void> runTest({required bool useGgLog}) async {
+          final canCommit = MockCanCommit();
+          canCommit.mockExec(
+            result: null,
+            directory: d, // <-- ggLog
+            ggLog: useGgLog ? messages.add : null,
+            force: true,
+            saveState: false,
+          );
+
+          await canCommit.exec(
+            directory: d,
+            ggLog: messages.add,
+            force: true,
+            saveState: false,
+          );
+          expect(messages[0], contains('✅ CanCommit'));
+        }
+
+        test('with ggLog', () async {
+          await runTest(useGgLog: true);
+        });
+
+        test('with directory == null', () async {
+          await runTest(useGgLog: false);
+        });
+      });
+    });
+
+    group('mockGet', () {
+      group('should mock get', () {
+        Future<void> runTest({required bool useGgLog}) async {
+          final canCommit = MockCanCommit();
+          canCommit.mockGet(
+            result: null,
+            directory: d,
+            ggLog: useGgLog ? messages.add : null, // <-- ggLog
+            force: true,
+            saveState: false,
+          );
+
+          await canCommit.get(
+            directory: d,
+            ggLog: messages.add,
+            force: true,
+            saveState: false,
+          );
+          expect(messages[0], contains('✅ CanCommit'));
+        }
+
+        test('with ggLog', () async {
+          await runTest(useGgLog: true);
+        });
+
+        test('with directory == null', () async {
+          await runTest(useGgLog: false);
         });
       });
     });

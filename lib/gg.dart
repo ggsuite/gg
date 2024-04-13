@@ -27,6 +27,7 @@ export 'src/commands/do/do_push.dart';
 export 'src/commands/do/do_commit.dart';
 export 'src/commands/do/do_publish.dart';
 export 'src/commands/do/do_upgrade.dart';
+export 'src/commands/do/do_maintain.dart';
 
 // Did
 export 'src/commands/did.dart';

@@ -12,6 +12,8 @@ import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
+import 'package:matcher/expect.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Upgrades all dependencies
 class DoUpgrade extends DirCommand<void> {
@@ -53,6 +55,8 @@ class DoUpgrade extends DirCommand<void> {
     required GgLog ggLog,
     bool? majorVersions,
   }) async {
+    majorVersions ??= _majorVersionsFromArgs;
+
     // Use this log method to supress logs.
     void noLog(_) {} // coverage:ignore-line
 
@@ -63,6 +67,7 @@ class DoUpgrade extends DirCommand<void> {
     final isDone = await _didUpgrade.get(
       directory: directory,
       ggLog: noLog,
+      majorVersions: majorVersions,
     );
 
     if (isDone) {
@@ -83,7 +88,6 @@ class DoUpgrade extends DirCommand<void> {
     );
 
     // Perform the upgrade
-    majorVersions ??= _majorVersionsFromArgs;
     await _runDartPubUpgrade(
       directory: directory,
       majorVersions: majorVersions,
@@ -188,4 +192,68 @@ class DoUpgrade extends DirCommand<void> {
 }
 
 /// Mock for [DoUpgrade].
-class MockDoUpgrade extends MockDirCommand<void> implements DoUpgrade {}
+class MockDoUpgrade extends MockDirCommand<void> implements DoUpgrade {
+  // ...........................................................................
+  /// Makes [exec] successful or not
+  @override
+  void mockExec({
+    void result,
+    GgLog? ggLog,
+    Directory? directory,
+    bool? majorVersions,
+    bool doThrow = false,
+    String? message,
+  }) {
+    when(
+      () => exec(
+        directory: any(
+          named: 'directory',
+          that: predicate<Directory>(
+            (d) => directory == null || d.path == directory.path,
+          ),
+        ),
+        ggLog: ggLog ?? any(named: 'ggLog'),
+        majorVersions: majorVersions,
+      ),
+    ).thenAnswer((invocation) async {
+      return defaultReaction(
+        doThrow: doThrow,
+        message: message,
+        invocation: invocation,
+        result: null,
+      );
+    });
+  }
+
+  // ...........................................................................
+  /// Makes [get] successful or not
+  @override
+  void mockGet({
+    void result,
+    GgLog? ggLog,
+    Directory? directory,
+    bool? majorVersions,
+    bool doThrow = false,
+    String? message,
+  }) {
+    when(
+      () => get(
+        directory: any(
+          named: 'directory',
+          that: predicate<Directory>(
+            (d) => directory == null || d.path == directory.path,
+          ),
+        ),
+        ggLog: ggLog ?? any(named: 'ggLog'),
+        majorVersions: majorVersions,
+      ),
+    ).thenAnswer((invocation) async {
+      return defaultReaction(
+        doThrow: doThrow,
+        message: message,
+        invocation: invocation,
+        result: null,
+      );
+    });
+  }
+}

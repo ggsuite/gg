@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.1] - 2024-04-13
 
 ### Added
 
@@ -10,6 +10,7 @@
 - upgrade dependencies and make tests work again
 - Tests for DoUpgrade
 - did upgrade only checks if changes are available on pub.dev
+- DoMaintain to check if everything is upgraded and published from time to time
 
 ### Changed
 
@@ -139,7 +140,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.0...HEAD
+[3.0.1]: https://github.com/inlavigo/gg/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/inlavigo/gg/compare/2.0.5...3.0.0
 [2.0.5]: https://github.com/inlavigo/gg/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/inlavigo/gg/compare/2.0.3...2.0.4

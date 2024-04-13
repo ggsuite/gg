@@ -63,12 +63,57 @@ void main() {
       });
     });
 
-    group('should handle special cases: ', () {
+    group('should handle edge cases: ', () {
       test('instantiate without optional parameters', () {
         expect(
           () => DidUpgrade(ggLog: ggLog),
           returnsNormally,
         );
+      });
+    });
+  });
+
+  // #########################################################################
+  group('MockDidUpgrade', () {
+    group('mockGet', () {
+      group('should mock get', () {
+        test('with ggLog', () async {
+          final didUpgrade = MockDidUpgrade();
+          didUpgrade.mockGet(
+            result: true,
+            directory: d,
+            ggLog: ggLog,
+            majorVersions: true,
+          );
+
+          final result = await didUpgrade.get(
+            directory: d,
+            ggLog: ggLog,
+            majorVersions: true,
+          );
+
+          expect(result, isTrue);
+          expect(messages[0], contains('✅ DidUpgrade'));
+        });
+
+        test('without ggLog', () async {
+          final didUpgrade = MockDidUpgrade();
+          didUpgrade.mockGet(
+            result: true,
+            directory: d,
+            majorVersions: true,
+            ggLog: null, // <-- ggLog is null
+          );
+
+          final result = await didUpgrade.get(
+            directory: d,
+            majorVersions: true,
+            ggLog: (_) {},
+          );
+
+          expect(result, isTrue);
+          expect(messages, isEmpty);
+        });
       });
     });
   });
