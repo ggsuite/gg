@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Removed
+
+- dependency pana
+
 ## [3.0.1] - 2024-04-13
 
 ### Added
@@ -140,6 +146,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.1...HEAD
 [3.0.1]: https://github.com/inlavigo/gg/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/inlavigo/gg/compare/2.0.5...3.0.0
 [2.0.5]: https://github.com/inlavigo/gg/compare/2.0.4...2.0.5
