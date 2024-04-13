@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.2] - 2024-04-13
+
+### Changed
+
+- Use a globally installed pana to make pana check
 
 ### Removed
 
@@ -146,7 +150,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.1...HEAD
+[3.0.2]: https://github.com/inlavigo/gg/compare/3.0.1...3.0.2
 [3.0.1]: https://github.com/inlavigo/gg/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/inlavigo/gg/compare/2.0.5...3.0.0
 [2.0.5]: https://github.com/inlavigo/gg/compare/2.0.4...2.0.5

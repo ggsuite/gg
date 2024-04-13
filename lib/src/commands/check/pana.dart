@@ -51,7 +51,7 @@ class Pana extends DirCommand<void> {
 
     final statusPrinter = GgStatusPrinter<ProcessResult>(
       ggLog: ggLog,
-      message: 'Running "dart pana"',
+      message: 'Running pana',
     );
 
     // Pana will only run if the package is to be published to pub.dev
@@ -80,7 +80,7 @@ class Pana extends DirCommand<void> {
 
     if (code != 0) {
       throw Exception(
-        '"dart run pana" failed. See log for details.',
+        'pana failed. See log for details.',
       );
     }
   }
@@ -142,12 +142,13 @@ class Pana extends DirCommand<void> {
 
 // ...........................................................................
   Future<_TaskResult> _task(Directory dir) async {
+    // Make sure pana is installed
+    await _installPana();
+
     // Run 'pana' and capture the output
     final result = await processWrapper.run(
-      'dart',
+      'pana',
       [
-        'run',
-        'pana',
         '--no-warning',
         '--json',
         '--no-dartdoc', // dartdoc is enforced using analysis_options.yaml
@@ -193,6 +194,38 @@ class Pana extends DirCommand<void> {
       help: 'Check only packages published to pub.dev.',
       negatable: true,
     );
+  }
+
+  // ...........................................................................
+  /// Returns true if pana is installed
+  Future<bool> _isPanaInstalled() async {
+    final result = await processWrapper.run(
+      'dart',
+      ['pub', 'global', 'list'],
+    );
+
+    if (result.exitCode != 0) {
+      throw Exception('Failed to check if pana is installed: ${result.stderr}');
+    }
+
+    return result.stdout.toString().contains(RegExp(r'[\n^\s]+pana\s+'));
+  }
+
+  // ...........................................................................
+  Future<void> _installPana() async {
+    if (await _isPanaInstalled()) {
+      return;
+    }
+
+    final result = await processWrapper.run(
+      'dart',
+      ['pub', 'global', 'activate', 'pana'],
+    );
+
+    if (result.exitCode != 0) {
+      ggLog(result.stderr.toString());
+      throw Exception('Failed to install pana: ${result.stderr}');
+    }
   }
 }
 
