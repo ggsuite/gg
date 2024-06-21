@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.6] - 2024-06-21
+
+### Changed
+
+- Update to new version of gg\_tests
+
 ## [3.0.5] - 2024-06-21
 
 ### Fixed
@@ -168,6 +174,7 @@
 
 - Initial version
 
+[3.0.6]: https://github.com/inlavigo/gg/compare/3.0.5...3.0.6
 [3.0.5]: https://github.com/inlavigo/gg/compare/3.0.4...3.0.5
 [3.0.4]: https://github.com/inlavigo/gg/compare/3.0.3...3.0.4
 [3.0.3]: https://github.com/inlavigo/gg/compare/3.0.2...3.0.3
