@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fix an issue with binary file hash calculation
+
 ## [3.0.6] - 2024-06-21
 
 ### Changed
@@ -174,6 +180,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.6...HEAD
 [3.0.6]: https://github.com/inlavigo/gg/compare/3.0.5...3.0.6
 [3.0.5]: https://github.com/inlavigo/gg/compare/3.0.4...3.0.5
 [3.0.4]: https://github.com/inlavigo/gg/compare/3.0.3...3.0.4
