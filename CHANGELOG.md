@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Update gg\_test to 1.0.19. Only failing error lines are shown, but not details.
+
 ## [3.0.7] - 2024-08-20
 
 ### Fixed
@@ -180,6 +186,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.7...HEAD
 [3.0.7]: https://github.com/inlavigo/gg/compare/3.0.6...3.0.7
 [3.0.6]: https://github.com/inlavigo/gg/compare/3.0.5...3.0.6
 [3.0.5]: https://github.com/inlavigo/gg/compare/3.0.4...3.0.5
