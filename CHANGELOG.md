@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.9] - 2024-08-24
+
+### Changed
+
+- Show detailed test errors when running on a github pipeline
+
 ## [3.0.8] - 2024-08-24
 
 ### Changed
@@ -186,6 +192,7 @@
 
 - Initial version
 
+[3.0.9]: https://github.com/inlavigo/gg/compare/3.0.8...3.0.9
 [3.0.8]: https://github.com/inlavigo/gg/compare/3.0.7...3.0.8
 [3.0.7]: https://github.com/inlavigo/gg/compare/3.0.6...3.0.7
 [3.0.6]: https://github.com/inlavigo/gg/compare/3.0.5...3.0.6
