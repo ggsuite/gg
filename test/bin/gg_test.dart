@@ -15,8 +15,8 @@ void main() {
     test('should be executable', () async {
       // Execute bin/gg.dart and check if it prints help
       final result = await Process.run(
-        './bin/gg.dart',
-        ['check', 'analyze', '--help'],
+        'dart',
+        ['./bin/gg.dart', 'check', 'analyze', '--help'],
       );
 
       final expectedMessages = [
