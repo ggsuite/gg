@@ -59,6 +59,11 @@ class CommandCluster extends DirCommand<void> {
   }) async {
     ggLog(yellow(shortDescription));
 
+    // If we have no commands, let's do nothing.
+    if (commands.isEmpty) {
+      return;
+    }
+
     // Was successful before? Do nothing.
     if (!await _actionIsNeeded(directory, ggLog, force)) {
       _printAlreadyDoneSuccess(ggLog);

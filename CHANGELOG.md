@@ -6,6 +6,7 @@
 
 - Change launch.json
 - Test change
+- Prevent updating the hash for CanUpgrade.
 
 ## [3.0.11] - 2024-08-30
 
