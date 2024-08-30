@@ -157,7 +157,7 @@ class GgState {
   // ######################
 
   final LastChangesHash _lastChangesHash;
-  final _ggJson = const GgJson();
+  final _ggJson = const GgJson(prettyPrint: true);
 
   final IsPushed _isPushed;
   final ModifiedFiles _modifiedFiles;
