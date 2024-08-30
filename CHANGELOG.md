@@ -6,6 +6,7 @@
 
 - Update dependencies to latest versions
 - Make pana work on windows
+- Run tests on MacOS
 
 ## [3.0.9] - 2024-08-24
 
