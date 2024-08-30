@@ -10,7 +10,7 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
-      "args": ["check", "pana"],
+      "args": ["can", "commit"],
       "cwd": "${workspaceFolder}"
     },
     {
