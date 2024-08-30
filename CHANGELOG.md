@@ -5,6 +5,7 @@
 ### Changed
 
 - Update dependencies to latest versions
+- Make pana work on windows
 
 ## [3.0.9] - 2024-08-24
 

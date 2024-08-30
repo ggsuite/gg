@@ -17,6 +17,7 @@ import 'package:test/test.dart';
 
 void main() {
   final messages = <String>[];
+  final panaCmd = Platform.isWindows ? 'pana.bat' : 'pana';
 
   late GgProcessWrapper processWrapper;
   late Pana pana;
@@ -84,7 +85,7 @@ void main() {
   void mockPanaResult(String json) {
     when(
       () => processWrapper.run(
-        'pana',
+        panaCmd,
         ['--no-warning', '--json', '--no-dartdoc'],
         workingDirectory: d.path,
       ),
