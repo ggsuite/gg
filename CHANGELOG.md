@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.13] - 2024-09-04
+
+### Changed
+
+- Don't expect tests for l10n folders
+
 ## [3.0.12] - 2024-08-30
 
 ### Changed
@@ -215,6 +221,7 @@
 
 - Initial version
 
+[3.0.13]: https://github.com/inlavigo/gg/compare/3.0.12...3.0.13
 [3.0.12]: https://github.com/inlavigo/gg/compare/3.0.11...3.0.12
 [3.0.11]: https://github.com/inlavigo/gg/compare/3.0.10...3.0.11
 [3.0.10]: https://github.com/inlavigo/gg/compare/3.0.9...3.0.10
