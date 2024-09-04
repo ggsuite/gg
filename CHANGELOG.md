@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.14] - 2024-09-04
+
+### Changed
+
+- Exclude l10 from coverage
+
 ## [3.0.13] - 2024-09-04
 
 ### Changed
@@ -221,6 +227,7 @@
 
 - Initial version
 
+[3.0.14]: https://github.com/inlavigo/gg/compare/3.0.13...3.0.14
 [3.0.13]: https://github.com/inlavigo/gg/compare/3.0.12...3.0.13
 [3.0.12]: https://github.com/inlavigo/gg/compare/3.0.11...3.0.12
 [3.0.11]: https://github.com/inlavigo/gg/compare/3.0.10...3.0.11
