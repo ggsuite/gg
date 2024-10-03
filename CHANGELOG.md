@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- When commit with ammendWhenNotPushed = true is called and no upstream branch is set, changes will be ammended
+
 ## [3.0.14] - 2024-09-04
 
 ### Changed
@@ -227,6 +233,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.14...HEAD
 [3.0.14]: https://github.com/inlavigo/gg/compare/3.0.13...3.0.14
 [3.0.13]: https://github.com/inlavigo/gg/compare/3.0.12...3.0.13
 [3.0.12]: https://github.com/inlavigo/gg/compare/3.0.11...3.0.12
