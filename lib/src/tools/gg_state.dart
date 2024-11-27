@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_git/gg_git.dart';
-import 'package:gg_json/gg_json.dart';
+import 'package:gg_direct_json/gg_direct_json.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:path/path.dart';
 
@@ -157,7 +157,7 @@ class GgState {
   // ######################
 
   final LastChangesHash _lastChangesHash;
-  final _ggJson = const GgJson(prettyPrint: true);
+  final _ggJson = const DirectJson(prettyPrint: true);
 
   final IsPushed _isPushed;
   final ModifiedFiles _modifiedFiles;

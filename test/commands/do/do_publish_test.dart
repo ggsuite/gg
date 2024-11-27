@@ -10,7 +10,7 @@ import 'package:gg/gg.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
-import 'package:gg_json/gg_json.dart';
+import 'package:gg_direct_json/gg_direct_json.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
@@ -30,7 +30,7 @@ void main() {
 
   late int successHash;
   late int needsChangeHash;
-  const ggJson = GgJson();
+  const directJson = DirectJson();
   late Version publishedVersionValue;
 
   // ...........................................................................
@@ -163,7 +163,7 @@ void main() {
       group('should succeed', () {
         group('and not publish', () {
           test('when publishing was already successful', () async {
-            await ggJson.writeFile(
+            await directJson.writeFile(
               file: File(join(d.path, '.gg.json')),
               path: 'doPublish/success/hash',
               value: successHash,
@@ -191,7 +191,7 @@ void main() {
                         );
 
                         // Mock needing publish
-                        await ggJson.writeFile(
+                        await directJson.writeFile(
                           file: File(join(d.path, '.gg.json')),
                           path: 'doPublish/success/hash',
                           value: needsChangeHash,
@@ -274,7 +274,7 @@ void main() {
                       );
 
                       // Mock needing publish
-                      await ggJson.writeFile(
+                      await directJson.writeFile(
                         file: File(join(d.path, '.gg.json')),
                         path: 'doPublish/success/hash',
                         value: needsChangeHash,
@@ -307,7 +307,7 @@ void main() {
                   );
 
                   // Mock needing publish
-                  await ggJson.writeFile(
+                  await directJson.writeFile(
                     file: File(join(d.path, '.gg.json')),
                     path: 'doPublish/success/hash',
                     value: needsChangeHash,
@@ -355,7 +355,7 @@ void main() {
               await makeLastStateSuccessful();
 
               // Mock needing publish
-              await ggJson.writeFile(
+              await directJson.writeFile(
                 file: File(join(d.path, '.gg.json')),
                 path: 'doPublish/success/hash',
                 value: needsChangeHash,
@@ -419,7 +419,7 @@ void main() {
               mockPublishedVersion();
 
               // Mock needing publish
-              await ggJson.writeFile(
+              await directJson.writeFile(
                 file: File(join(d.path, '.gg.json')),
                 path: 'doPublish/success/hash',
                 value: needsChangeHash,

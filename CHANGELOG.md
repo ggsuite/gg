@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Replace gg\_json by gg\_direct\_json
+
 ## [3.0.15] - 2024-10-03
 
 ### Changed
@@ -237,6 +243,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.15...HEAD
 [3.0.15]: https://github.com/inlavigo/gg/compare/3.0.14...3.0.15
 [3.0.14]: https://github.com/inlavigo/gg/compare/3.0.13...3.0.14
 [3.0.13]: https://github.com/inlavigo/gg/compare/3.0.12...3.0.13
