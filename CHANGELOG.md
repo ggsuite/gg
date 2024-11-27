@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.16] - 2024-11-27
 
 ### Changed
 
@@ -243,7 +243,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.15...HEAD
+[3.0.16]: https://github.com/inlavigo/gg/compare/3.0.15...3.0.16
 [3.0.15]: https://github.com/inlavigo/gg/compare/3.0.14...3.0.15
 [3.0.14]: https://github.com/inlavigo/gg/compare/3.0.13...3.0.14
 [3.0.13]: https://github.com/inlavigo/gg/compare/3.0.12...3.0.13
