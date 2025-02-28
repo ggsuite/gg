@@ -27,10 +27,7 @@ class Analyze extends DirCommand<void> {
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> get({
-    required Directory directory,
-    required GgLog ggLog,
-  }) async {
+  Future<void> get({required Directory directory, required GgLog ggLog}) async {
     await check(directory: directory);
 
     final statusPrinter = GgStatusPrinter<ProcessResult>(
@@ -40,11 +37,11 @@ class Analyze extends DirCommand<void> {
 
     statusPrinter.logStatus(GgStatusPrinterStatus.running);
 
-    final result = await processWrapper.run(
-      'dart',
-      ['analyze', '--fatal-infos', '--fatal-warnings'],
-      workingDirectory: directory.path,
-    );
+    final result = await processWrapper.run('dart', [
+      'analyze',
+      '--fatal-infos',
+      '--fatal-warnings',
+    ], workingDirectory: directory.path);
 
     statusPrinter.logStatus(
       result.exitCode == 0
@@ -65,9 +62,7 @@ class Analyze extends DirCommand<void> {
       final filesRed = files.map((e) => red('- $e')).join('\n');
       ggLog(filesRed);
 
-      throw Exception(
-        '"dart analyze" failed. See log for details.',
-      );
+      throw Exception('"dart analyze" failed. See log for details.');
     }
   }
 

@@ -22,16 +22,19 @@ void main() {
 
   // ...........................................................................
   void mockCommands() {
-    when(() => commands.analyze.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
+    when(
+      () => commands.analyze.exec(directory: d, ggLog: messages.add),
+    ).thenAnswer((_) async {
       messages.add('did analyze');
     });
-    when(() => commands.format.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
+    when(
+      () => commands.format.exec(directory: d, ggLog: messages.add),
+    ).thenAnswer((_) async {
       messages.add('did format');
     });
-    when(() => commands.tests.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
+    when(
+      () => commands.tests.exec(directory: d, ggLog: messages.add),
+    ).thenAnswer((_) async {
       messages.add('did cover');
     });
   }

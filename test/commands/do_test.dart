@@ -20,13 +20,8 @@ void main() {
   setUp(() {
     d = Directory.systemTemp.createTempSync();
     messages.clear();
-    doCommand = Do(
-      ggLog: messages.add,
-    );
-    runner = CommandRunner<void>(
-      'test',
-      'test',
-    )..addCommand(doCommand);
+    doCommand = Do(ggLog: messages.add);
+    runner = CommandRunner<void>('test', 'test')..addCommand(doCommand);
   });
 
   tearDown(() {

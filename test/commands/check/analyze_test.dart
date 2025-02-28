@@ -37,15 +37,10 @@ void main() {
         test('when called with args=[--help]', () async {
           await capturePrint(
             ggLog: messages.add,
-            code: () => runner.run(
-              ['analyze', '--help'],
-            ),
+            code: () => runner.run(['analyze', '--help']),
           );
 
-          expect(
-            messages.last,
-            contains('Runs »dart analyze«.'),
-          );
+          expect(messages.last, contains('Runs »dart analyze«.'));
         });
       });
 
@@ -53,9 +48,7 @@ void main() {
       group('should throw', () {
         test('if input is missing', () async {
           await expectLater(
-            runner.run(
-              ['analyze', '--input=some-unknown-dir'],
-            ),
+            runner.run(['analyze', '--input=some-unknown-dir']),
             throwsA(
               isA<ArgumentError>().having(
                 (e) => e.message,
@@ -73,10 +66,7 @@ void main() {
           // Configure runner and command
           final runner = CommandRunner<void>('test', 'test');
           runner.addCommand(
-            Analyze(
-              ggLog: messages.add,
-              processWrapper: processWrapper,
-            ),
+            Analyze(ggLog: messages.add, processWrapper: processWrapper),
           );
 
           // Make process wrapper returning an error
@@ -87,16 +77,12 @@ void main() {
               workingDirectory: any(named: 'workingDirectory'),
             ),
           ).thenAnswer(
-            (_) => Future.value(
-              ProcessResult(1, 1, 'stdout', 'stderr'),
-            ),
+            (_) => Future.value(ProcessResult(1, 1, 'stdout', 'stderr')),
           );
 
           // Run the command
           await expectLater(
-            () => runner.run(
-              ['analyze', tmpDir.path],
-            ),
+            () => runner.run(['analyze', tmpDir.path]),
             throwsA(
               isA<Exception>().having(
                 (e) => e.toString(),

@@ -47,15 +47,9 @@ void main() {
       group('should return true', () {
         group('and print ✓', () {
           test('when state was set to success before', () async {
-            await didCommand.state.writeSuccess(
-              directory: d,
-              key: 'did-do',
-            );
+            await didCommand.state.writeSuccess(directory: d, key: 'did-do');
 
-            await didCommand.exec(
-              directory: d,
-              ggLog: messages.add,
-            );
+            await didCommand.exec(directory: d, ggLog: messages.add);
             expect(messages[0], contains('⌛️ Did do?'));
             expect(messages[1], contains('✅ Did do?'));
           });
@@ -69,10 +63,7 @@ void main() {
             late String exceptionMessage;
 
             try {
-              await didCommand.exec(
-                directory: d,
-                ggLog: messages.add,
-              );
+              await didCommand.exec(directory: d, ggLog: messages.add);
             } catch (e) {
               exceptionMessage = e.toString();
             }
@@ -94,10 +85,7 @@ void main() {
       group('should return', () {
         group('false', () {
           test('if something has changed inbetween', () async {
-            await didCommand.state.writeSuccess(
-              directory: d,
-              key: 'did-do',
-            );
+            await didCommand.state.writeSuccess(directory: d, key: 'did-do');
 
             await addAndCommitSampleFile(
               d,
@@ -115,34 +103,28 @@ void main() {
         });
 
         group('true', () {
-          test('if a success state was saved and nothing has changed',
-              () async {
-            await didCommand.state.writeSuccess(
-              directory: d,
-              key: 'did-do',
-            );
+          test(
+            'if a success state was saved and nothing has changed',
+            () async {
+              await didCommand.state.writeSuccess(directory: d, key: 'did-do');
 
-            final success = await didCommand.get(
-              directory: d,
-              ggLog: messages.add,
-            );
+              final success = await didCommand.get(
+                directory: d,
+                ggLog: messages.add,
+              );
 
-            expect(success, isTrue);
-          });
+              expect(success, isTrue);
+            },
+          );
         });
       });
     });
 
     group('set(directory, ggLog)', () {
       test('should set the state to success', () async {
-        await didCommand.set(
-          directory: d,
-        );
+        await didCommand.set(directory: d);
 
-        final success = await didCommand.get(
-          directory: d,
-          ggLog: messages.add,
-        );
+        final success = await didCommand.get(directory: d, ggLog: messages.add);
 
         expect(success, isTrue);
       });

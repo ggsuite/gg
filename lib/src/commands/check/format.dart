@@ -20,18 +20,13 @@ import 'package:mocktail/mocktail.dart' as mocktail;
 /// Runs dart format on the source code
 class Format extends DirCommand<void> {
   /// Constructor
-  Format({
-    required super.ggLog,
-    this.processWrapper = const GgProcessWrapper(),
-  }) : super(name: 'format', description: 'Runs »dart format«.');
+  Format({required super.ggLog, this.processWrapper = const GgProcessWrapper()})
+    : super(name: 'format', description: 'Runs »dart format«.');
 
   // ...........................................................................
   /// Executes the command
   @override
-  Future<void> get({
-    required Directory directory,
-    required GgLog ggLog,
-  }) async {
+  Future<void> get({required Directory directory, required GgLog ggLog}) async {
     await check(directory: directory);
 
     final statusPrinter = GgStatusPrinter<ProcessResult>(
@@ -41,11 +36,13 @@ class Format extends DirCommand<void> {
 
     statusPrinter.logStatus(GgStatusPrinterStatus.running);
 
-    final result = await processWrapper.run(
-      'dart',
-      ['format', '.', '--fix', '--set-exit-if-changed'],
-      workingDirectory: directory.path,
-    );
+    final result = await processWrapper.run('dart', [
+      'format',
+      '.',
+      '-o',
+      'write',
+      '--set-exit-if-changed',
+    ], workingDirectory: directory.path);
 
     if (result.exitCode == 0) {
       statusPrinter.logStatus(GgStatusPrinterStatus.success);
@@ -67,18 +64,14 @@ class Format extends DirCommand<void> {
         final filesRed = files.map((e) => '- ${red(e)}').join('\n');
         ggLog(filesRed);
 
-        throw Exception(
-          'dart format failed.',
-        );
+        throw Exception('dart format failed.');
       }
 
       // When no files have changed, but an error occurred log the error
       if (files.isEmpty) {
         statusPrinter.logStatus(GgStatusPrinterStatus.error);
         ggLog(brightBlack('std'));
-        throw Exception(
-          'dart format failed.',
-        );
+        throw Exception('dart format failed.');
       }
 
       statusPrinter.logStatus(GgStatusPrinterStatus.success);

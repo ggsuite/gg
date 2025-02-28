@@ -61,25 +61,18 @@ void main() {
     bool upgradingCausesChange = true,
   }) {
     when(
-      () => processWrapper.run(
-        'dart',
-        ['pub', 'upgrade', if (majorVersions) '--major-versions'],
-        workingDirectory: d.path,
-      ),
-    ).thenAnswer(
-      (_) async {
-        if (upgradingCausesChange) {
-          await updateSampleFileWithoutCommitting(d);
-        }
+      () => processWrapper.run('dart', [
+        'pub',
+        'upgrade',
+        if (majorVersions) '--major-versions',
+      ], workingDirectory: d.path),
+    ).thenAnswer((_) async {
+      if (upgradingCausesChange) {
+        await updateSampleFileWithoutCommitting(d);
+      }
 
-        return ProcessResult(
-          0,
-          exitCode,
-          stdout,
-          stderr,
-        );
-      },
-    );
+      return ProcessResult(0, exitCode, stdout, stderr);
+    });
   }
 
   // ...........................................................................
@@ -129,8 +122,7 @@ void main() {
   // ...........................................................................
   group('DoUpgrade', () {
     group('- main case', () {
-      group(
-          '- should run »dart pub upggrade», '
+      group('- should run »dart pub upggrade», '
           'check if everything still runs (canCommit) '
           'and finally commit and publish changes', () {
         void check() {
@@ -176,23 +168,16 @@ void main() {
           }
 
           test('- programmatically', () async {
-            await perform(
-              doUpgrade.exec(directory: d, ggLog: ggLog),
-            );
+            await perform(doUpgrade.exec(directory: d, ggLog: ggLog));
           });
 
           test('- via CLI', () async {
-            await perform(
-              runner.run(['upgrade', d.path, '-i', d.path]),
-            );
+            await perform(runner.run(['upgrade', d.path, '-i', d.path]));
           });
         });
 
         test('- when »dart pub upgrade« exists with an error', () async {
-          mockDartPubUpgrade(
-            exitCode: 1,
-            stderr: 'Something went wrong',
-          );
+          mockDartPubUpgrade(exitCode: 1, stderr: 'Something went wrong');
 
           late String exception;
           try {
@@ -202,9 +187,7 @@ void main() {
           }
           expect(
             exception,
-            contains(
-              '»dart pub upgrade« failed: Something went wrong',
-            ),
+            contains('»dart pub upgrade« failed: Something went wrong'),
           );
         });
       });
@@ -221,10 +204,7 @@ void main() {
           });
 
           void check() {
-            expect(
-              messages.last,
-              yellow('Everything is already up to date.'),
-            );
+            expect(messages.last, yellow('Everything is already up to date.'));
           }
 
           test('- programmatically', () async {
@@ -240,36 +220,35 @@ void main() {
       });
 
       group('- should not commit and publish ', () {
-        test(
-          'when nothing was changed by »dart pub upgrade«',
-          () async {
-            mockDartPubUpgrade(upgradingCausesChange: false);
-            await doUpgrade.exec(directory: d, ggLog: ggLog);
-            final allMessages = messages.join('\n');
-            expect(allMessages, isNot(contains('✅ DoCommit')));
-            expect(allMessages, isNot(contains('✅ DoPublish')));
-          },
-        );
-      });
-
-      test('- should require fixing errors happening through updating',
-          () async {
-        mockCanCommit(success: false);
-
-        late String exception;
-        try {
+        test('when nothing was changed by »dart pub upgrade«', () async {
+          mockDartPubUpgrade(upgradingCausesChange: false);
           await doUpgrade.exec(directory: d, ggLog: ggLog);
-        } catch (e) {
-          exception = e.toString();
-        }
-
-        final message = red(
-          'After the update tests are not running anymore. '
-          'Please run ${blue('»gg can commit«')} and try again.',
-        );
-
-        expect(exception, contains(message));
+          final allMessages = messages.join('\n');
+          expect(allMessages, isNot(contains('✅ DoCommit')));
+          expect(allMessages, isNot(contains('✅ DoPublish')));
+        });
       });
+
+      test(
+        '- should require fixing errors happening through updating',
+        () async {
+          mockCanCommit(success: false);
+
+          late String exception;
+          try {
+            await doUpgrade.exec(directory: d, ggLog: ggLog);
+          } catch (e) {
+            exception = e.toString();
+          }
+
+          final message = red(
+            'After the update tests are not running anymore. '
+            'Please run ${blue('»gg can commit«')} and try again.',
+          );
+
+          expect(exception, contains(message));
+        },
+      );
 
       group('- should allow to upgrade major versions', () {
         setUp(() {
@@ -295,11 +274,7 @@ void main() {
         });
 
         test('- programmatically', () async {
-          await doUpgrade.exec(
-            directory: d,
-            ggLog: ggLog,
-            majorVersions: true,
-          );
+          await doUpgrade.exec(directory: d, ggLog: ggLog, majorVersions: true);
         });
 
         test('- via CLI', () async {
@@ -366,11 +341,7 @@ void main() {
             majorVersions: true,
           );
 
-          await didUpgrade.get(
-            directory: d,
-            ggLog: ggLog,
-            majorVersions: true,
-          );
+          await didUpgrade.get(directory: d, ggLog: ggLog, majorVersions: true);
 
           expect(messages[0], contains('✅ DoUpgrade'));
         });

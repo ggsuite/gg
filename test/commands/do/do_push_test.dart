@@ -33,12 +33,14 @@ void main() async {
   // ...........................................................................
   void mockCanPush(bool success) {
     if (success) {
-      when(() => canPush.exec(directory: any(named: 'directory'), ggLog: ggLog))
-          .thenAnswer((_) async => {});
+      when(
+        () => canPush.exec(directory: any(named: 'directory'), ggLog: ggLog),
+      ).thenAnswer((_) async => {});
       return;
     } else {
-      when(() => canPush.exec(directory: any(named: 'directory'), ggLog: ggLog))
-          .thenThrow(Exception('Cannot push.'));
+      when(
+        () => canPush.exec(directory: any(named: 'directory'), ggLog: ggLog),
+      ).thenThrow(Exception('Cannot push.'));
       return;
     }
   }
@@ -61,15 +63,13 @@ void main() async {
     ggJson = File(join(dLocal.path, '.gg.json'));
 
     // Init pubspec.yaml
-    await File(join(dLocal.path, 'pubspec.yaml')).writeAsString(
-      'version: 1.0.0\nrepository: https://foo.com',
-    );
+    await File(
+      join(dLocal.path, 'pubspec.yaml'),
+    ).writeAsString('version: 1.0.0\nrepository: https://foo.com');
     await commitFile(dLocal, 'pubspec.yaml');
 
     // Init CHANGELOG.md
-    await File(join(dLocal.path, 'CHANGELOG.md')).writeAsString(
-      '# Changelog',
-    );
+    await File(join(dLocal.path, 'CHANGELOG.md')).writeAsString('# Changelog');
     await commitFile(dLocal, 'CHANGELOG.md');
   });
 
@@ -104,10 +104,7 @@ void main() async {
 
               // Execute the same push a second time
               await doPush.exec(directory: dLocal, ggLog: ggLog);
-              expect(
-                messages.last,
-                yellow('Already checked and pushed.'),
-              );
+              expect(messages.last, yellow('Already checked and pushed.'));
             });
           });
         });
@@ -119,11 +116,10 @@ void main() async {
               final processWrapper = MockGgProcessWrapper();
 
               when(
-                () => processWrapper.run(
-                  'git',
-                  ['push', '-f'],
-                  workingDirectory: dLocal.path,
-                ),
+                () => processWrapper.run('git', [
+                  'push',
+                  '-f',
+                ], workingDirectory: dLocal.path),
               ).thenAnswer((_) async => ProcessResult(1, 0, '', ''));
 
               // Make a change that could be pushed
@@ -148,11 +144,10 @@ void main() async {
 
               // Make sure the force flag is passed to git
               verify(
-                () => processWrapper.run(
-                  'git',
-                  ['push', '-f'],
-                  workingDirectory: dLocal.path,
-                ),
+                () => processWrapper.run('git', [
+                  'push',
+                  '-f',
+                ], workingDirectory: dLocal.path),
               ).called(1);
             });
           });
@@ -163,8 +158,9 @@ void main() async {
               await updateSampleFileWithoutCommitting(dLocal);
 
               // Commit the change using ggDoCommit
-              when(() => canCommit.exec(directory: dLocal, ggLog: ggLog))
-                  .thenAnswer((_) async => {});
+              when(
+                () => canCommit.exec(directory: dLocal, ggLog: ggLog),
+              ).thenAnswer((_) async => {});
               await doCommit.exec(
                 directory: dLocal,
                 ggLog: ggLog,
@@ -219,11 +215,9 @@ void main() async {
           final processWrapper = MockGgProcessWrapper();
 
           when(
-            () => processWrapper.run(
-              'git',
-              ['push'],
-              workingDirectory: dLocal.path,
-            ),
+            () => processWrapper.run('git', [
+              'push',
+            ], workingDirectory: dLocal.path),
           ).thenAnswer((_) async => ProcessResult(1, 1, '', 'Some error'));
 
           // Let check's pass

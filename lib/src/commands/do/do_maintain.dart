@@ -21,8 +21,8 @@ class DoMaintain extends DirCommand<void> {
     GgState? state,
     DoUpgrade? doUpgrade,
     DidPublish? didPublish,
-  })  : _didPublish = didPublish ?? DidPublish(ggLog: ggLog),
-        _doUpgrade = doUpgrade ?? DoUpgrade(ggLog: ggLog) {
+  }) : _didPublish = didPublish ?? DidPublish(ggLog: ggLog),
+       _doUpgrade = doUpgrade ?? DoUpgrade(ggLog: ggLog) {
     _addParam();
   }
 
@@ -56,19 +56,17 @@ class DoMaintain extends DirCommand<void> {
       ggLog: ggLog,
       message: 'Upgrading dependencies',
     ).logTask(
-      task: () => _doUpgrade.get(
-        directory: directory,
-        ggLog: messages.add,
-        majorVersions: majorVersions,
-      ),
+      task:
+          () => _doUpgrade.get(
+            directory: directory,
+            ggLog: messages.add,
+            majorVersions: majorVersions,
+          ),
       success: (result) => true,
     );
 
     // Rung »gg did publish«
-    await _didPublish.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    await _didPublish.exec(directory: directory, ggLog: ggLog);
   }
 
   /// The key used to save the state of the command
@@ -88,7 +86,8 @@ class DoMaintain extends DirCommand<void> {
     argParser.addFlag(
       'major-versions',
       abbr: 'm',
-      help: 'Upgrades packages to their latest resolvable versions, '
+      help:
+          'Upgrades packages to their latest resolvable versions, '
           'and updates pubspec.yaml.',
       defaultsTo: false,
       negatable: false,

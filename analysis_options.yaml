@@ -21,17 +21,16 @@ linter:
     - lines_longer_than_80_chars
     - prefer_single_quotes
     - void_checks
-    - require_trailing_commas
     - prefer_const_constructors
     - always_declare_return_types
     - prefer_const_constructors_in_immutables
     - prefer_const_declarations
     - prefer_const_literals_to_create_immutables
     - prefer_constructors_over_static_methods
-    - package_api_docs
     - public_member_api_docs
     - missing_whitespace_between_adjacent_strings
     - unawaited_futures
+    
 
 #   exclude:
 #     - path/to/excluded/files/**
@@ -43,6 +42,7 @@ analyzer:
     strict-raw-types: true
   errors:
     always_declare_return_types: true
+    require_trailing_commas: true
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
 

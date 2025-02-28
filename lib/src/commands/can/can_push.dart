@@ -21,14 +21,9 @@ class CanPush extends CommandCluster {
   }) : super(commands: _checks(checkCommands, ggLog));
 
   // ...........................................................................
-  static List<DirCommand<void>> _checks(
-    Checks? checks,
-    GgLog ggLog,
-  ) {
+  static List<DirCommand<void>> _checks(Checks? checks, GgLog ggLog) {
     checks ??= Checks(ggLog: ggLog);
-    return [
-      checks.isCommitted,
-    ];
+    return [checks.isCommitted];
   }
 }
 

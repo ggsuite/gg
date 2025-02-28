@@ -23,21 +23,14 @@ class CanPublish extends CommandCluster {
     Pana? pana,
     HasRightFormat? changeLogHasRightFormat,
   }) : super(
-          commands: [
-            isVersionPrepared ??
-                IsVersionPrepared(
-                  ggLog: ggLog,
-                  treatUnpublishedAsOk: true,
-                ),
-            changeLogHasRightFormat ?? HasRightFormat(ggLog: ggLog),
-            didCommit ?? DidCommit(ggLog: ggLog),
-            pana ??
-                Pana(
-                  ggLog: ggLog,
-                  publishedOnly: true,
-                ),
-          ],
-        );
+         commands: [
+           isVersionPrepared ??
+               IsVersionPrepared(ggLog: ggLog, treatUnpublishedAsOk: true),
+           changeLogHasRightFormat ?? HasRightFormat(ggLog: ggLog),
+           didCommit ?? DidCommit(ggLog: ggLog),
+           pana ?? Pana(ggLog: ggLog, publishedOnly: true),
+         ],
+       );
 }
 
 // .............................................................................

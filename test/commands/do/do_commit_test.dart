@@ -56,7 +56,8 @@ void main() {
       d,
       fileName: 'pubspec.yaml',
       content:
-          'version: 1.0.0\n' 'repository:https://github.com/inlavigo/gg.git',
+          'version: 1.0.0\n'
+          'repository:https://github.com/inlavigo/gg.git',
     );
 
     // Mock stuff
@@ -64,10 +65,7 @@ void main() {
     mockCanCommit();
 
     // Create command
-    doCommit = DoCommit(
-      ggLog: ggLog,
-      canCommit: canCommit,
-    );
+    doCommit = DoCommit(ggLog: ggLog, canCommit: canCommit);
 
     // Create runner
     runner = CommandRunner<void>('test', 'test');
@@ -105,8 +103,7 @@ void main() {
         });
 
         group('and log »Checks successful. Nothing to commit.«', () {
-          test(
-              'when the command is executed the first time '
+          test('when the command is executed the first time '
               'but nothing needs to be committed.', () async {
             // Execute command the first time
             await doCommit.exec(
@@ -124,8 +121,7 @@ void main() {
         });
 
         group('and commit and log »Checks successful. Commit successful.«', () {
-          test(
-              'when the command is executed the first time '
+          test('when the command is executed the first time '
               'and uncommitted changes were committed.', () async {
             // Add uncommitted file
             await addFileWithoutCommitting(d);
@@ -188,10 +184,7 @@ void main() {
                 expect(changelog, contains('# Changelog\n'));
                 expect(changelog, contains('## Unreleased\n'));
                 expect(changelog, contains('## Added\n'));
-                expect(
-                  changelog,
-                  contains('My very special commit message\n'),
-                );
+                expect(changelog, contains('My very special commit message\n'));
               });
             });
             test('is true', () async {
@@ -301,9 +294,7 @@ void main() {
         group('and allow to execute from cli', () {
           test('with message', () async {
             await addFileWithoutCommitting(d);
-            await runner.run(
-              ['commit', '-i', d.path, 'add', 'My commit'],
-            );
+            await runner.run(['commit', '-i', d.path, 'add', 'My commit']);
             expect(
               messages.last,
               yellow('Checks successful. Commit successful.'),
@@ -334,10 +325,7 @@ void main() {
             } catch (e) {
               exception = e.toString();
             }
-            expect(
-              exception,
-              contains(doCommit.helpOnMissingMessage),
-            );
+            expect(exception, contains(doCommit.helpOnMissingMessage));
 
             // Commit everything.
             // Run the command again without message and log type.
@@ -365,20 +353,12 @@ void main() {
           final processWrapper = MockGgProcessWrapper();
 
           when(
-            () => processWrapper.run(
-              'git',
-              ['add', '.'],
-              workingDirectory: d.path,
-            ),
+            () => processWrapper.run('git', [
+              'add',
+              '.',
+            ], workingDirectory: d.path),
           ).thenAnswer(
-            (_) => Future.value(
-              ProcessResult(
-                1,
-                1,
-                '',
-                'Some error',
-              ),
-            ),
+            (_) => Future.value(ProcessResult(1, 1, '', 'Some error')),
           );
 
           mockCanCommit();
@@ -413,39 +393,22 @@ void main() {
           // Make git commit failing
           final processWrapper = MockGgProcessWrapper();
           when(
-            () => processWrapper.run(
-              'git',
-              ['commit', '-m', 'Add: My commit'],
-              workingDirectory: d.path,
-            ),
+            () => processWrapper.run('git', [
+              'commit',
+              '-m',
+              'Add: My commit',
+            ], workingDirectory: d.path),
           ).thenAnswer(
-            (_) => Future.value(
-              ProcessResult(
-                1,
-                1,
-                '',
-                'Some error',
-              ),
-            ),
+            (_) => Future.value(ProcessResult(1, 1, '', 'Some error')),
           );
 
           // Make git add working
           when(
-            () => processWrapper.run(
-              'git',
-              ['add', '.'],
-              workingDirectory: d.path,
-            ),
-          ).thenAnswer(
-            (_) => Future.value(
-              ProcessResult(
-                1,
-                0,
-                '',
-                '',
-              ),
-            ),
-          );
+            () => processWrapper.run('git', [
+              'add',
+              '.',
+            ], workingDirectory: d.path),
+          ).thenAnswer((_) => Future.value(ProcessResult(1, 0, '', '')));
 
           mockCanCommit();
 
@@ -480,10 +443,7 @@ void main() {
           await addFileWithoutCommitting(d);
 
           // Execute the command
-          final doCommit = DoCommit(
-            ggLog: ggLog,
-            canCommit: canCommit,
-          );
+          final doCommit = DoCommit(ggLog: ggLog, canCommit: canCommit);
 
           late String exception;
 
@@ -498,10 +458,7 @@ void main() {
             exception = e.toString();
           }
 
-          expect(
-            exception,
-            'Exception: ${doCommit.helpOnMissingMessage}',
-          );
+          expect(exception, 'Exception: ${doCommit.helpOnMissingMessage}');
         });
 
         test('when no log-type is provided', () async {
@@ -509,10 +466,7 @@ void main() {
           await addFileWithoutCommitting(d);
 
           // Execute the command
-          final doCommit = DoCommit(
-            ggLog: ggLog,
-            canCommit: canCommit,
-          );
+          final doCommit = DoCommit(ggLog: ggLog, canCommit: canCommit);
 
           late String exception;
 
@@ -527,17 +481,14 @@ void main() {
             exception = e.toString();
           }
 
-          expect(
-            exception,
-            'Exception: ${doCommit.helpOnMissingMessage}',
-          );
+          expect(exception, 'Exception: ${doCommit.helpOnMissingMessage}');
         });
 
         test('when pubspec.yaml does not contain a repo URL', () async {
           // Remove repository URL from pubspec.yaml
-          await File('${d.path}/pubspec.yaml').writeAsString(
-            'version: 1.0.0\n',
-          );
+          await File(
+            '${d.path}/pubspec.yaml',
+          ).writeAsString('version: 1.0.0\n');
 
           await addFileWithoutCommitting(d);
 

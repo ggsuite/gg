@@ -24,9 +24,7 @@ void main() {
 
   // ...........................................................................
   Future<void> initCommand() async {
-    ggState = GgState(
-      ggLog: messages.add,
-    );
+    ggState = GgState(ggLog: messages.add);
     await initGit(dLocal);
   }
 
@@ -61,26 +59,19 @@ void main() {
           await addAndCommitSampleFile(dLocal);
 
           // Get last changes hash
-          final hash = await LastChangesHash(ggLog: messages.add).get(
-            directory: dLocal,
+          final hash = await LastChangesHash(
             ggLog: messages.add,
-          );
+          ).get(directory: dLocal, ggLog: messages.add);
 
           // Set the state
-          await ggState.writeSuccess(
-            directory: dLocal,
-            key: 'can-commit',
-          );
+          await ggState.writeSuccess(directory: dLocal, key: 'can-commit');
 
           // Check the file
           final checkJson = File('${dLocal.path}/.gg.json');
           await expectLater(await checkJson.exists(), isTrue);
           final contentsString = await checkJson.readAsString();
           final contents = json.decode(contentsString);
-          expect(
-            contents['can-commit']['success']['hash'],
-            hash,
-          );
+          expect(contents['can-commit']['success']['hash'], hash);
         });
       });
 
@@ -107,10 +98,7 @@ void main() {
           );
 
           // Run the command a first time
-          await ggState.writeSuccess(
-            directory: dLocal,
-            key: 'isCommitted',
-          );
+          await ggState.writeSuccess(directory: dLocal, key: 'isCommitted');
 
           // Because we have not pushed the changes yet,
           // changes to gg.json should be ammended to the last commit
@@ -160,17 +148,10 @@ void main() {
           );
 
           // Push the changes
-          await Process.run(
-            'git',
-            ['push'],
-            workingDirectory: dLocal.path,
-          );
+          await Process.run('git', ['push'], workingDirectory: dLocal.path);
 
           // Run the command a first time
-          await ggState.writeSuccess(
-            directory: dLocal,
-            key: 'isCommitted',
-          );
+          await ggState.writeSuccess(directory: dLocal, key: 'isCommitted');
 
           // Because we have pushed the changes already,
           // changes to gg.json should be commited as a new commit
@@ -193,10 +174,7 @@ void main() {
           );
 
           // Executing the cluster again should not change anything
-          await ggState.writeSuccess(
-            directory: dLocal,
-            key: 'isCommitted',
-          );
+          await ggState.writeSuccess(directory: dLocal, key: 'isCommitted');
 
           final commitCount1 = await commitCount.get(
             directory: dLocal,
@@ -256,10 +234,7 @@ void main() {
 
           test('if last success hash is not current hash', () async {
             // Set the state
-            await ggState.writeSuccess(
-              directory: dLocal,
-              key: 'can-commit',
-            );
+            await ggState.writeSuccess(directory: dLocal, key: 'can-commit');
 
             // Change the file
             await addAndCommitSampleFile(dLocal);
@@ -279,10 +254,7 @@ void main() {
             await addAndCommitSampleFile(dLocal, fileName: 'file0.txt');
 
             // Write success after everything is committed
-            await ggState.writeSuccess(
-              directory: dLocal,
-              key: 'can-commit',
-            );
+            await ggState.writeSuccess(directory: dLocal, key: 'can-commit');
 
             // Read succes -> It should be true
             final result = await ggState.readSuccess(
@@ -304,10 +276,7 @@ void main() {
             expect(result2, isFalse);
 
             // Write success again
-            await ggState.writeSuccess(
-              directory: dLocal,
-              key: 'can-commit',
-            );
+            await ggState.writeSuccess(directory: dLocal, key: 'can-commit');
 
             // Read success -> It should be true
             final result3 = await ggState.readSuccess(
@@ -337,16 +306,12 @@ void main() {
       group('replaces the hash in .gg.json with the current hash', () {
         test('when current hash is different', () async {
           // Get last changes hash
-          final hash = await LastChangesHash(ggLog: messages.add).get(
-            directory: dLocal,
+          final hash = await LastChangesHash(
             ggLog: messages.add,
-          );
+          ).get(directory: dLocal, ggLog: messages.add);
 
           // Set the state
-          await ggState.writeSuccess(
-            directory: dLocal,
-            key: 'can-commit',
-          );
+          await ggState.writeSuccess(directory: dLocal, key: 'can-commit');
 
           // Change the file
           await addAndCommitSampleFile(dLocal);
@@ -360,10 +325,7 @@ void main() {
           expect(result, isFalse);
 
           // Update the previous hash
-          await ggState.updateHash(
-            hash: hash,
-            directory: dLocal,
-          );
+          await ggState.updateHash(hash: hash, directory: dLocal);
 
           // Now ggState.readSuccess should return true again
           final result1 = await ggState.readSuccess(
@@ -376,16 +338,12 @@ void main() {
 
         test('but not when the hash has not changed', () async {
           // Get last changes hash
-          final hash = await LastChangesHash(ggLog: messages.add).get(
-            directory: dLocal,
+          final hash = await LastChangesHash(
             ggLog: messages.add,
-          );
+          ).get(directory: dLocal, ggLog: messages.add);
 
           // Update the previous hash
-          await ggState.updateHash(
-            hash: hash,
-            directory: dLocal,
-          );
+          await ggState.updateHash(hash: hash, directory: dLocal);
         });
       });
     });
@@ -393,10 +351,7 @@ void main() {
     group('reset(directory)', () {
       test('should reset success state', () async {
         // Set the state
-        await ggState.writeSuccess(
-          directory: dLocal,
-          key: 'can-commit',
-        );
+        await ggState.writeSuccess(directory: dLocal, key: 'can-commit');
 
         expect(
           await ggState.readSuccess(

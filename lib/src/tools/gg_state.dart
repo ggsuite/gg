@@ -25,13 +25,13 @@ class GgState {
     HeadMessage? headMessage,
     HasRemote? hasRemote,
     CommitCount? commitCount,
-  })  : _lastChangesHash = lastChangesHash ?? LastChangesHash(ggLog: ggLog),
-        _isPushed = isPushed ?? IsPushed(ggLog: ggLog),
-        _modifiedFiles = modifiedFiles ?? ModifiedFiles(ggLog: ggLog),
-        _commit = commit ?? Commit(ggLog: ggLog),
-        _headMessage = headMessage ?? HeadMessage(ggLog: ggLog),
-        _hasRemote = hasRemote ?? HasRemote(ggLog: ggLog),
-        _commitCount = commitCount ?? CommitCount(ggLog: ggLog);
+  }) : _lastChangesHash = lastChangesHash ?? LastChangesHash(ggLog: ggLog),
+       _isPushed = isPushed ?? IsPushed(ggLog: ggLog),
+       _modifiedFiles = modifiedFiles ?? ModifiedFiles(ggLog: ggLog),
+       _commit = commit ?? Commit(ggLog: ggLog),
+       _headMessage = headMessage ?? HeadMessage(ggLog: ggLog),
+       _hasRemote = hasRemote ?? HasRemote(ggLog: ggLog),
+       _commitCount = commitCount ?? CommitCount(ggLog: ggLog);
 
   // ...........................................................................
   /// The logger used for logging
@@ -64,7 +64,7 @@ class GgState {
     }
 
     // Get the hash written to .gg.json
-    final hashInCheckJson = await _ggJson.readFile<int>(
+    final hashInCheckJson = await DirectJson.readFile<int>(
       file: _configFile(directory: directory),
       path: _hashPath(key).join('/'),
     );
@@ -95,13 +95,10 @@ class GgState {
     }
 
     // Get the hash of the current commit
-    final hash = await currentHash(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    final hash = await currentHash(directory: directory, ggLog: ggLog);
 
     // Write the hash to .gg.json
-    await _ggJson.writeFile(
+    await DirectJson.writeFile(
       file: _configFile(directory: directory),
       path: _hashPath(key).join('/'),
       value: hash,
@@ -141,8 +138,10 @@ class GgState {
       return;
     }
 
-    final ggJSonFileContent =
-        (await ggJsonFile.readAsString()).replaceAll('$hash', '$current');
+    final ggJSonFileContent = (await ggJsonFile.readAsString()).replaceAll(
+      '$hash',
+      '$current',
+    );
     await ggJsonFile.writeAsString(ggJSonFileContent);
   }
 
@@ -157,7 +156,6 @@ class GgState {
   // ######################
 
   final LastChangesHash _lastChangesHash;
-  final _ggJson = const DirectJson(prettyPrint: true);
 
   final IsPushed _isPushed;
   final ModifiedFiles _modifiedFiles;
@@ -170,9 +168,7 @@ class GgState {
   List<String> _hashPath(String name) => [name, 'success', 'hash'];
 
   // ...........................................................................
-  File _configFile({
-    required Directory directory,
-  }) {
+  File _configFile({required Directory directory}) {
     final filePath = join(directory.path, '.gg.json');
     final file = File(filePath);
     return file;
@@ -207,10 +203,7 @@ class GgState {
     // Otherwise commit or ammend .gg.json
 
     // Check if the repository has a remote
-    final hasRemote = await _hasRemote.get(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    final hasRemote = await _hasRemote.get(directory: directory, ggLog: ggLog);
 
     final everythingWasPushed = hasRemote && await _wasPushed(directory);
 
@@ -219,13 +212,14 @@ class GgState {
     // we will ammend changes to .gg.json to the last commit.
     // - If everything was committed and pushed, create a new commit
     // - If everything was committed but not pushed, ammend to last commit
-    final message = everythingWasPushed
-        ? 'Add: .gg.json check results'
-        : await _headMessage.get(
-            directory: directory,
-            ggLog: ggLog,
-            throwIfNotEverythingIsCommitted: false,
-          );
+    final message =
+        everythingWasPushed
+            ? 'Add: .gg.json check results'
+            : await _headMessage.get(
+              directory: directory,
+              ggLog: ggLog,
+              throwIfNotEverythingIsCommitted: false,
+            );
 
     await _commit.commit(
       directory: directory,

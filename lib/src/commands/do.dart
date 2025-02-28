@@ -12,10 +12,7 @@ import 'package:gg_log/gg_log.dart';
 /// Various checks for the source code
 class Do extends Command<void> {
   /// Constructor
-  Do({
-    required this.ggLog,
-    DepsOfDo? deps,
-  }) {
+  Do({required this.ggLog, DepsOfDo? deps}) {
     deps ??= DepsOfDo(ggLog: ggLog);
     _initSubCommands(deps);
   }
@@ -51,10 +48,10 @@ class DepsOfDo {
     DoPush? doPush,
     DoPublish? doPublish,
     DoUpgrade? doUpgrade,
-  })  : doCommit = doCommit ?? DoCommit(ggLog: ggLog),
-        doPush = doPush ?? DoPush(ggLog: ggLog),
-        doPublish = doPublish ?? DoPublish(ggLog: ggLog),
-        doUpgrade = doUpgrade ?? DoUpgrade(ggLog: ggLog);
+  }) : doCommit = doCommit ?? DoCommit(ggLog: ggLog),
+       doPush = doPush ?? DoPush(ggLog: ggLog),
+       doPublish = doPublish ?? DoPublish(ggLog: ggLog),
+       doUpgrade = doUpgrade ?? DoUpgrade(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;

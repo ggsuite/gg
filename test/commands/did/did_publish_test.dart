@@ -53,9 +53,7 @@ void main() {
       }
       expect(
         exception,
-        contains(
-          colorize('Not yet published. Please run »gg do publish«.'),
-        ),
+        contains(colorize('Not yet published. Please run »gg do publish«.')),
       );
     });
   });

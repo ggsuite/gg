@@ -42,11 +42,7 @@ void main() {
   group('CanUpgrade', () {
     group('should succeed', () {
       setUp(() {
-        didPublish.mockExec(
-          result: true,
-          directory: d,
-          ggLog: ggLog,
-        );
+        didPublish.mockExec(result: true, directory: d, ggLog: ggLog);
       });
 
       tearDown(() {

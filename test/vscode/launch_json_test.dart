@@ -14,9 +14,9 @@ void main() {
   group('.vscode/launch.json', () {
     test('pathes in launch.json', () {
       const String launchJsonPath = '.vscode/launch.json';
-      final String launchJson = File(launchJsonPath)
-          .readAsStringSync()
-          .replaceAll(RegExp(r'//.*'), '');
+      final String launchJson = File(
+        launchJsonPath,
+      ).readAsStringSync().replaceAll(RegExp(r'//.*'), '');
 
       final parsedLaunchJson = jsonDecode(launchJson) as Map<String, dynamic>;
 
@@ -29,11 +29,7 @@ void main() {
             configuration['name'].toString() == 'gg.dart',
       );
 
-      expect(
-        gg,
-        isNotNull,
-        reason: 'Item for executing bin/gg.dart not found',
-      );
+      expect(gg, isNotNull, reason: 'Item for executing bin/gg.dart not found');
 
       expect(gg['name'], 'gg.dart');
       expect(gg['type'], 'dart');

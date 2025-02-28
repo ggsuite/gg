@@ -27,10 +27,7 @@ void main() {
     d = await Directory.systemTemp.createTemp();
     registerFallbackValue(d);
     isUpgraded = MockIsUpgraded();
-    didUpgrade = DidUpgrade(
-      ggLog: ggLog,
-      isUpgraded: isUpgraded,
-    );
+    didUpgrade = DidUpgrade(ggLog: ggLog, isUpgraded: isUpgraded);
     runner = CommandRunner<void>('test', 'test')..addCommand(didUpgrade);
   });
 
@@ -42,14 +39,9 @@ void main() {
   group('DidUpgrade', () {
     group('should check', () {
       group('if everything is upgraded', () {
-        for (final viaCli in [
-          true,
-          false,
-        ]) {
+        for (final viaCli in [true, false]) {
           test('via CLI and programmatically', () async {
-            isUpgraded.mockGet(
-              result: true,
-            );
+            isUpgraded.mockGet(result: true);
 
             if (viaCli == false) {
               await didUpgrade.exec(directory: d, ggLog: ggLog);
@@ -65,10 +57,7 @@ void main() {
 
     group('should handle edge cases: ', () {
       test('instantiate without optional parameters', () {
-        expect(
-          () => DidUpgrade(ggLog: ggLog),
-          returnsNormally,
-        );
+        expect(() => DidUpgrade(ggLog: ggLog), returnsNormally);
       });
     });
   });

@@ -25,10 +25,10 @@ class DoPush extends DirCommand<void> {
     CanPush? canPush,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     GgState? state,
-  })  : _processWrapper = processWrapper,
-        _isPushedViaGit = isPushed ?? IsPushed(ggLog: ggLog),
-        _canPush = canPush ?? CanPush(ggLog: ggLog),
-        state = state ?? GgState(ggLog: ggLog) {
+  }) : _processWrapper = processWrapper,
+       _isPushedViaGit = isPushed ?? IsPushed(ggLog: ggLog),
+       _canPush = canPush ?? CanPush(ggLog: ggLog),
+       state = state ?? GgState(ggLog: ggLog) {
     _addParam();
   }
 
@@ -38,12 +38,7 @@ class DoPush extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? force,
-  }) =>
-      get(
-        directory: directory,
-        ggLog: ggLog,
-        force: force,
-      );
+  }) => get(directory: directory, ggLog: ggLog, force: force);
 
   // ...........................................................................
   @override
@@ -76,16 +71,10 @@ class DoPush extends DirCommand<void> {
     }
 
     // Is everything fine?
-    await _canPush.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    await _canPush.exec(directory: directory, ggLog: ggLog);
 
     // Write success before pushing
-    await state.writeSuccess(
-      directory: directory,
-      key: stateKey,
-    );
+    await state.writeSuccess(directory: directory, key: stateKey);
 
     // Did .gg.json change? Is a new push needed?
     final isPushedViaGitAfterWritingSuccess = await _isPushedViaGit.get(
@@ -134,11 +123,11 @@ class DoPush extends DirCommand<void> {
     required bool force,
     bool pushTags = false,
   }) async {
-    final result = await _processWrapper.run(
-      'git',
-      ['push', if (force) '-f', if (pushTags) '--tags'],
-      workingDirectory: directory.path,
-    );
+    final result = await _processWrapper.run('git', [
+      'push',
+      if (force) '-f',
+      if (pushTags) '--tags', // coverage:ignore-line
+    ], workingDirectory: directory.path);
 
     if (result.exitCode != 0) {
       throw Exception('git push failed: ${result.stderr}');

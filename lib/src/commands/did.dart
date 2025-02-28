@@ -12,10 +12,7 @@ import 'package:gg_log/gg_log.dart';
 /// Various checks for the source code
 class Did extends Command<void> {
   /// Constructor
-  Did({
-    required this.ggLog,
-    DepsOfDid? deps,
-  }) {
+  Did({required this.ggLog, DepsOfDid? deps}) {
     deps ??= DepsOfDid(ggLog: ggLog);
     _initSubCommands(deps);
   }
@@ -50,10 +47,10 @@ class DepsOfDid {
     DidPush? push,
     DidPublish? publish,
     DidUpgrade? upgrade,
-  })  : didCommit = commit ?? DidCommit(ggLog: ggLog),
-        didPush = push ?? DidPush(ggLog: ggLog),
-        didPublish = publish ?? DidPublish(ggLog: ggLog),
-        didUpgrade = upgrade ?? DidUpgrade(ggLog: ggLog);
+  }) : didCommit = commit ?? DidCommit(ggLog: ggLog),
+       didPush = push ?? DidPush(ggLog: ggLog),
+       didPublish = publish ?? DidPublish(ggLog: ggLog),
+       didUpgrade = upgrade ?? DidUpgrade(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;

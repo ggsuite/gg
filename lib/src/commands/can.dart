@@ -14,10 +14,7 @@ import 'package:gg_log/gg_log.dart';
 /// Various checks for the source code
 class Can extends Command<void> {
   /// Constructor
-  Can({
-    required this.ggLog,
-    DepsOfCan? deps,
-  }) {
+  Can({required this.ggLog, DepsOfCan? deps}) {
     deps ??= DepsOfCan(ggLog: ggLog);
     _initSubCommands(deps);
   }
@@ -50,9 +47,9 @@ class DepsOfCan {
     CanCommit? commit,
     CanPush? push,
     CanPublish? publish,
-  })  : canCommit = commit ?? CanCommit(ggLog: ggLog),
-        canPush = push ?? CanPush(ggLog: ggLog),
-        canPublish = publish ?? CanPublish(ggLog: ggLog);
+  }) : canCommit = commit ?? CanCommit(ggLog: ggLog),
+       canPush = push ?? CanPush(ggLog: ggLog),
+       canPublish = publish ?? CanPublish(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;

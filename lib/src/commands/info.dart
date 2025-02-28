@@ -12,9 +12,7 @@ import 'package:gg_log/gg_log.dart';
 /// Commands to inform about the source code
 class Info extends Command<void> {
   /// Constructor
-  Info({
-    required this.ggLog,
-  }) {
+  Info({required this.ggLog}) {
     _initSubCommands();
   }
 

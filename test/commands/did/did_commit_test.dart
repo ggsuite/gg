@@ -37,9 +37,7 @@ void main() {
         expect(await didCommit.get(directory: d, ggLog: ggLog), isFalse);
 
         // Let's set a success state
-        await didCommit.set(
-          directory: d,
-        );
+        await didCommit.set(directory: d);
 
         // Now the command should return true
         expect(await didCommit.get(directory: d, ggLog: ggLog), isTrue);

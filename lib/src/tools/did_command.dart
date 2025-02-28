@@ -58,10 +58,7 @@ class DidCommand extends DirCommand<bool> {
   // ...........................................................................
   /// Returns previously set value
   @override
-  Future<bool> get({
-    required Directory directory,
-    required GgLog ggLog,
-  }) async {
+  Future<bool> get({required Directory directory, required GgLog ggLog}) async {
     final success = await state.readSuccess(
       directory: directory,
       key: stateKey,
@@ -73,13 +70,8 @@ class DidCommand extends DirCommand<bool> {
 
   // ...........................................................................
   /// Returns previously set value
-  Future<void> set({
-    required Directory directory,
-  }) async {
-    await state.writeSuccess(
-      directory: directory,
-      key: stateKey,
-    );
+  Future<void> set({required Directory directory}) async {
+    await state.writeSuccess(directory: directory, key: stateKey);
   }
 
   /// The question to be answered by the did command

@@ -27,11 +27,11 @@ class DoUpgrade extends DirCommand<void> {
     CanUpgrade? canUpgrade,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     CanCommit? canCommit,
-  })  : _state = state ?? GgState(ggLog: ggLog),
-        _processWrapper = processWrapper,
-        _didUpgrade = didUpgrade ?? DidUpgrade(ggLog: ggLog),
-        _canUpgrade = canUpgrade ?? CanUpgrade(ggLog: ggLog),
-        _canCommit = canCommit ?? CanCommit(ggLog: ggLog) {
+  }) : _state = state ?? GgState(ggLog: ggLog),
+       _processWrapper = processWrapper,
+       _didUpgrade = didUpgrade ?? DidUpgrade(ggLog: ggLog),
+       _canUpgrade = canUpgrade ?? CanUpgrade(ggLog: ggLog),
+       _canCommit = canCommit ?? CanCommit(ggLog: ggLog) {
     _addParam();
   }
 
@@ -41,12 +41,7 @@ class DoUpgrade extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? majorVersions,
-  }) =>
-      get(
-        directory: directory,
-        ggLog: ggLog,
-        majorVersions: majorVersions,
-      );
+  }) => get(directory: directory, ggLog: ggLog, majorVersions: majorVersions);
 
   // ...........................................................................
   @override
@@ -76,10 +71,7 @@ class DoUpgrade extends DirCommand<void> {
     }
 
     // Can upgrade?
-    await _canUpgrade.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    await _canUpgrade.exec(directory: directory, ggLog: ggLog);
 
     // Remember the state before the upgrade
     final hashBefore = await _state.currentHash(
@@ -101,7 +93,6 @@ class DoUpgrade extends DirCommand<void> {
         force: true, // Checks need to be done, even if if nothing has changed
       );
     }
-
     // When not everything is running, reset success sate
     catch (e) {
       await _state.reset(directory: directory);
@@ -144,7 +135,8 @@ class DoUpgrade extends DirCommand<void> {
     argParser.addFlag(
       'major-versions',
       abbr: 'm',
-      help: 'Upgrades packages to their latest resolvable versions, '
+      help:
+          'Upgrades packages to their latest resolvable versions, '
           'and updates pubspec.yaml.',
       defaultsTo: false,
       negatable: false,
@@ -157,11 +149,7 @@ class DoUpgrade extends DirCommand<void> {
     required Directory directory,
     required bool majorVersions,
   }) async {
-    final args = [
-      'pub',
-      'upgrade',
-      if (majorVersions) '--major-versions',
-    ];
+    final args = ['pub', 'upgrade', if (majorVersions) '--major-versions'];
 
     await GgStatusPrinter<bool>(
       message: 'Run »dart ${args.join(' ')}«',

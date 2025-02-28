@@ -12,10 +12,7 @@ import 'package:gg_log/gg_log.dart';
 /// Various checks for the source code
 class Check extends Command<void> {
   /// Constructor
-  Check({
-    required this.ggLog,
-    Checks? checks,
-  }) {
+  Check({required this.ggLog, Checks? checks}) {
     _initSubCommands(checks);
   }
 

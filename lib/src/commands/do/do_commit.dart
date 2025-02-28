@@ -49,12 +49,12 @@ class DoCommit extends DirCommand<void> {
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     GgState? state,
     cl.Add? addToChangeLog,
-  })  : _processWrapper = processWrapper,
-        _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
-        _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
-        _commit = commit ?? Commit(ggLog: ggLog),
-        state = state ?? GgState(ggLog: ggLog),
-        _addToChangeLog = addToChangeLog ?? cl.Add(ggLog: ggLog) {
+  }) : _processWrapper = processWrapper,
+       _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
+       _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
+       _commit = commit ?? Commit(ggLog: ggLog),
+       state = state ?? GgState(ggLog: ggLog),
+       _addToChangeLog = addToChangeLog ?? cl.Add(ggLog: ggLog) {
     _addParam();
   }
 
@@ -66,14 +66,13 @@ class DoCommit extends DirCommand<void> {
     String? message,
     cl.LogType? logType,
     bool? updateChangeLog,
-  }) =>
-      get(
-        directory: directory,
-        ggLog: ggLog,
-        message: message,
-        logType: logType,
-        updateChangeLog: updateChangeLog,
-      );
+  }) => get(
+    directory: directory,
+    ggLog: ggLog,
+    message: message,
+    logType: logType,
+    updateChangeLog: updateChangeLog,
+  );
 
   // ...........................................................................
   @override
@@ -124,10 +123,7 @@ class DoCommit extends DirCommand<void> {
     final repoUrl = await _repositoryUrl(directory);
 
     // Is everything fine?
-    await _canCommit.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    await _canCommit.exec(directory: directory, ggLog: ggLog);
 
     // Update changelog when a message is given
     updateChangeLog ??= argResults?['log'] as bool? ?? true;
@@ -154,10 +150,7 @@ class DoCommit extends DirCommand<void> {
     }
 
     // Save the state
-    await state.writeSuccess(
-      directory: directory,
-      key: stateKey,
-    );
+    await state.writeSuccess(directory: directory, key: stateKey);
   }
 
   /// The state used to save the state of the command
@@ -201,11 +194,10 @@ class DoCommit extends DirCommand<void> {
 
   // ...........................................................................
   Future<void> _gitAdd(Directory directory, String message) async {
-    final result = await _processWrapper.run(
-      'git',
-      ['add', '.'],
-      workingDirectory: directory.path,
-    );
+    final result = await _processWrapper.run('git', [
+      'add',
+      '.',
+    ], workingDirectory: directory.path);
 
     if (result.exitCode != 0) {
       throw Exception('git add failed: ${result.stderr}');
@@ -230,11 +222,11 @@ class DoCommit extends DirCommand<void> {
 
     message = '${logTypeToEmoji[logType]}: $message';
 
-    final result = await _processWrapper.run(
-      'git',
-      ['commit', '-m', message],
-      workingDirectory: directory.path,
-    );
+    final result = await _processWrapper.run('git', [
+      'commit',
+      '-m',
+      message,
+    ], workingDirectory: directory.path);
 
     if (result.exitCode != 0) {
       throw Exception('git commit failed: ${result.stderr}');
@@ -252,9 +244,7 @@ class DoCommit extends DirCommand<void> {
   // ...........................................................................
   cl.LogType _getLogTypeFromArgs(bool everythingIsCommitted) {
     if ((argResults?.rest.length ?? 0) < 1) {
-      throw Exception(
-        helpOnMissingMessage,
-      );
+      throw Exception(helpOnMissingMessage);
     }
 
     final logTypeString = argResults!.rest[0];

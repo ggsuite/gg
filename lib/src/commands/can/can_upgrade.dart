@@ -19,8 +19,8 @@ class CanUpgrade extends CommandCluster {
     super.stateKey = 'canUpgrade',
     DidPublish? didPublish,
   }) : super(
-          commands: [], // Currently we can upgrade always
-        );
+         commands: [], // Currently we can upgrade always
+       );
 }
 
 // .............................................................................

@@ -34,18 +34,18 @@ class DoPublish extends DirCommand<void> {
     IsPublished? isPublished,
     changelog.Release? release,
     PublishTo? publishTo,
-  })  : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
-        _publishToPubDev = publish ?? Publish(ggLog: ggLog),
-        _state = state ?? GgState(ggLog: ggLog),
-        _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog),
-        _commit = commit ?? Commit(ggLog: ggLog),
-        _doPush = doPush ?? DoPush(ggLog: ggLog),
-        _prepareNextVersion =
-            prepareNextVersion ?? PrepareNextVersion(ggLog: ggLog),
-        _fromPubspec = fromPubspec ?? FromPubspec(ggLog: ggLog),
-        _releaseChangelog = release ?? changelog.Release(ggLog: ggLog),
-        _isPublished = isPublished ?? IsPublished(ggLog: ggLog),
-        _publishTo = publishTo ?? PublishTo(ggLog: ggLog) {
+  }) : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
+       _publishToPubDev = publish ?? Publish(ggLog: ggLog),
+       _state = state ?? GgState(ggLog: ggLog),
+       _addVersionTag = addVersionTag ?? AddVersionTag(ggLog: ggLog),
+       _commit = commit ?? Commit(ggLog: ggLog),
+       _doPush = doPush ?? DoPush(ggLog: ggLog),
+       _prepareNextVersion =
+           prepareNextVersion ?? PrepareNextVersion(ggLog: ggLog),
+       _fromPubspec = fromPubspec ?? FromPubspec(ggLog: ggLog),
+       _releaseChangelog = release ?? changelog.Release(ggLog: ggLog),
+       _isPublished = isPublished ?? IsPublished(ggLog: ggLog),
+       _publishTo = publishTo ?? PublishTo(ggLog: ggLog) {
     _addArgs();
   }
 
@@ -59,12 +59,11 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
-  }) =>
-      get(
-        directory: directory,
-        ggLog: ggLog,
-        askBeforePublishing: askBeforePublishing,
-      );
+  }) => get(
+    directory: directory,
+    ggLog: ggLog,
+    askBeforePublishing: askBeforePublishing,
+  );
 
   // ...........................................................................
   @override
@@ -97,16 +96,10 @@ class DoPublish extends DirCommand<void> {
     );
 
     // Can publish?
-    await _canPublish.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    await _canPublish.exec(directory: directory, ggLog: ggLog);
 
     // Publish change log using cider
-    await _prepareChangelog(
-      directory: directory,
-      ggLog: noLog,
-    );
+    await _prepareChangelog(directory: directory, ggLog: noLog);
 
     // Publish on pub.dev
     final publishToPubDev = await _shouldPublishToPubDev(directory, ggLog);
@@ -120,10 +113,7 @@ class DoPublish extends DirCommand<void> {
     }
 
     // Save state
-    await _state.writeSuccess(
-      directory: directory,
-      key: stateKey,
-    );
+    await _state.writeSuccess(directory: directory, key: stateKey);
 
     // Push commits to remote
     await _doPush.exec(
@@ -139,11 +129,7 @@ class DoPublish extends DirCommand<void> {
     );
 
     // Push tags to remote
-    await _doPush.gitPush(
-      directory: directory,
-      force: false,
-      pushTags: true,
-    );
+    await _doPush.gitPush(directory: directory, force: false, pushTags: true);
 
     // Prepare next version
     await _addNextVersion(directory, ggLog);
@@ -178,16 +164,10 @@ class DoPublish extends DirCommand<void> {
     );
 
     // Release the changelog
-    await _releaseChangelog.exec(
-      directory: directory,
-      ggLog: ggLog,
-    );
+    await _releaseChangelog.exec(directory: directory, ggLog: ggLog);
 
     // Update state
-    await _state.updateHash(
-      hash: hashBefore,
-      directory: directory,
-    );
+    await _state.updateHash(hash: hashBefore, directory: directory);
 
     // Commit changes to change log
     await _commit.commit(
@@ -224,15 +204,10 @@ class DoPublish extends DirCommand<void> {
     );
 
     // Update state
-    await _state.updateHash(
-      hash: hashBefore,
-      directory: directory,
-    );
+    await _state.updateHash(hash: hashBefore, directory: directory);
 
     // Get new version
-    final newVersion = await _fromPubspec.fromDirectory(
-      directory: directory,
-    );
+    final newVersion = await _fromPubspec.fromDirectory(directory: directory);
 
     // Commit changes to change log
     await _commit.commit(
@@ -244,10 +219,7 @@ class DoPublish extends DirCommand<void> {
     );
 
     // Push commits to remote
-    await _doPush.gitPush(
-      directory: directory,
-      force: false,
-    );
+    await _doPush.gitPush(directory: directory, force: false);
   }
 
   // ...........................................................................
@@ -295,10 +267,7 @@ class DoPublish extends DirCommand<void> {
   }
 
   // ...........................................................................
-  Future<bool> _shouldPublishToPubDev(
-    Directory directory,
-    GgLog ggLog,
-  ) async {
+  Future<bool> _shouldPublishToPubDev(Directory directory, GgLog ggLog) async {
     final pubspecFile = File(join(directory.path, 'pubspec.yaml'));
     final pubspec = await pubspecFile.readAsString();
     return !pubspec.contains(RegExp(r'publish_to:'));

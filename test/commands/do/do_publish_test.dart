@@ -30,7 +30,6 @@ void main() {
 
   late int successHash;
   late int needsChangeHash;
-  const directJson = DirectJson();
   late Version publishedVersionValue;
 
   // ...........................................................................
@@ -40,38 +39,32 @@ void main() {
   void mockPublishIsSuccessful({
     required bool success,
     required bool askBeforePublishing,
-  }) =>
-      when(
-        () => publish.exec(
-          directory: dMock(),
-          ggLog: ggLog,
-          askBeforePublishing: askBeforePublishing,
-        ),
-      ).thenAnswer((_) async {
-        if (!success) {
-          throw Exception('Publishing failed.');
-        } else {
-          publishedVersionValue = Version.parse('1.2.4');
-          ggLog('Publishing was successful.');
-        }
-      });
+  }) => when(
+    () => publish.exec(
+      directory: dMock(),
+      ggLog: ggLog,
+      askBeforePublishing: askBeforePublishing,
+    ),
+  ).thenAnswer((_) async {
+    if (!success) {
+      throw Exception('Publishing failed.');
+    } else {
+      publishedVersionValue = Version.parse('1.2.4');
+      ggLog('Publishing was successful.');
+    }
+  });
 
   void mockPublishedVersion() => when(
-        () => publishedVersion.get(
-          directory: dMock(),
-          ggLog: any(named: 'ggLog'),
-        ),
-      ).thenAnswer((_) async {
-        return publishedVersionValue;
-      });
+    () => publishedVersion.get(directory: dMock(), ggLog: any(named: 'ggLog')),
+  ).thenAnswer((_) async {
+    return publishedVersionValue;
+  });
 
   // ...........................................................................
   Future<void> makeLastStateSuccessful() async {
-    successHash = await LastChangesHash(ggLog: ggLog).get(
-      directory: d,
+    successHash = await LastChangesHash(
       ggLog: ggLog,
-      ignoreFiles: GgState.ignoreFiles,
-    );
+    ).get(directory: d, ggLog: ggLog, ignoreFiles: GgState.ignoreFiles);
 
     await File(join(d.path, '.gg.json')).writeAsString(
       '{"canCommit":{"success":{"hash":$successHash}},'
@@ -115,7 +108,8 @@ void main() {
     needsChangeHash = 12345;
 
     // Mock publishing
-    dMock = () => any(
+    dMock =
+        () => any(
           named: 'directory',
           that: predicate<Directory>((x) => x.path == d.path),
         );
@@ -129,10 +123,7 @@ void main() {
       publishedVersion: publishedVersion,
     );
 
-    canPublish = CanPublish(
-      ggLog: ggLog,
-      isVersionPrepared: isVersionPrepared,
-    );
+    canPublish = CanPublish(ggLog: ggLog, isVersionPrepared: isVersionPrepared);
     mockPublishedVersion();
 
     // Instantiate with mocks
@@ -163,16 +154,13 @@ void main() {
       group('should succeed', () {
         group('and not publish', () {
           test('when publishing was already successful', () async {
-            await directJson.writeFile(
+            await DirectJson.writeFile(
               file: File(join(d.path, '.gg.json')),
               path: 'doPublish/success/hash',
               value: successHash,
             );
 
-            await doPublish.exec(
-              directory: d,
-              ggLog: ggLog,
-            );
+            await doPublish.exec(directory: d, ggLog: ggLog);
             expect(messages[0], yellow('Current state is already published.'));
           });
         });
@@ -191,7 +179,7 @@ void main() {
                         );
 
                         // Mock needing publish
-                        await directJson.writeFile(
+                        await DirectJson.writeFile(
                           file: File(join(d.path, '.gg.json')),
                           path: 'doPublish/success/hash',
                           value: needsChangeHash,
@@ -220,19 +208,21 @@ void main() {
                         expect(messages[i++], contains('✅ Increase version'));
 
                         // Was a new version created?
-                        final pubspec = await File(join(d.path, 'pubspec.yaml'))
-                            .readAsString();
+                        final pubspec =
+                            await File(
+                              join(d.path, 'pubspec.yaml'),
+                            ).readAsString();
                         final changeLog =
-                            await File(join(d.path, 'CHANGELOG.md'))
-                                .readAsString();
+                            await File(
+                              join(d.path, 'CHANGELOG.md'),
+                            ).readAsString();
                         expect(pubspec, contains('version: 1.2.5'));
                         expect(changeLog, contains('## [1.2.4] -'));
 
                         // Was the new version checked in?
-                        final headMessage = await HeadMessage(ggLog: ggLog).get(
-                          directory: d,
+                        final headMessage = await HeadMessage(
                           ggLog: ggLog,
-                        );
+                        ).get(directory: d, ggLog: ggLog);
                         expect(
                           headMessage,
                           'Prepare development of version 1.2.5',
@@ -241,20 +231,23 @@ void main() {
                         // Was .gg.json updated in a way that didCommit,
                         // didPush and didPublish return true?
                         expect(
-                          await DidCommit(ggLog: ggLog)
-                              .get(directory: d, ggLog: ggLog),
+                          await DidCommit(
+                            ggLog: ggLog,
+                          ).get(directory: d, ggLog: ggLog),
                           isTrue,
                         );
 
                         expect(
-                          await DidPush(ggLog: ggLog)
-                              .get(directory: d, ggLog: ggLog),
+                          await DidPush(
+                            ggLog: ggLog,
+                          ).get(directory: d, ggLog: ggLog),
                           isTrue,
                         );
 
                         expect(
-                          await DidPublish(ggLog: ggLog)
-                              .get(directory: d, ggLog: ggLog),
+                          await DidPublish(
+                            ggLog: ggLog,
+                          ).get(directory: d, ggLog: ggLog),
                           isTrue,
                         );
                       });
@@ -274,7 +267,7 @@ void main() {
                       );
 
                       // Mock needing publish
-                      await directJson.writeFile(
+                      await DirectJson.writeFile(
                         file: File(join(d.path, '.gg.json')),
                         path: 'doPublish/success/hash',
                         value: needsChangeHash,
@@ -289,8 +282,9 @@ void main() {
 
                       // Check
                       expect(
-                        await DidPublish(ggLog: ggLog)
-                            .get(directory: d, ggLog: ggLog),
+                        await DidPublish(
+                          ggLog: ggLog,
+                        ).get(directory: d, ggLog: ggLog),
                         isTrue,
                       );
                     });
@@ -307,7 +301,7 @@ void main() {
                   );
 
                   // Mock needing publish
-                  await directJson.writeFile(
+                  await DirectJson.writeFile(
                     file: File(join(d.path, '.gg.json')),
                     path: 'doPublish/success/hash',
                     value: needsChangeHash,
@@ -322,8 +316,9 @@ void main() {
 
                   // Check result
                   expect(
-                    await DidPublish(ggLog: ggLog)
-                        .get(directory: d, ggLog: ggLog),
+                    await DidPublish(
+                      ggLog: ggLog,
+                    ).get(directory: d, ggLog: ggLog),
                     isTrue,
                   );
                 });
@@ -333,10 +328,7 @@ void main() {
 
           group('not to pub.dev', () {
             test('when »publish_to: none« is found in pubspec.yaml', () async {
-              doPublish = DoPublish(
-                ggLog: ggLog,
-                publish: publish,
-              );
+              doPublish = DoPublish(ggLog: ggLog, publish: publish);
 
               // Prepare pubspec.yaml
               final pubspecFile = File(join(d.path, 'pubspec.yaml'));
@@ -355,17 +347,14 @@ void main() {
               await makeLastStateSuccessful();
 
               // Mock needing publish
-              await directJson.writeFile(
+              await DirectJson.writeFile(
                 file: File(join(d.path, '.gg.json')),
                 path: 'doPublish/success/hash',
                 value: needsChangeHash,
               );
 
               // Publish
-              await doPublish.exec(
-                directory: d,
-                ggLog: ggLog,
-              );
+              await doPublish.exec(directory: d, ggLog: ggLog);
 
               // Were the steps performed?
               var i = 0;
@@ -383,10 +372,9 @@ void main() {
               expect(changeLog, contains('## [1.0.1] -'));
 
               // Was the new version checked in?
-              final headMessage = await HeadMessage(ggLog: ggLog).get(
-                directory: d,
+              final headMessage = await HeadMessage(
                 ggLog: ggLog,
-              );
+              ).get(directory: d, ggLog: ggLog);
               expect(headMessage, 'Prepare development of version 1.0.2');
 
               // Was .gg.json updated in a way that didCommit,
@@ -419,7 +407,7 @@ void main() {
               mockPublishedVersion();
 
               // Mock needing publish
-              await directJson.writeFile(
+              await DirectJson.writeFile(
                 file: File(join(d.path, '.gg.json')),
                 path: 'doPublish/success/hash',
                 value: needsChangeHash,

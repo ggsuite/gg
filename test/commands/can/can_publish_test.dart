@@ -30,27 +30,27 @@ void main() {
 
   // ...........................................................................
   void mockCommands() {
-    when(
-      () => pana.exec(
-        directory: d,
-        ggLog: messages.add,
-      ),
-    ).thenAnswer((_) async {
+    when(() => pana.exec(directory: d, ggLog: messages.add)).thenAnswer((
+      _,
+    ) async {
       messages.add('pana');
     });
-    when(() => didCommit.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
+    when(() => didCommit.exec(directory: d, ggLog: messages.add)).thenAnswer((
+      _,
+    ) async {
       messages.add('didCommit');
       return true;
     });
-    when(() => isVersionPrepared.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
+    when(
+      () => isVersionPrepared.exec(directory: d, ggLog: messages.add),
+    ).thenAnswer((_) async {
       messages.add('isVersionPrepared');
       return true;
     });
 
-    when(() => hasRightFormat.exec(directory: d, ggLog: messages.add))
-        .thenAnswer((_) async {
+    when(
+      () => hasRightFormat.exec(directory: d, ggLog: messages.add),
+    ).thenAnswer((_) async {
       messages.add('hasRightFormat');
       return true;
     });
@@ -72,8 +72,9 @@ void main() {
     d = Directory.systemTemp.createTempSync();
     await initGit(d);
     await addAndCommitSampleFile(d);
-    File(join(d.path, 'pubspec.yaml'))
-        .writeAsStringSync('name: test\nrepository: https://foo.com');
+    File(
+      join(d.path, 'pubspec.yaml'),
+    ).writeAsStringSync('name: test\nrepository: https://foo.com');
   });
 
   // ...........................................................................
@@ -98,10 +99,7 @@ void main() {
     });
 
     test('should have a code coverage of 100%', () {
-      expect(
-        CanPublish(ggLog: ggLog),
-        isNotNull,
-      );
+      expect(CanPublish(ggLog: ggLog), isNotNull);
     });
   });
 }

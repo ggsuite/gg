@@ -14,10 +14,12 @@ void main() {
 
     test('should be executable', () async {
       // Execute bin/gg.dart and check if it prints help
-      final result = await Process.run(
-        'dart',
-        ['./bin/gg.dart', 'check', 'analyze', '--help'],
-      );
+      final result = await Process.run('dart', [
+        './bin/gg.dart',
+        'check',
+        'analyze',
+        '--help',
+      ]);
 
       final expectedMessages = [
         RegExp(r'Usage:\s+gg check analyze \[arguments\]'),

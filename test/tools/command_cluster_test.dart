@@ -49,8 +49,9 @@ void main() {
     );
 
     // Mock the commands
-    when(() => isCommitted.exec(directory: d, ggLog: ggLog))
-        .thenAnswer((_) async {
+    when(() => isCommitted.exec(directory: d, ggLog: ggLog)).thenAnswer((
+      _,
+    ) async {
       ggLog('isCommitted');
       return true;
     });
@@ -58,8 +59,9 @@ void main() {
       ggLog('isPushed');
       return true;
     });
-    when(() => isUpgraded.exec(directory: d, ggLog: ggLog))
-        .thenAnswer((_) async {
+    when(() => isUpgraded.exec(directory: d, ggLog: ggLog)).thenAnswer((
+      _,
+    ) async {
       ggLog('isUpgraded');
       return true;
     });
@@ -72,76 +74,68 @@ void main() {
   group('CommandCluster', () {
     group('exec(directory, log)', () {
       group('with force == false', () {
-        test('should not run commands again that were successful before',
-            () async {
-          // Run the command a first time
-          // Should complain about missing commits
-          late String exception;
-          try {
-            await commandCluster.exec(directory: d, ggLog: ggLog);
-          } catch (e) {
-            exception = e.toString();
-          }
-
-          expect(messages[0], contains('Do all check commands work?'));
-          expect(messages[1], 'isCommitted');
-          expect(messages[2], 'isPushed');
-          expect(messages[3], 'isUpgraded');
-
-          expect(
-            exception,
-            'Exception: There must be at least one commit in the repository.',
-          );
-
-          // Make an initial commit
-          await addAndCommitSampleFile(d, fileName: 'file1.txt');
-
-          // Run command again
-          await commandCluster.exec(directory: d, ggLog: ggLog);
-          expect(messages[4], contains('Do all check commands work?'));
-          expect(messages[5], 'isCommitted');
-          expect(messages[6], 'isPushed');
-          expect(messages[7], 'isUpgraded');
-
-          // Run the command a second time.
-          // Should not run the commands again,
-          // because force is false
-          // and the commands were successful before.
-          await commandCluster.exec(directory: d, ggLog: ggLog);
-          expect(messages[8], contains('Do all check commands work?'));
-          expect(
-            messages[9],
-            '✅ Everything is fine.',
-          );
-        });
-      });
-
-      group('with force == true', () {
         test(
-          'should run commands '
-          'no matter if they were successful before or not',
+          'should not run commands again that were successful before',
           () async {
-            await addAndCommitSampleFile(d, fileName: 'file1.txt');
-
             // Run the command a first time
-            await commandCluster.exec(directory: d, ggLog: ggLog);
+            // Should complain about missing commits
+            late String exception;
+            try {
+              await commandCluster.exec(directory: d, ggLog: ggLog);
+            } catch (e) {
+              exception = e.toString();
+            }
+
             expect(messages[0], contains('Do all check commands work?'));
             expect(messages[1], 'isCommitted');
             expect(messages[2], 'isPushed');
             expect(messages[3], 'isUpgraded');
 
-            // Run the command a second first time
-            await commandCluster.exec(
-              directory: d,
-              ggLog: ggLog,
-              force: true,
+            expect(
+              exception,
+              'Exception: There must be at least one commit in the repository.',
             );
+
+            // Make an initial commit
+            await addAndCommitSampleFile(d, fileName: 'file1.txt');
+
+            // Run command again
+            await commandCluster.exec(directory: d, ggLog: ggLog);
             expect(messages[4], contains('Do all check commands work?'));
             expect(messages[5], 'isCommitted');
             expect(messages[6], 'isPushed');
             expect(messages[7], 'isUpgraded');
+
+            // Run the command a second time.
+            // Should not run the commands again,
+            // because force is false
+            // and the commands were successful before.
+            await commandCluster.exec(directory: d, ggLog: ggLog);
+            expect(messages[8], contains('Do all check commands work?'));
+            expect(messages[9], '✅ Everything is fine.');
           },
         );
+      });
+
+      group('with force == true', () {
+        test('should run commands '
+            'no matter if they were successful before or not', () async {
+          await addAndCommitSampleFile(d, fileName: 'file1.txt');
+
+          // Run the command a first time
+          await commandCluster.exec(directory: d, ggLog: ggLog);
+          expect(messages[0], contains('Do all check commands work?'));
+          expect(messages[1], 'isCommitted');
+          expect(messages[2], 'isPushed');
+          expect(messages[3], 'isUpgraded');
+
+          // Run the command a second first time
+          await commandCluster.exec(directory: d, ggLog: ggLog, force: true);
+          expect(messages[4], contains('Do all check commands work?'));
+          expect(messages[5], 'isCommitted');
+          expect(messages[6], 'isPushed');
+          expect(messages[7], 'isUpgraded');
+        });
       });
 
       group('with save-state == true or (false)', () {

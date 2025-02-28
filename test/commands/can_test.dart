@@ -20,13 +20,8 @@ void main() {
   setUp(() {
     d = Directory.systemTemp.createTempSync();
     messages.clear();
-    can = Can(
-      ggLog: messages.add,
-    );
-    runner = CommandRunner<void>(
-      'test',
-      'test',
-    )..addCommand(can);
+    can = Can(ggLog: messages.add);
+    runner = CommandRunner<void>('test', 'test')..addCommand(can);
   });
 
   tearDown(() {

@@ -40,20 +40,14 @@ void main() {
     }
 
     when(
-      () => processWrapper.run(
-        'dart',
-        ['pub', 'global', 'list'],
-      ),
+      () => processWrapper.run('dart', ['pub', 'global', 'list']),
     ).thenAnswer((_) async => ProcessResult(0, exitCode, response, stderr));
   }
 
   // ...........................................................................
   void mockPanaInstallation({required bool success, String stderr = ''}) {
     when(
-      () => processWrapper.run(
-        'dart',
-        ['pub', 'global', 'activate', 'pana'],
-      ),
+      () => processWrapper.run('dart', ['pub', 'global', 'activate', 'pana']),
     ).thenAnswer((_) async {
       if (!success) {
         return ProcessResult(0, 1, '', stderr);
@@ -84,11 +78,11 @@ void main() {
   // ...........................................................................
   void mockPanaResult(String json) {
     when(
-      () => processWrapper.run(
-        panaCmd,
-        ['--no-warning', '--json', '--no-dartdoc'],
-        workingDirectory: d.path,
-      ),
+      () => processWrapper.run(panaCmd, [
+        '--no-warning',
+        '--json',
+        '--no-dartdoc',
+      ], workingDirectory: d.path),
     ).thenAnswer((_) async => ProcessResult(0, 0, json, ''));
   }
 
@@ -140,8 +134,9 @@ void main() {
       group('when package is not published to pub.dev', () {
         test('and publishedOnly is set to true', () async {
           // Add publish_to: none
-          await File(join(d.path, 'pubspec.yaml'))
-              .writeAsString('publish_to: none');
+          await File(
+            join(d.path, 'pubspec.yaml'),
+          ).writeAsString('publish_to: none');
 
           // Run pana
           await runner.run(['pana', '--input', d.path, '--published-only']);
@@ -203,29 +198,31 @@ void main() {
     });
 
     group('should throw', () {
-      test(' if someshing goes wrong like checking if pana is installed',
-          () async {
-        // Mock pana not being installed
-        mockPanaIsInstalled(
-          isInstalled: false,
-          exitCode: 1,
-          stderr: 'Something went wrong',
-        );
+      test(
+        ' if someshing goes wrong like checking if pana is installed',
+        () async {
+          // Mock pana not being installed
+          mockPanaIsInstalled(
+            isInstalled: false,
+            exitCode: 1,
+            stderr: 'Something went wrong',
+          );
 
-        // Run pana
-        late String exception;
-        try {
-          await runner.run(['pana', '--input', d.path]);
-        } catch (e) {
-          exception = e.toString();
-        }
-        expect(
-          exception,
-          contains(
-            'Failed to check if pana is installed: Something went wrong',
-          ),
-        );
-      });
+          // Run pana
+          late String exception;
+          try {
+            await runner.run(['pana', '--input', d.path]);
+          } catch (e) {
+            exception = e.toString();
+          }
+          expect(
+            exception,
+            contains(
+              'Failed to check if pana is installed: Something went wrong',
+            ),
+          );
+        },
+      );
 
       test(' if someshing goes wrong while installing pana', () async {
         // Mock pana not being installed
@@ -243,9 +240,7 @@ void main() {
         }
         expect(
           exception,
-          contains(
-            'Failed to install pana: Something went wrong',
-          ),
+          contains('Failed to install pana: Something went wrong'),
         );
       });
     });

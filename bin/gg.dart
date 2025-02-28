@@ -16,20 +16,12 @@ Future<void> run({
   required List<String> args,
   required GgLog ggLog,
   GgProcessWrapper processWrapper = const GgProcessWrapper(),
-}) =>
-    GgCommandRunner(
-      ggLog: ggLog,
-      command: Gg(
-        ggLog: ggLog,
-        processWrapper: processWrapper,
-      ),
-    ).run(args: args);
+}) => GgCommandRunner(
+  ggLog: ggLog,
+  command: Gg(ggLog: ggLog, processWrapper: processWrapper),
+).run(args: args);
 
 // .............................................................................
 Future<void> main(List<String> args) async {
-  await run(
-    args: args,
-    ggLog: print,
-    processWrapper: const GgProcessWrapper(),
-  );
+  await run(args: args, ggLog: print, processWrapper: const GgProcessWrapper());
 }

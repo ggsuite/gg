@@ -27,15 +27,15 @@ class Checks {
     IsVersioned? isVersioned,
     IsPublished? isPublished,
     IsUpgraded? isUpgraded,
-  })  : analyze = analyze ?? Analyze(ggLog: ggLog),
-        format = format ?? Format(ggLog: ggLog),
-        tests = tests ?? Tests(ggLog: ggLog),
-        pana = pana ?? Pana(ggLog: ggLog),
-        isPushed = isPushed ?? IsPushed(ggLog: ggLog),
-        isCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
-        isVersioned = isVersioned ?? IsVersioned(ggLog: ggLog),
-        isPublished = isPublished ?? IsPublished(ggLog: ggLog),
-        isUpgraded = isUpgraded ?? IsUpgraded(ggLog: ggLog) {
+  }) : analyze = analyze ?? Analyze(ggLog: ggLog),
+       format = format ?? Format(ggLog: ggLog),
+       tests = tests ?? Tests(ggLog: ggLog),
+       pana = pana ?? Pana(ggLog: ggLog),
+       isPushed = isPushed ?? IsPushed(ggLog: ggLog),
+       isCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
+       isVersioned = isVersioned ?? IsVersioned(ggLog: ggLog),
+       isPublished = isPublished ?? IsPublished(ggLog: ggLog),
+       isUpgraded = isUpgraded ?? IsUpgraded(ggLog: ggLog) {
     _initAll();
   }
 

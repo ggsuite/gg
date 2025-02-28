@@ -54,15 +54,10 @@ void main() {
         test('when called with args=[--help]', () async {
           await capturePrint(
             ggLog: messages.add,
-            code: () => runner.run(
-              ['format', '--help'],
-            ),
+            code: () => runner.run(['format', '--help']),
           );
 
-          expect(
-            messages.last,
-            contains('Runs »dart format«.'),
-          );
+          expect(messages.last, contains('Runs »dart format«.'));
         });
       });
 
@@ -70,9 +65,7 @@ void main() {
       group('should throw', () {
         test('if input is missing', () async {
           await expectLater(
-            runner.run(
-              ['format', '--input=some-unknown-dir'],
-            ),
+            runner.run(['format', '--input=some-unknown-dir']),
             throwsA(
               isA<ArgumentError>().having(
                 (e) => e.message,
@@ -92,9 +85,7 @@ void main() {
 
               // Run the command
               await expectLater(
-                () => runner.run(
-                  ['format', '--input', tmpDir.path],
-                ),
+                () => runner.run(['format', '--input', tmpDir.path]),
                 throwsA(
                   isA<Exception>().having(
                     (e) => e.toString(),
@@ -131,10 +122,7 @@ void main() {
           // Configure runner and command
           final runner = CommandRunner<void>('test', 'test');
           runner.addCommand(
-            Format(
-              ggLog: messages.add,
-              processWrapper: processWrapper,
-            ),
+            Format(ggLog: messages.add, processWrapper: processWrapper),
           );
 
           // Make process wrapper returning an error
@@ -145,16 +133,12 @@ void main() {
               workingDirectory: any(named: 'workingDirectory'),
             ),
           ).thenAnswer(
-            (_) => Future.value(
-              ProcessResult(1, 1, 'stdout', 'stderr'),
-            ),
+            (_) => Future.value(ProcessResult(1, 1, 'stdout', 'stderr')),
           );
 
           // Run the command
           await expectLater(
-            () => runner.run(
-              ['format', tmpDir.path],
-            ),
+            () => runner.run(['format', tmpDir.path]),
             throwsA(
               isA<Exception>().having(
                 (e) => e.toString(),

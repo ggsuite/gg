@@ -14,16 +14,11 @@ import 'package:test/test.dart';
 void main() {
   final messages = <String>[];
   late CommandRunner<void> runner;
-  final check = Check(
-    ggLog: messages.add,
-  );
+  final check = Check(ggLog: messages.add);
 
   setUp(() {
     messages.clear();
-    runner = CommandRunner<void>(
-      'gg',
-      'Description goes here.',
-    );
+    runner = CommandRunner<void>('gg', 'Description goes here.');
     runner.addCommand(check);
   });
 

@@ -25,10 +25,7 @@ void main() {
   group('gg()', () {
     // #########################################################################
     group('gg', () {
-      final gg = Gg(
-        ggLog: messages.add,
-        processWrapper: processWrapper,
-      );
+      final gg = Gg(ggLog: messages.add, processWrapper: processWrapper);
 
       final CommandRunner<void> runner = CommandRunner<void>(
         'gg',
@@ -40,8 +37,8 @@ void main() {
 
         await capturePrint(
           ggLog: messages.add,
-          code: () =>
-              runner.run(['gg', 'check', 'analyze', '--input', tmp.path]),
+          code:
+              () => runner.run(['gg', 'check', 'analyze', '--input', tmp.path]),
         );
 
         await tmp.delete(recursive: true);
@@ -54,18 +51,17 @@ void main() {
         // Iterate all files in lib/src/commands
         // and check if they are added to the command runner
         // and if they are added to the help message
-        final subCommands = Directory('lib/src/commands')
-            .listSync(recursive: false)
-            .where(
-              (file) => file.path.endsWith('.dart'),
-            )
-            .map(
-              (e) => basename(e.path)
-                  .replaceAll('.dart', '')
-                  .replaceAll('_', '-')
-                  .replaceAll('gg-', ''),
-            )
-            .toList();
+        final subCommands =
+            Directory('lib/src/commands')
+                .listSync(recursive: false)
+                .where((file) => file.path.endsWith('.dart'))
+                .map(
+                  (e) => basename(e.path)
+                      .replaceAll('.dart', '')
+                      .replaceAll('_', '-')
+                      .replaceAll('gg-', ''),
+                )
+                .toList();
 
         await capturePrint(
           ggLog: messages.add,
@@ -78,7 +74,8 @@ void main() {
           expect(
             hasLog(messages, subCommand),
             isTrue,
-            reason: '\nMissing subcommand "$subCommandStr"\n'
+            reason:
+                '\nMissing subcommand "$subCommandStr"\n'
                 'Please open  "lib/src/gg.dart" and add\n'
                 '"addSubcommand($subCommandStr(ggLog: ggLog));',
           );

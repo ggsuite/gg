@@ -28,12 +28,9 @@ class Pana extends DirCommand<void> {
     this.processWrapper = const GgProcessWrapper(),
     PublishTo? publishTo,
     bool? publishedOnly,
-  })  : _publishTo = publishTo ?? PublishTo(ggLog: ggLog),
-        _publishedOnlyFromConstructor = publishedOnly,
-        super(
-          name: 'pana',
-          description: 'Runs »dart run pana«.',
-        ) {
+  }) : _publishTo = publishTo ?? PublishTo(ggLog: ggLog),
+       _publishedOnlyFromConstructor = publishedOnly,
+       super(name: 'pana', description: 'Runs »dart run pana«.') {
     _addArgs();
   }
 
@@ -79,9 +76,7 @@ class Pana extends DirCommand<void> {
     }
 
     if (code != 0) {
-      throw Exception(
-        'pana failed. See log for details.',
-      );
+      throw Exception('pana failed. See log for details.');
     }
   }
 
@@ -111,51 +106,42 @@ class Pana extends DirCommand<void> {
   List<String> _readProblems(Map<String, dynamic> jsonOutput) {
     final problems = <String>[];
     final sections = jsonOutput['report']['sections'] as List<dynamic>;
-    final failedSections =
-        sections.where((section) => section['status'] == 'failed');
+    final failedSections = sections.where(
+      (section) => section['status'] == 'failed',
+    );
 
     for (final section in failedSections) {
       final summary = section['summary'] as String;
-      final errorPoints = summary.split('###').where(
-            (element) => element.contains('[x]'),
-          );
+      final errorPoints = summary
+          .split('###')
+          .where((element) => element.contains('[x]'));
 
       for (final errorPoint in errorPoints) {
-        final parts = errorPoint.split('\n').map(
-              (e) => e.trim(),
-            );
+        final parts = errorPoint.split('\n').map((e) => e.trim());
 
         final title = parts.first;
         final details = parts.skip(1);
 
         final titleRed = red(title);
-        final detailsGray = details
-            .map(
-              (e) => brightBlack(e),
-            )
-            .join('\n');
+        final detailsGray = details.map((e) => brightBlack(e)).join('\n');
         problems.add('\n$titleRed$detailsGray');
       }
     }
     return problems;
   }
 
-// ...........................................................................
+  // ...........................................................................
   Future<_TaskResult> _task(Directory dir) async {
     // Make sure pana is installed
     await _installPana();
 
     // Run 'pana' and capture the output
     final pana = Platform.isWindows ? 'pana.bat' : 'pana';
-    final result = await processWrapper.run(
-      pana,
-      [
-        '--no-warning',
-        '--json',
-        '--no-dartdoc', // dartdoc is enforced using analysis_options.yaml
-      ],
-      workingDirectory: dir.path,
-    );
+    final result = await processWrapper.run(pana, [
+      '--no-warning',
+      '--json',
+      '--no-dartdoc', // dartdoc is enforced using analysis_options.yaml
+    ], workingDirectory: dir.path);
 
     try {
       // Parse the JSON output to get the score
@@ -172,9 +158,7 @@ class Pana extends DirCommand<void> {
 
         return (1, <String>[], errors);
       } else {
-        final messages = [
-          'All pub points achieved: $points',
-        ];
+        final messages = ['All pub points achieved: $points'];
         return (0, <String>[], messages);
       }
     } catch (e) {
@@ -200,10 +184,7 @@ class Pana extends DirCommand<void> {
   // ...........................................................................
   /// Returns true if pana is installed
   Future<bool> _isPanaInstalled() async {
-    final result = await processWrapper.run(
-      'dart',
-      ['pub', 'global', 'list'],
-    );
+    final result = await processWrapper.run('dart', ['pub', 'global', 'list']);
 
     if (result.exitCode != 0) {
       throw Exception('Failed to check if pana is installed: ${result.stderr}');
@@ -218,10 +199,12 @@ class Pana extends DirCommand<void> {
       return;
     }
 
-    final result = await processWrapper.run(
-      'dart',
-      ['pub', 'global', 'activate', 'pana'],
-    );
+    final result = await processWrapper.run('dart', [
+      'pub',
+      'global',
+      'activate',
+      'pana',
+    ]);
 
     if (result.exitCode != 0) {
       ggLog(result.stderr.toString());

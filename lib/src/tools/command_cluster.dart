@@ -41,13 +41,12 @@ class CommandCluster extends DirCommand<void> {
     required GgLog ggLog,
     bool? force,
     bool? saveState,
-  }) =>
-      get(
-        directory: directory,
-        ggLog: ggLog,
-        force: force,
-        saveState: saveState,
-      );
+  }) => get(
+    directory: directory,
+    ggLog: ggLog,
+    force: force,
+    saveState: saveState,
+  );
 
   // ...........................................................................
   @override
@@ -79,10 +78,7 @@ class CommandCluster extends DirCommand<void> {
       // Save success
       saveState ??= argResults?['save-state'] as bool? ?? true;
       if (saveState) {
-        await _state.writeSuccess(
-          directory: directory,
-          key: stateKey,
-        );
+        await _state.writeSuccess(directory: directory, key: stateKey);
       }
     } catch (e) {
       rethrow;
