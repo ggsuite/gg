@@ -184,6 +184,7 @@ class Pana extends DirCommand<void> {
   // ...........................................................................
   /// Returns true if pana is installed
   Future<bool> _isPanaInstalled() async {
+    // If a new version of pana is available, it needs to be updated.
     final result = await processWrapper.run('dart', ['pub', 'global', 'list']);
 
     if (result.exitCode != 0) {

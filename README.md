@@ -14,6 +14,10 @@ colorized error messages.
 
 ## Preparation
 
+### Install required tools
+
+- `dart global activate pana`
+
 ### Create a New Library Project
 
 ```bash
