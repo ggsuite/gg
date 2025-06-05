@@ -25,9 +25,13 @@ class DoPush extends DirCommand<void> {
     CanPush? canPush,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     GgState? state,
+    UpstreamBranch? upstreamBranch,
+    LocalBranch? localBranch,
   }) : _processWrapper = processWrapper,
        _isPushedViaGit = isPushed ?? IsPushed(ggLog: ggLog),
        _canPush = canPush ?? CanPush(ggLog: ggLog),
+       _upstreamBranch = upstreamBranch ?? UpstreamBranch(ggLog: ggLog),
+       _localBranch = localBranch ?? LocalBranch(ggLog: ggLog),
        state = state ?? GgState(ggLog: ggLog) {
     _addParam();
   }
@@ -105,6 +109,9 @@ class DoPush extends DirCommand<void> {
   final IsPushed _isPushedViaGit;
   final CanPush _canPush;
 
+  final UpstreamBranch _upstreamBranch;
+  final LocalBranch _localBranch;
+
   // ...........................................................................
   void _addParam() {
     argParser.addFlag(
@@ -123,10 +130,41 @@ class DoPush extends DirCommand<void> {
     required bool force,
     bool pushTags = false,
   }) async {
+    // Create upstream branch when necessary
+    await _createUpstreamBranch(directory);
+
     final result = await _processWrapper.run('git', [
       'push',
       if (force) '-f',
       if (pushTags) '--tags', // coverage:ignore-line
+    ], workingDirectory: directory.path);
+
+    if (result.exitCode != 0) {
+      throw Exception('git push failed: ${result.stderr}');
+    }
+  }
+
+  // ...........................................................................
+  Future<void> _createUpstreamBranch(Directory directory) async {
+    final upstreamBranch = await _upstreamBranch.get(
+      ggLog: ggLog,
+      directory: directory,
+    );
+
+    if (upstreamBranch.isNotEmpty) {
+      return;
+    }
+
+    final localBranch = await _localBranch.get(
+      ggLog: ggLog,
+      directory: directory,
+    );
+
+    final result = await _processWrapper.run('git', [
+      'push',
+      '--set-upstream',
+      'origin',
+      localBranch,
     ], workingDirectory: directory.path);
 
     if (result.exitCode != 0) {
