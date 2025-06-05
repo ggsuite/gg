@@ -62,7 +62,9 @@ class Analyze extends DirCommand<void> {
       final filesRed = files.map((e) => red('- $e')).join('\n');
       ggLog(filesRed);
 
-      throw Exception('"dart analyze" failed. See log for details.');
+      throw Exception(
+        'Analyze failed. Run "${blue('dart analyze')}" to see details.',
+      );
     }
   }
 

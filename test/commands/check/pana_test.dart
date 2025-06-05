@@ -101,7 +101,8 @@ void main() {
             isA<Exception>().having(
               (e) => e.toString(),
               'toString()',
-              contains('pana failed. See log for details.'),
+              'Exception: Pana failed. '
+                  'Run "${blue('pana')}" again to see details.',
             ),
           ),
         );
@@ -161,7 +162,8 @@ void main() {
             isA<Exception>().having(
               (e) => e.toString(),
               'toString()',
-              contains('pana failed. See log for details.'),
+              'Exception: Pana failed. '
+                  'Run "${blue('pana')}" again to see details.',
             ),
           ),
         );

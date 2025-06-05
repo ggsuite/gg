@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
 import 'package:gg/gg.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -87,7 +88,9 @@ void main() {
               isA<Exception>().having(
                 (e) => e.toString(),
                 'message',
-                contains('"dart analyze" failed. See log for details.'),
+
+                'Exception: Analyze failed. '
+                    'Run "${blue('dart analyze')}" to see details.',
               ),
             ),
           );

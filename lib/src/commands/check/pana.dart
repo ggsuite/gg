@@ -76,7 +76,9 @@ class Pana extends DirCommand<void> {
     }
 
     if (code != 0) {
-      throw Exception('pana failed. See log for details.');
+      throw Exception(
+        'Pana failed. Run "${blue('pana')}" again to see details.',
+      );
     }
   }
 

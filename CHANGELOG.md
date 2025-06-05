@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Improve error message
+
 ## [3.0.17] - 2025-02-28
 
 ### Changed
@@ -249,6 +255,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.17...HEAD
 [3.0.17]: https://github.com/inlavigo/gg/compare/3.0.16...3.0.17
 [3.0.16]: https://github.com/inlavigo/gg/compare/3.0.15...3.0.16
 [3.0.15]: https://github.com/inlavigo/gg/compare/3.0.14...3.0.15
