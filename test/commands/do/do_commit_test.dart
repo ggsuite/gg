@@ -175,8 +175,8 @@ void main() {
                   'commit',
                   '-i',
                   d.path,
-                  'add',
-                  'My very special commit message',
+                  '-m',
+                  'add My very special commit message',
                 ]);
 
                 // Check CHANGELOG.md
@@ -268,6 +268,7 @@ void main() {
               '-i',
               d.path,
               'add',
+              '-m',
               'My commit',
               '--no-log',
             ]);
@@ -284,6 +285,7 @@ void main() {
               '-i',
               d.path,
               'add',
+              '-m',
               'My commit',
               '--log',
             ]);
@@ -297,7 +299,14 @@ void main() {
         group('and allow to execute from cli', () {
           test('with message', () async {
             await addFileWithoutCommitting(d);
-            await runner.run(['commit', '-i', d.path, 'add', 'My commit']);
+            await runner.run([
+              'commit',
+              '-i',
+              d.path,
+              'add',
+              '-m',
+              'My commit',
+            ]);
             expect(
               messages.last,
               yellow('Checks successful. Commit successful.'),
@@ -464,29 +473,6 @@ void main() {
           expect(exception, 'Exception: ${doCommit.helpOnMissingMessage}');
         });
 
-        test('when no log-type is provided', () async {
-          // Add an uncommitted file
-          await addFileWithoutCommitting(d);
-
-          // Execute the command
-          final doCommit = DoCommit(ggLog: ggLog, canCommit: canCommit);
-
-          late String exception;
-
-          try {
-            await doCommit.exec(
-              directory: d,
-              ggLog: ggLog,
-              message: 'My message',
-              logType: null, // no log-type
-            );
-          } catch (e) {
-            exception = e.toString();
-          }
-
-          expect(exception, 'Exception: ${doCommit.helpOnMissingMessage}');
-        });
-
         test('when pubspec.yaml does not contain a repo URL', () async {
           // Remove repository URL from pubspec.yaml
           await File(
@@ -529,6 +515,7 @@ void main() {
               'commit',
               '-i',
               d.path,
+              '-m',
               'Did $keyWord something',
             ]);
 

@@ -108,8 +108,8 @@ class DoCommit extends DirCommand<void> {
 
     // Check needed options
     try {
-      logType ??= _getLogTypeFromArgs(isCommittedViaGit);
-      message ??= _getMessageFromArgs(isCommittedViaGit, logType);
+      message ??= _getMessageFromArgs();
+      logType ??= _getLogTypeFromMessage(message);
     } catch (e) {
       // type and message are only needed when there are uncommitted changes.
       if (!isCommittedViaGit) {
@@ -190,6 +190,12 @@ class DoCommit extends DirCommand<void> {
       negatable: true,
       defaultsTo: true,
     );
+
+    argParser.addOption(
+      'message',
+      abbr: 'm',
+      help: 'The commit message and log entry.',
+    );
   }
 
   // ...........................................................................
@@ -226,31 +232,26 @@ class DoCommit extends DirCommand<void> {
   /// The help text printed when message is missing.
   String get helpOnMissingMessage {
     final part0 = red('Run again with message.\n');
-    final part1 = blue('gg do commit ${yellow('<your message>')}');
+    final part1 = blue('gg do commit ${yellow('-m<your message>')}');
     return '$part0$part1';
   }
 
   // ...........................................................................
-  cl.LogType _getLogTypeFromArgs(bool everythingIsCommitted) {
-    if ((argResults?.rest.length ?? 0) < 1) {
-      throw Exception(helpOnMissingMessage);
-    }
-
-    final logTypeString = argResults!.rest[0];
+  cl.LogType _getLogTypeFromMessage(String message) {
     try {
-      return _stringToLogType(logTypeString);
+      return _stringToLogType(message);
     } catch (e) {
       return cl.LogType.changed;
     }
   }
 
   // ...........................................................................
-  String _getMessageFromArgs(bool everythingIsCommitted, cl.LogType logType) {
-    if ((argResults?.rest.length ?? 0) < 1) {
+  String _getMessageFromArgs() {
+    final String message = (argResults?['message'] ?? '') as String;
+    if (message.isEmpty) {
       throw Exception(helpOnMissingMessage);
     }
 
-    final message = argResults!.rest.join(' ');
     return message;
   }
 

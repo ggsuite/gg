@@ -8,6 +8,10 @@
 - Update to dart 3.8.0
 - Don't add log type to commit message
 
+### Fixed
+
+- Require -m prefix for gg do commit
+
 ## [3.0.17] - 2025-02-28
 
 ### Changed
