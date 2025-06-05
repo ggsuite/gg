@@ -116,6 +116,39 @@ void main() async {
         });
 
         group('and push', () {
+          test('and create an upstream branch, when not existing', () async {
+            // Create a branch that does not exist on the remote
+            const branchName = 'new-branch';
+            await createBranch(dLocal, branchName);
+
+            // Before the upstream branch should not exist
+            final upstreamBranchBefore = await upstreamBranchName(dLocal);
+            expect(upstreamBranchBefore, isEmpty);
+
+            // Create a change
+            await updateSampleFileWithoutCommitting(dLocal);
+
+            // Commit the change using ggDoCommit
+            when(
+              () => canCommit.exec(directory: dLocal, ggLog: ggLog),
+            ).thenAnswer((_) async => {});
+            await doCommit.exec(
+              directory: dLocal,
+              ggLog: ggLog,
+              message: 'Message 0',
+              logType: LogType.added,
+            );
+
+            // Push the change using ggDoPush
+            await doPush.exec(directory: dLocal, ggLog: ggLog);
+
+            // The changes should be pushed
+            expect(await isPushed.get(directory: dLocal, ggLog: ggLog), isTrue);
+
+            // The upstream branch should be set
+            final upstreamBranchAfter = await upstreamBranchName(dLocal);
+            expect(upstreamBranchAfter, 'origin/$branchName');
+          });
           group('and overwrite the last pushed commit', () {
             test('when force or --force is specified', () async {
               // Make git push succeed
@@ -248,6 +281,45 @@ void main() async {
           }
 
           expect(exception, 'Exception: git push failed: Some error');
+        });
+
+        test('when creating an upstream branch fails', () async {
+          // Create a branch that does not exist on the remote
+          const branchName = 'new-branch';
+          await createBranch(dLocal, branchName);
+
+          // Make git push fail
+          final processWrapper = MockGgProcessWrapper();
+
+          when(
+            () => processWrapper.run('git', [
+              'push',
+              '--set-upstream',
+              'origin',
+              branchName,
+            ], workingDirectory: dLocal.path),
+          ).thenAnswer((_) async => ProcessResult(1, 1, '', 'Some error'));
+
+          // Create the command
+          final doPush = DoPush(
+            ggLog: ggLog,
+            canPush: canPush,
+            processWrapper: processWrapper,
+          );
+
+          // Execute the command
+          late String exception;
+          try {
+            await doPush.exec(directory: dLocal, ggLog: ggLog);
+          } catch (e) {
+            exception = e.toString();
+          }
+
+          expect(
+            exception,
+            'Exception: git push --set-upstream origin $branchName failed: '
+            'Some error',
+          );
         });
       });
     });

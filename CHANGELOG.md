@@ -1,12 +1,14 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.18] - 2025-06-05
 
 ### Changed
 
 - Improve error message
 - Update to dart 3.8.0
 - Don't add log type to commit message
+- Some change
+- When not existing gg do push creates an upstream branch on the remote
 
 ### Fixed
 
@@ -261,7 +263,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.17...HEAD
+[3.0.18]: https://github.com/inlavigo/gg/compare/3.0.17...3.0.18
 [3.0.17]: https://github.com/inlavigo/gg/compare/3.0.16...3.0.17
 [3.0.16]: https://github.com/inlavigo/gg/compare/3.0.15...3.0.16
 [3.0.15]: https://github.com/inlavigo/gg/compare/3.0.14...3.0.15
