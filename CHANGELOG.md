@@ -7,6 +7,7 @@
 - Improve error message
 - Update to dart 3.8.0
 - Don't add log type to commit message
+- Some change 
 
 ### Fixed
 
