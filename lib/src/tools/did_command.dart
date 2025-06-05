@@ -35,13 +35,14 @@ class DidCommand extends DirCommand<bool> {
   }) async {
     final messages = <String>[];
 
-    final result = await GgStatusPrinter<bool>(
-      message: shortDescription,
-      ggLog: ggLog,
-    ).logTask(
-      task: () => get(ggLog: messages.add, directory: directory),
-      success: (success) => success,
-    );
+    final result =
+        await GgStatusPrinter<bool>(
+          message: shortDescription,
+          ggLog: ggLog,
+        ).logTask(
+          task: () => get(ggLog: messages.add, directory: directory),
+          success: (success) => success,
+        );
 
     if (!result) {
       final printedMessages = <String>[

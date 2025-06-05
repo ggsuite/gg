@@ -286,8 +286,9 @@ class DoCommit extends DirCommand<void> {
     required bool commit,
   }) async {
     // Check if message is already in CHANGELOG.md
-    final changeLog =
-        await File('${directory.path}/CHANGELOG.md').readAsString();
+    final changeLog = await File(
+      '${directory.path}/CHANGELOG.md',
+    ).readAsString();
 
     if (changeLog.contains(message)) {
       return false;

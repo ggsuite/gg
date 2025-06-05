@@ -56,12 +56,11 @@ class DoMaintain extends DirCommand<void> {
       ggLog: ggLog,
       message: 'Upgrading dependencies',
     ).logTask(
-      task:
-          () => _doUpgrade.get(
-            directory: directory,
-            ggLog: messages.add,
-            majorVersions: majorVersions,
-          ),
+      task: () => _doUpgrade.get(
+        directory: directory,
+        ggLog: messages.add,
+        majorVersions: majorVersions,
+      ),
       success: (result) => true,
     );
 

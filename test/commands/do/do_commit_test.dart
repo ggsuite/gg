@@ -157,8 +157,9 @@ void main() {
                 );
 
                 // Check CHANGELOG.md
-                final changelog =
-                    await File('${d.path}/CHANGELOG.md').readAsString();
+                final changelog = await File(
+                  '${d.path}/CHANGELOG.md',
+                ).readAsString();
                 expect(changelog, contains('# Changelog\n'));
                 expect(changelog, contains('## Unreleased\n'));
                 expect(changelog, contains('## Added\n'));
@@ -179,8 +180,9 @@ void main() {
                 ]);
 
                 // Check CHANGELOG.md
-                final changelog =
-                    await File('${d.path}/CHANGELOG.md').readAsString();
+                final changelog = await File(
+                  '${d.path}/CHANGELOG.md',
+                ).readAsString();
                 expect(changelog, contains('# Changelog\n'));
                 expect(changelog, contains('## Unreleased\n'));
                 expect(changelog, contains('## Added\n'));
@@ -201,8 +203,9 @@ void main() {
               );
 
               // Check CHANGELOG.md
-              final changelog =
-                  await File('${d.path}/CHANGELOG.md').readAsString();
+              final changelog = await File(
+                '${d.path}/CHANGELOG.md',
+              ).readAsString();
               expect(changelog, contains('# Changelog\n'));
               expect(changelog, contains('## Unreleased\n'));
               expect(changelog, contains('## Added\n'));
@@ -530,8 +533,9 @@ void main() {
             ]);
 
             // Check CHANGELOG.md
-            final changelog =
-                await File('${d.path}/CHANGELOG.md').readAsString();
+            final changelog = await File(
+              '${d.path}/CHANGELOG.md',
+            ).readAsString();
             expect(changelog, contains('# Changelog\n'));
             expect(changelog, contains('## Unreleased\n'));
             expect(changelog, contains('## $resultingLogType\n'));

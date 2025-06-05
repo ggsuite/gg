@@ -56,8 +56,9 @@ class GgState {
     );
 
     // If no config file exists, return false
-    final fileExists =
-        await File(_configFile(directory: directory).path).exists();
+    final fileExists = await File(
+      _configFile(directory: directory).path,
+    ).exists();
 
     if (!fileExists) {
       return false;
@@ -212,14 +213,13 @@ class GgState {
     // we will ammend changes to .gg.json to the last commit.
     // - If everything was committed and pushed, create a new commit
     // - If everything was committed but not pushed, ammend to last commit
-    final message =
-        everythingWasPushed
-            ? 'Add: .gg.json check results'
-            : await _headMessage.get(
-              directory: directory,
-              ggLog: ggLog,
-              throwIfNotEverythingIsCommitted: false,
-            );
+    final message = everythingWasPushed
+        ? 'Add: .gg.json check results'
+        : await _headMessage.get(
+            directory: directory,
+            ggLog: ggLog,
+            throwIfNotEverythingIsCommitted: false,
+          );
 
     await _commit.commit(
       directory: directory,

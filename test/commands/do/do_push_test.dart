@@ -34,12 +34,18 @@ void main() async {
   void mockCanPush(bool success) {
     if (success) {
       when(
-        () => canPush.exec(directory: any(named: 'directory'), ggLog: ggLog),
+        () => canPush.exec(
+          directory: any(named: 'directory'),
+          ggLog: ggLog,
+        ),
       ).thenAnswer((_) async => {});
       return;
     } else {
       when(
-        () => canPush.exec(directory: any(named: 'directory'), ggLog: ggLog),
+        () => canPush.exec(
+          directory: any(named: 'directory'),
+          ggLog: ggLog,
+        ),
       ).thenThrow(Exception('Cannot push.'));
       return;
     }

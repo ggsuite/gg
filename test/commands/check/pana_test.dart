@@ -23,8 +23,9 @@ void main() {
   late Pana pana;
   late CommandRunner<void> runner;
   late Directory d;
-  final successReport =
-      File('test/data/pana_success_report.json').readAsStringSync();
+  final successReport = File(
+    'test/data/pana_success_report.json',
+  ).readAsStringSync();
 
   // .........................................................................
   void mockPanaIsInstalled({
@@ -151,8 +152,9 @@ void main() {
     group('should fail ', () {
       test('when 140 pubpoints are not reached', () async {
         // Mock an success report
-        final notSuccessReport =
-            File('test/data/pana_not_success_report.json').readAsStringSync();
+        final notSuccessReport = File(
+          'test/data/pana_not_success_report.json',
+        ).readAsStringSync();
         mockPanaResult(notSuccessReport);
 
         // Run pana

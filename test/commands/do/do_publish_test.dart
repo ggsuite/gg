@@ -39,26 +39,31 @@ void main() {
   void mockPublishIsSuccessful({
     required bool success,
     required bool askBeforePublishing,
-  }) => when(
-    () => publish.exec(
-      directory: dMock(),
-      ggLog: ggLog,
-      askBeforePublishing: askBeforePublishing,
-    ),
-  ).thenAnswer((_) async {
-    if (!success) {
-      throw Exception('Publishing failed.');
-    } else {
-      publishedVersionValue = Version.parse('1.2.4');
-      ggLog('Publishing was successful.');
-    }
-  });
+  }) =>
+      when(
+        () => publish.exec(
+          directory: dMock(),
+          ggLog: ggLog,
+          askBeforePublishing: askBeforePublishing,
+        ),
+      ).thenAnswer((_) async {
+        if (!success) {
+          throw Exception('Publishing failed.');
+        } else {
+          publishedVersionValue = Version.parse('1.2.4');
+          ggLog('Publishing was successful.');
+        }
+      });
 
-  void mockPublishedVersion() => when(
-    () => publishedVersion.get(directory: dMock(), ggLog: any(named: 'ggLog')),
-  ).thenAnswer((_) async {
-    return publishedVersionValue;
-  });
+  void mockPublishedVersion() =>
+      when(
+        () => publishedVersion.get(
+          directory: dMock(),
+          ggLog: any(named: 'ggLog'),
+        ),
+      ).thenAnswer((_) async {
+        return publishedVersionValue;
+      });
 
   // ...........................................................................
   Future<void> makeLastStateSuccessful() async {
@@ -108,11 +113,10 @@ void main() {
     needsChangeHash = 12345;
 
     // Mock publishing
-    dMock =
-        () => any(
-          named: 'directory',
-          that: predicate<Directory>((x) => x.path == d.path),
-        );
+    dMock = () => any(
+      named: 'directory',
+      that: predicate<Directory>((x) => x.path == d.path),
+    );
     registerFallbackValue(d);
     publish = MockPublish();
 
@@ -208,14 +212,12 @@ void main() {
                         expect(messages[i++], contains('✅ Increase version'));
 
                         // Was a new version created?
-                        final pubspec =
-                            await File(
-                              join(d.path, 'pubspec.yaml'),
-                            ).readAsString();
-                        final changeLog =
-                            await File(
-                              join(d.path, 'CHANGELOG.md'),
-                            ).readAsString();
+                        final pubspec = await File(
+                          join(d.path, 'pubspec.yaml'),
+                        ).readAsString();
+                        final changeLog = await File(
+                          join(d.path, 'CHANGELOG.md'),
+                        ).readAsString();
                         expect(pubspec, contains('version: 1.2.5'));
                         expect(changeLog, contains('## [1.2.4] -'));
 
@@ -366,8 +368,9 @@ void main() {
 
               // Was a new version created?
               pubspec = await pubspecFile.readAsString();
-              final changeLog =
-                  await File(join(d.path, 'CHANGELOG.md')).readAsString();
+              final changeLog = await File(
+                join(d.path, 'CHANGELOG.md'),
+              ).readAsString();
               expect(pubspec, contains('version: 1.0.2'));
               expect(changeLog, contains('## [1.0.1] -'));
 

@@ -5,6 +5,7 @@
 ### Changed
 
 - Improve error message
+- Update to dart 3.8.0
 
 ## [3.0.17] - 2025-02-28
 
