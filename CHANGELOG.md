@@ -6,6 +6,7 @@
 
 - Improve error message
 - Update to dart 3.8.0
+- Don't add log type to commit message
 
 ## [3.0.17] - 2025-02-28
 

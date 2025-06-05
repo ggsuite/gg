@@ -211,17 +211,6 @@ class DoCommit extends DirCommand<void> {
     required String message,
     required cl.LogType logType,
   }) async {
-    const logTypeToEmoji = {
-      cl.LogType.added: 'Add',
-      cl.LogType.changed: 'Modify',
-      cl.LogType.deprecated: 'Deprecate',
-      cl.LogType.fixed: 'Fix',
-      cl.LogType.removed: 'Remove',
-      cl.LogType.security: 'Secure',
-    };
-
-    message = '${logTypeToEmoji[logType]}: $message';
-
     final result = await _processWrapper.run('git', [
       'commit',
       '-m',

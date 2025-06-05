@@ -399,7 +399,7 @@ void main() {
             () => processWrapper.run('git', [
               'commit',
               '-m',
-              'Add: My commit',
+              'My commit',
             ], workingDirectory: d.path),
           ).thenAnswer(
             (_) => Future.value(ProcessResult(1, 1, '', 'Some error')),
