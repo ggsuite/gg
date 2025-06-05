@@ -130,9 +130,18 @@ class DoPush extends DirCommand<void> {
     required bool force,
     bool pushTags = false,
   }) async {
-    // Create upstream branch when necessary
-    await _createUpstreamBranch(directory);
+    final didPush = await _pushNewBranch(directory);
+    if (!didPush) {
+      await _pushExistingBranch(force, pushTags, directory);
+    }
+  }
 
+  // ...........................................................................
+  Future<void> _pushExistingBranch(
+    bool force,
+    bool pushTags,
+    Directory directory,
+  ) async {
     final result = await _processWrapper.run('git', [
       'push',
       if (force) '-f',
@@ -145,14 +154,14 @@ class DoPush extends DirCommand<void> {
   }
 
   // ...........................................................................
-  Future<void> _createUpstreamBranch(Directory directory) async {
+  Future<bool> _pushNewBranch(Directory directory) async {
     final upstreamBranch = await _upstreamBranch.get(
       ggLog: ggLog,
       directory: directory,
     );
 
     if (upstreamBranch.isNotEmpty) {
-      return;
+      return false;
     }
 
     final localBranch = await _localBranch.get(
@@ -168,8 +177,12 @@ class DoPush extends DirCommand<void> {
     ], workingDirectory: directory.path);
 
     if (result.exitCode != 0) {
-      throw Exception('git push failed: ${result.stderr}');
+      throw Exception(
+        'git push --set-upstream origin $localBranch failed: ${result.stderr}',
+      );
     }
+
+    return true;
   }
 
   // ...........................................................................
