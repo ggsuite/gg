@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.19] - 2025-06-07
+
+### Changed
+
+- Print more details when tests fail
+
 ## [3.0.18] - 2025-06-05
 
 ### Changed
@@ -263,6 +269,7 @@
 
 - Initial version
 
+[3.0.19]: https://github.com/inlavigo/gg/compare/3.0.18...3.0.19
 [3.0.18]: https://github.com/inlavigo/gg/compare/3.0.17...3.0.18
 [3.0.17]: https://github.com/inlavigo/gg/compare/3.0.16...3.0.17
 [3.0.16]: https://github.com/inlavigo/gg/compare/3.0.15...3.0.16
