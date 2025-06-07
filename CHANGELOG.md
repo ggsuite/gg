@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.20] - 2025-06-07
+
+### Fixed
+
+- Fix a missing error output on test errors
+
 ## [3.0.19] - 2025-06-07
 
 ### Changed
@@ -269,6 +275,7 @@
 
 - Initial version
 
+[3.0.20]: https://github.com/inlavigo/gg/compare/3.0.19...3.0.20
 [3.0.19]: https://github.com/inlavigo/gg/compare/3.0.18...3.0.19
 [3.0.18]: https://github.com/inlavigo/gg/compare/3.0.17...3.0.18
 [3.0.17]: https://github.com/inlavigo/gg/compare/3.0.16...3.0.17
