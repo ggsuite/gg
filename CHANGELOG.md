@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.22] - 2025-06-09
+
+### Changed
+
+- Improve error message on version errors.
+
 ## [3.0.21] - 2025-06-07
 
 ### Changed
@@ -281,6 +287,7 @@
 
 - Initial version
 
+[3.0.22]: https://github.com/inlavigo/gg/compare/3.0.21...3.0.22
 [3.0.21]: https://github.com/inlavigo/gg/compare/3.0.20...3.0.21
 [3.0.20]: https://github.com/inlavigo/gg/compare/3.0.19...3.0.20
 [3.0.19]: https://github.com/inlavigo/gg/compare/3.0.18...3.0.19
