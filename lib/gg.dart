@@ -20,6 +20,7 @@ export 'src/commands/can/can_push.dart';
 export 'src/commands/can/can_commit.dart';
 export 'src/commands/can/can_publish.dart';
 export 'src/commands/can/can_upgrade.dart';
+export 'src/commands/can/can_merge.dart';
 
 // Do
 export 'src/commands/do.dart';
@@ -28,6 +29,7 @@ export 'src/commands/do/do_commit.dart';
 export 'src/commands/do/do_publish.dart';
 export 'src/commands/do/do_upgrade.dart';
 export 'src/commands/do/do_maintain.dart';
+export 'src/commands/do/do_merge.dart';
 
 // Did
 export 'src/commands/did.dart';

@@ -8,6 +8,7 @@ import 'package:args/command_runner.dart';
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/commands/can/can_publish.dart';
 import 'package:gg/src/commands/can/can_push.dart';
+import 'package:gg/src/commands/can/can_merge.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
@@ -28,18 +29,19 @@ class Can extends Command<void> {
 
   /// The description of the command
   @override
-  final description = 'Checks if you can commit, push, publish, ....';
+  final description = 'Checks if you can commit, push, publish, merge, ....';
 
   // ...........................................................................
   void _initSubCommands(DepsOfCan deps) {
     addSubcommand(deps.canCommit);
     addSubcommand(deps.canPush);
     addSubcommand(deps.canPublish);
+    addSubcommand(deps.canMerge);
   }
 }
 
 // .............................................................................
-/// Dependencies for the check command
+/// Dependencies for the can command (commit, push, publish, merge)
 class DepsOfCan {
   /// Constructor
   DepsOfCan({
@@ -47,9 +49,11 @@ class DepsOfCan {
     CanCommit? commit,
     CanPush? push,
     CanPublish? publish,
+    CanMerge? merge,
   }) : canCommit = commit ?? CanCommit(ggLog: ggLog),
        canPush = push ?? CanPush(ggLog: ggLog),
-       canPublish = publish ?? CanPublish(ggLog: ggLog);
+       canPublish = publish ?? CanPublish(ggLog: ggLog),
+       canMerge = merge ?? CanMerge(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;
@@ -62,4 +66,7 @@ class DepsOfCan {
 
   /// The can publish command
   final CanPublish canPublish;
+
+  /// The can merge command
+  final CanMerge canMerge;
 }

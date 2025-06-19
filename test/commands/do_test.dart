@@ -39,8 +39,10 @@ void main() {
 
       expect(
         messages.first,
-        contains('Provide actions or commit, push, publish.'),
+        contains('Provide actions or commit, push, publish, merge.'),
       );
+      // our new subcommand should also show up
+      expect(messages.join('\n'), contains('merge'));
     });
   });
 }
