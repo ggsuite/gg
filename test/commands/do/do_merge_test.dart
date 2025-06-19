@@ -1,11 +1,12 @@
 // @license
-// Copyright (c) 2025 Göran Hegenberg. All Rights Reserved.
+// Copyright (c) 2025 Gran Hegenberg. All Rights Reserved.
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
 import 'dart:io';
 import 'package:gg/gg.dart';
+import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_merge/gg_merge.dart' as gg_merge;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -20,6 +21,8 @@ void main() {
 
   setUp(() async {
     d = await Directory.systemTemp.createTemp('do_merge');
+    await initGit(d);
+    await addAndCommitSampleFile(d);
     registerFallbackValue(d);
     canMerge = MockCanMerge();
     merge = gg_merge.MockDoMerge();
