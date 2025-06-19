@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Do not add version tag automatically. Use --add-version-tag to add the tag.
+
 ## [3.0.22] - 2025-06-09
 
 ### Changed
@@ -287,6 +293,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.22...HEAD
 [3.0.22]: https://github.com/inlavigo/gg/compare/3.0.21...3.0.22
 [3.0.21]: https://github.com/inlavigo/gg/compare/3.0.20...3.0.21
 [3.0.20]: https://github.com/inlavigo/gg/compare/3.0.19...3.0.20

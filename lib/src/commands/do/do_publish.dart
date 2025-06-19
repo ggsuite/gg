@@ -59,10 +59,12 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
+    bool? addVersionTag,
   }) => get(
     directory: directory,
     ggLog: ggLog,
     askBeforePublishing: askBeforePublishing,
+    addVersionTag: addVersionTag,
   );
 
   // ...........................................................................
@@ -71,6 +73,7 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
+    bool? addVersionTag,
   }) async {
     // Does directory exist?
     await check(directory: directory);
@@ -123,10 +126,12 @@ class DoPublish extends DirCommand<void> {
     );
 
     // Add git version tag
-    await _addVersionTag.exec(
-      directory: directory,
-      ggLog: (msg) => ggLog('✅ $msg'),
-    );
+    if (addVersionTag ?? _shouldAddVersionTag) {
+      await _addVersionTag.exec(
+        directory: directory,
+        ggLog: (msg) => ggLog('✅ $msg'),
+      );
+    }
 
     // Push tags to remote
     await _doPush.gitPush(directory: directory, force: false, pushTags: true);
@@ -278,12 +283,24 @@ class DoPublish extends DirCommand<void> {
       argResults?['ask-before-publishing'] as bool? ?? true;
 
   // ...........................................................................
+  bool get _shouldAddVersionTag =>
+      argResults?['add-version-tag'] as bool? ?? false;
+
+  // ...........................................................................
   void _addArgs() {
     argParser.addFlag(
       'ask-before-publishing',
       abbr: 'a',
       help: 'Ask for confirmation before publishing to pub.dev.',
       defaultsTo: true,
+      negatable: true,
+    );
+
+    argParser.addFlag(
+      'add-version-tag',
+      abbr: 't',
+      help: 'Add version tag to git after publishing.',
+      defaultsTo: false,
       negatable: true,
     );
   }

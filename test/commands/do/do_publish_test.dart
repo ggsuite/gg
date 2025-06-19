@@ -8,9 +8,9 @@ import 'dart:io';
 
 import 'package:gg/gg.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
+import 'package:gg_direct_json/gg_direct_json.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
-import 'package:gg_direct_json/gg_direct_json.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
@@ -194,6 +194,7 @@ void main() {
                           directory: d,
                           ggLog: ggLog,
                           askBeforePublishing: ask,
+                          addVersionTag: true,
                         );
 
                         // Were the steps performed?
@@ -356,7 +357,11 @@ void main() {
               );
 
               // Publish
-              await doPublish.exec(directory: d, ggLog: ggLog);
+              await doPublish.exec(
+                directory: d,
+                ggLog: ggLog,
+                addVersionTag: true,
+              );
 
               // Were the steps performed?
               var i = 0;
@@ -424,6 +429,7 @@ void main() {
                   directory: d,
                   ggLog: ggLog,
                   askBeforePublishing: false,
+                  addVersionTag: true,
                 );
               } catch (e) {
                 exception = e.toString();
