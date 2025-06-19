@@ -137,7 +137,9 @@ class DoPublish extends DirCommand<void> {
     await _doPush.gitPush(directory: directory, force: false, pushTags: true);
 
     // Prepare next version
-    await _addNextVersion(directory, ggLog);
+    if (_shouldIncreaseVersion) {
+      await _addNextVersion(directory, ggLog);
+    }
   }
 
   // ######################
@@ -287,6 +289,10 @@ class DoPublish extends DirCommand<void> {
       argResults?['add-version-tag'] as bool? ?? false;
 
   // ...........................................................................
+  bool get _shouldIncreaseVersion =>
+      argResults?['increase-version'] as bool? ?? true;
+
+  // ...........................................................................
   void _addArgs() {
     argParser.addFlag(
       'ask-before-publishing',
@@ -298,9 +304,17 @@ class DoPublish extends DirCommand<void> {
 
     argParser.addFlag(
       'add-version-tag',
-      abbr: 't',
-      help: 'Add version tag to git after publishing.',
-      defaultsTo: false,
+      abbr: 'v',
+      help: 'Add no version tag to git after publishing.',
+      defaultsTo: true,
+      negatable: true,
+    );
+
+    argParser.addFlag(
+      'increase-version',
+      abbr: 'c',
+      help: 'Increase version after publishing.',
+      defaultsTo: true,
       negatable: true,
     );
   }

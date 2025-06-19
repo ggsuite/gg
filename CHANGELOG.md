@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.23] - 2025-06-19
+
+### Added
+
+- Add options to prevent tagging and version-increase after publishing
 
 ### Changed
 
@@ -293,7 +297,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.22...HEAD
+[3.0.23]: https://github.com/inlavigo/gg/compare/3.0.22...3.0.23
 [3.0.22]: https://github.com/inlavigo/gg/compare/3.0.21...3.0.22
 [3.0.21]: https://github.com/inlavigo/gg/compare/3.0.20...3.0.21
 [3.0.20]: https://github.com/inlavigo/gg/compare/3.0.19...3.0.20
