@@ -6,6 +6,10 @@
 
 - Update version of gg\_test
 
+### Removed
+
+- remove publish\_to: none
+
 ## [3.0.23] - 2025-06-19
 
 ### Added
