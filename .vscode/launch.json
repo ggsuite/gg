@@ -10,8 +10,8 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
-      "args": ["check", "pana"],
-      "cwd": "${workspaceFolder}"
+      "args": ["can", "commit"],
+      "cwd": "P:\\grace_cloud\\gg"
     },
     {
       "name": "Current File",
