@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Update gg\_test to version 1.1.7
+
 ## [3.0.24] - 2025-07-09
 
 ### Changed
@@ -307,6 +313,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.24...HEAD
 [3.0.24]: https://github.com/inlavigo/gg/compare/3.0.23...3.0.24
 [3.0.23]: https://github.com/inlavigo/gg/compare/3.0.22...3.0.23
 [3.0.22]: https://github.com/inlavigo/gg/compare/3.0.21...3.0.22

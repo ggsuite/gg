@@ -16,7 +16,7 @@ dependencies:
   gg_process: ^1.0.6
   gg_publish: ^3.0.17
   gg_status_printer: ^1.1.0
-  gg_test: ^1.1.6
+  gg_test: ^1.1.7
   gg_version: ^4.0.2
   meta: ^1.12.0
   mocktail: ^1.0.3

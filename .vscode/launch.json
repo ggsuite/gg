@@ -11,7 +11,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/gg.dart",
       "args": ["can", "commit"],
-      "cwd": "P:\\grace_cloud\\gg"
+      "cwd": "P:\\grace_cloud\\kidney_core"
     },
     {
       "name": "Current File",
