@@ -1,11 +1,15 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.0] - 2025-08-02
 
 ### Added
 
 - add tests for merge
 - Add message parameter to gg merge
+
+### Changed
+
+- Prepare version 3.1.0
 
 ## [3.0.25] - 2025-07-31
 
@@ -320,7 +324,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/3.0.25...HEAD
+[3.1.0]: https://github.com/inlavigo/gg/compare/3.0.25...3.1.0
 [3.0.25]: https://github.com/inlavigo/gg/compare/3.0.24...3.0.25
 [3.0.24]: https://github.com/inlavigo/gg/compare/3.0.23...3.0.24
 [3.0.23]: https://github.com/inlavigo/gg/compare/3.0.22...3.0.23
