@@ -1,6 +1,6 @@
 name: gg
 description: A collection of checks and actions like analyzing, linting, testing, code coverage, committing, pushing, publishing.
-version: 3.1.0
+version: 3.1.1
 repository: https://github.com/inlavigo/gg.git
 publish_to: none
 
