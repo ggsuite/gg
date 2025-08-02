@@ -5,9 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:gg/src/commands/can/can_commit.dart';
-import 'package:gg/src/commands/can/can_publish.dart';
-import 'package:gg/src/commands/can/can_push.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
@@ -35,6 +33,8 @@ class Can extends Command<void> {
     addSubcommand(deps.canCommit);
     addSubcommand(deps.canPush);
     addSubcommand(deps.canPublish);
+    addSubcommand(deps.canUpgrade);
+    addSubcommand(deps.canMerge);
   }
 }
 
@@ -47,9 +47,13 @@ class DepsOfCan {
     CanCommit? commit,
     CanPush? push,
     CanPublish? publish,
+    CanUpgrade? upgrade,
+    CanMerge? merge,
   }) : canCommit = commit ?? CanCommit(ggLog: ggLog),
        canPush = push ?? CanPush(ggLog: ggLog),
-       canPublish = publish ?? CanPublish(ggLog: ggLog);
+       canPublish = publish ?? CanPublish(ggLog: ggLog),
+       canUpgrade = upgrade ?? CanUpgrade(ggLog: ggLog),
+       canMerge = merge ?? CanMerge(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;
@@ -62,4 +66,10 @@ class DepsOfCan {
 
   /// The can publish command
   final CanPublish canPublish;
+
+  /// The can upgrade command
+  final CanUpgrade canUpgrade;
+
+  /// The can merge command
+  final CanMerge canMerge;
 }
