@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## \[3.1.1\] - 2025-08-11
 
 ### Added
 
@@ -9,6 +9,8 @@
 ### Changed
 
 - Update gg\_merge to version 1.0.2
+
+## [3.1.1] - 2025-08-11
 
 ## [3.1.0] - 2025-08-02
 
@@ -334,7 +336,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/3.1.0...HEAD
+[3.1.1]: https://github.com/inlavigo/gg/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/inlavigo/gg/compare/3.0.25...3.1.0
 [3.0.25]: https://github.com/inlavigo/gg/compare/3.0.24...3.0.25
 [3.0.24]: https://github.com/inlavigo/gg/compare/3.0.23...3.0.24
