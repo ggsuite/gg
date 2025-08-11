@@ -7,8 +7,8 @@
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_git/gg_git.dart';
 import 'package:gg_direct_json/gg_direct_json.dart';
+import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:path/path.dart';
 
@@ -39,7 +39,12 @@ class GgState {
 
   // ...........................................................................
   /// The file that might be ignored while reading the hash
-  static const ignoreFiles = ['.gg.json', 'CHANGELOG.md'];
+  static const ignoreFiles = [
+    '.gg.json',
+    'CHANGELOG.md',
+    'pubspec.lock',
+    '.kidney_status',
+  ];
 
   // ...........................................................................
   /// Returns previously set value
