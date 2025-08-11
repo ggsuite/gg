@@ -86,6 +86,7 @@ void main() {
     // Create repositories
     d = await Directory.systemTemp.createTemp('local');
     await initLocalGit(d);
+    await enableEolLf(d);
     dRemote = await Directory.systemTemp.createTemp('remote');
     await initRemoteGit(dRemote);
     await addRemoteToLocal(local: d, remote: dRemote);

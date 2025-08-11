@@ -5,7 +5,6 @@
 // found in the LICENSE file in the root of this package.
 
 import 'dart:convert';
-
 import 'dart:io';
 
 import 'package:gg/src/tools/gg_state.dart';
@@ -34,7 +33,7 @@ void main() {
     dLocal = await initTestDir();
     dRemote = await initTestDir();
 
-    await initGit(dLocal);
+    await initGit(dLocal, isEolLfEnabled: false);
     await initRemoteGit(dRemote);
 
     await initCommand();
@@ -85,7 +84,7 @@ void main() {
             directory: dLocal,
             ggLog: ggLog,
           );
-          expect(initialCommitCount, 2);
+          expect(initialCommitCount, 3);
 
           // file1.txt should be shown as modified in the last commit
           expect(
@@ -108,7 +107,7 @@ void main() {
             directory: dLocal,
             ggLog: ggLog,
           );
-          expect(commitCount0, 2);
+          expect(commitCount0, 3);
 
           // - i.e. file1.txt should be shown as modified in the last commit
           expect(
@@ -188,7 +187,7 @@ void main() {
         test('if nothing is comitted', () async {
           await dLocal.delete(recursive: true);
           dLocal = await initTestDir();
-          await initGit(dLocal);
+          await initGit(dLocal, isEolLfEnabled: false);
 
           expect(
             () async => await ggState.writeSuccess(

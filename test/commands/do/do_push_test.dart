@@ -54,6 +54,7 @@ void main() async {
   // ...........................................................................
   setUp(() async {
     (dLocal, dRemote) = await initLocalAndRemoteGit();
+    await enableEolLf(dLocal);
 
     await addAndCommitPubspecFile(dLocal);
     await addAndCommitSampleFile(dLocal);

@@ -6,8 +6,8 @@
 
 import 'dart:io';
 
-import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
+import 'package:gg_args/gg_args.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_publish/gg_publish.dart';
@@ -79,22 +79,12 @@ void main() {
           () async {
             // Run the command a first time
             // Should complain about missing commits
-            late String exception;
-            try {
-              await commandCluster.exec(directory: d, ggLog: ggLog);
-            } catch (e) {
-              exception = e.toString();
-            }
+            await commandCluster.exec(directory: d, ggLog: ggLog);
 
             expect(messages[0], contains('Do all check commands work?'));
             expect(messages[1], 'isCommitted');
             expect(messages[2], 'isPushed');
             expect(messages[3], 'isUpgraded');
-
-            expect(
-              exception,
-              'Exception: There must be at least one commit in the repository.',
-            );
 
             // Make an initial commit
             await addAndCommitSampleFile(d, fileName: 'file1.txt');

@@ -9,6 +9,7 @@
 ### Changed
 
 - Update gg\_merge to version 1.0.2
+- BREAKING CHANGE: V.5.0.0: Git must be set to EOF LF
 
 ## [3.1.1] - 2025-08-11
 
