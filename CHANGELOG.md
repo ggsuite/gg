@@ -1,6 +1,6 @@
 # Changelog
 
-## \[3.1.1\] - 2025-08-11
+## \[Unreleased\] - 2025-08-11
 
 ### Added
 
@@ -10,6 +10,8 @@
 
 - Update gg\_merge to version 1.0.2
 - BREAKING CHANGE: V.5.0.0: Git must be set to EOF LF
+
+## [4.0.0] - 2025-08-11
 
 ## [3.1.1] - 2025-08-11
 
@@ -337,6 +339,7 @@
 
 - Initial version
 
+[4.0.0]: https://github.com/inlavigo/gg/compare/3.1.1...4.0.0
 [3.1.1]: https://github.com/inlavigo/gg/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/inlavigo/gg/compare/3.0.25...3.1.0
 [3.0.25]: https://github.com/inlavigo/gg/compare/3.0.24...3.0.25
