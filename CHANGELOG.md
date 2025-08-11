@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add message parameter to exec and get in do merge
+
 ### Changed
 
 - Update gg\_merge to version 1.0.2

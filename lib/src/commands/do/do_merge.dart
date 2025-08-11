@@ -56,11 +56,13 @@ class DoMerge extends DirCommand<void> {
     required GgLog ggLog,
     bool? automerge,
     bool? local,
+    String? message,
   }) => get(
     directory: directory,
     ggLog: ggLog,
     automerge: automerge,
     local: local,
+    message: message,
   );
 
   @override
@@ -69,10 +71,11 @@ class DoMerge extends DirCommand<void> {
     required GgLog ggLog,
     bool? automerge,
     bool? local,
+    String? message,
   }) async {
     automerge ??= argResults?['automerge'] as bool? ?? false;
     local ??= argResults?['local'] as bool? ?? false;
-    final message = argResults?['message'] as String?;
+    message ??= argResults?['message'] as String?;
 
     // Check state
     final isDone = await _state.readSuccess(

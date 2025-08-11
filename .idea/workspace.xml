@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2f3bc0cb-7ee9-4328-bd08-d3a620e88261" name="Changes" comment="change gg_merge dependency to pub.dev">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,6 +84,7 @@
       <updated>1753961958327</updated>
       <workItem from="1753961959626" duration="10852000" />
       <workItem from="1754466776883" duration="625000" />
+      <workItem from="1754644508808" duration="2060000" />
     </task>
     <task id="LOCAL-00001" summary="format code">
       <option name="closed" value="true" />
