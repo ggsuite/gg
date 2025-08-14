@@ -66,12 +66,14 @@ class DoCommit extends DirCommand<void> {
     String? message,
     cl.LogType? logType,
     bool? updateChangeLog,
+    bool? force,
   }) => get(
     directory: directory,
     ggLog: ggLog,
     message: message,
     logType: logType,
     updateChangeLog: updateChangeLog,
+    force: force,
   );
 
   // ...........................................................................
@@ -82,7 +84,11 @@ class DoCommit extends DirCommand<void> {
     String? message,
     cl.LogType? logType,
     bool? updateChangeLog,
+    bool? force,
   }) async {
+    // Read flags
+    force ??= _forceFromArgs();
+
     // Does directory exist?
     await check(directory: directory);
 
@@ -122,8 +128,10 @@ class DoCommit extends DirCommand<void> {
 
     final repoUrl = await _repositoryUrl(directory);
 
-    // Is everything fine?
-    await _canCommit.exec(directory: directory, ggLog: ggLog);
+    // Is everything fine? Skip checks when --force is used
+    if (force != true) {
+      await _canCommit.exec(directory: directory, ggLog: ggLog);
+    }
 
     // Update changelog when a message is given
     updateChangeLog ??= argResults?['log'] as bool? ?? true;
@@ -195,6 +203,14 @@ class DoCommit extends DirCommand<void> {
       'message',
       abbr: 'm',
       help: 'The commit message and log entry.',
+    );
+
+    argParser.addFlag(
+      'force',
+      abbr: 'f',
+      help: 'Commit without running checks (analyze/format/tests).',
+      defaultsTo: false,
+      negatable: true,
     );
   }
 
@@ -314,6 +330,11 @@ class DoCommit extends DirCommand<void> {
     }
 
     return true;
+  }
+
+  // ...........................................................................
+  bool _forceFromArgs() {
+    return argResults?['force'] as bool? ?? false;
   }
 }
 

@@ -555,4 +555,98 @@ void main() {
       });
     });
   });
+
+  group('DoCommit --force', () {
+    test('should bypass checks and commit programmatically', () async {
+      // Add uncommitted file
+      await addFileWithoutCommitting(d);
+
+      await doCommit.exec(
+        directory: d,
+        ggLog: ggLog,
+        message: 'My force commit',
+        logType: LogType.added,
+        force: true,
+      );
+
+      // Should not have run checks
+      verifyNever(
+        () => canCommit.exec(
+          directory: any(named: 'directory'),
+          ggLog: any(named: 'ggLog'),
+          force: any(named: 'force'),
+          saveState: any(named: 'saveState'),
+        ),
+      );
+
+      expect(messages.last, yellow('Checks successful. Commit successful.'));
+
+      // Second call should reuse state
+      await doCommit.exec(
+        directory: d,
+        ggLog: ggLog,
+        message: 'My force commit',
+        logType: LogType.added,
+        force: true,
+      );
+      expect(messages.last, yellow('Already checked and committed.'));
+    });
+
+    test('should bypass checks and commit via CLI', () async {
+      // Add uncommitted file
+      await addFileWithoutCommitting(d);
+
+      await runner.run([
+        'commit',
+        '-i',
+        d.path,
+        '--force',
+        '-m',
+        'add My force commit',
+      ]);
+
+      verifyNever(
+        () => canCommit.exec(
+          directory: any(named: 'directory'),
+          ggLog: any(named: 'ggLog'),
+          force: any(named: 'force'),
+          saveState: any(named: 'saveState'),
+        ),
+      );
+
+      expect(messages.last, yellow('Checks successful. Commit successful.'));
+    });
+
+    test('should bypass checks and set state when nothing to commit', () async {
+      // Everything already committed here
+      await doCommit.exec(
+        directory: d,
+        ggLog: ggLog,
+        message: null,
+        logType: null,
+        force: true,
+      );
+
+      verifyNever(
+        () => canCommit.exec(
+          directory: any(named: 'directory'),
+          ggLog: any(named: 'ggLog'),
+          force: any(named: 'force'),
+          saveState: any(named: 'saveState'),
+        ),
+      );
+
+      expect(messages.last, yellow('Checks successful. Nothing to commit.'));
+
+      // Run again to ensure state is used
+      await doCommit.exec(
+        directory: d,
+        ggLog: ggLog,
+        message: null,
+        logType: null,
+        force: true,
+      );
+      expect(messages.last, yellow('Already checked and committed.'));
+    });
+  });
 }
