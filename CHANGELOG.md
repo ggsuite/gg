@@ -11,6 +11,12 @@
 - Update gg\_merge to version 1.0.2
 - BREAKING CHANGE: V.5.0.0: Git must be set to EOF LF
 
+## [4.0.3] - 2025-08-16
+
+### Changed
+
+- Allow to print details using -v option on gg info last-changes-hash
+
 ## [4.0.2] - 2025-08-11
 
 ### Added
@@ -348,6 +354,7 @@
 
 - Initial version
 
+[4.0.3]: https://github.com/inlavigo/gg/compare/4.0.2...4.0.3
 [4.0.2]: https://github.com/inlavigo/gg/compare/4.0.1...4.0.2
 [4.0.1]: https://github.com/inlavigo/gg/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/inlavigo/gg/compare/3.1.1...4.0.0
