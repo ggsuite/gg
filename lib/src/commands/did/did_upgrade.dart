@@ -32,6 +32,7 @@ class DidUpgrade extends DidCommand {
     required Directory directory,
     required GgLog ggLog,
     bool? majorVersions,
+    bool? ignoreUnstaged,
   }) async {
     /// Is everything upgraded?
     final isUpgraded = await _isUpgraded.get(

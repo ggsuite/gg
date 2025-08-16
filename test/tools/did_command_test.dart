@@ -5,6 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'dart:io';
+
 import 'package:gg/src/tools/did_command.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
@@ -114,6 +115,42 @@ void main() {
               );
 
               expect(success, isTrue);
+            },
+          );
+
+          test(
+            'if an unstaged file exists and ignoreUnstaged is true',
+            () async {
+              // Write success
+              await didCommand.state.writeSuccess(directory: d, key: 'did-do');
+
+              final success = await didCommand.get(
+                directory: d,
+                ggLog: messages.add,
+              );
+
+              expect(success, isTrue);
+
+              // Add a file without committing
+              await addFileWithoutCommitting(d);
+
+              final success2 = await didCommand.get(
+                directory: d,
+                ggLog: messages.add,
+                ignoreUnstaged: true,
+              );
+
+              // Success is true, because ignoreUnstaged is true
+              expect(success2, isTrue);
+
+              final success3 = await didCommand.get(
+                directory: d,
+                ggLog: messages.add,
+                ignoreUnstaged: false,
+              );
+
+              // Success is false, because ignoreUnstaged is false
+              expect(success3, isFalse);
             },
           );
         });

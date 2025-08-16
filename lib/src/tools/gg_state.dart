@@ -52,12 +52,14 @@ class GgState {
     required Directory directory,
     required String key,
     required GgLog ggLog,
+    bool ignoreUnstaged = false,
   }) async {
     // Get the last changes hash
     final changesHash = await _lastChangesHash.get(
       directory: directory,
       ggLog: ggLog,
       ignoreFiles: ignoreFiles,
+      ignoreUnstaged: ignoreUnstaged,
     );
 
     // If no config file exists, return false
@@ -86,6 +88,7 @@ class GgState {
   Future<void> writeSuccess({
     required Directory directory,
     required String key,
+    bool ignoreUnstaged = false,
   }) async {
     // Nothing committed so far? Do nothing.
     await _checkCommitsAvailable(directory, ggLog);
@@ -95,13 +98,18 @@ class GgState {
       directory: directory,
       key: key,
       ggLog: ggLog,
+      ignoreUnstaged: ignoreUnstaged,
     );
     if (isWritten) {
       return;
     }
 
     // Get the hash of the current commit
-    final hash = await currentHash(directory: directory, ggLog: ggLog);
+    final hash = await currentHash(
+      directory: directory,
+      ggLog: ggLog,
+      ignoreUnstaged: ignoreUnstaged,
+    );
 
     // Write the hash to .gg.json
     await DirectJson.writeFile(
@@ -119,11 +127,13 @@ class GgState {
   Future<int> currentHash({
     required Directory directory,
     required GgLog ggLog,
+    bool ignoreUnstaged = false,
   }) async {
     return await _lastChangesHash.get(
       directory: directory,
       ggLog: ggLog,
       ignoreFiles: ignoreFiles,
+      ignoreUnstaged: ignoreUnstaged,
     );
   }
 

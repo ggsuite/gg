@@ -24,7 +24,9 @@ class DidCommand extends DirCommand<bool> {
     required super.ggLog,
     required this.stateKey,
     GgState? state,
-  }) : state = state ?? GgState(ggLog: ggLog);
+  }) : state = state ?? GgState(ggLog: ggLog) {
+    _addArgs();
+  }
 
   // ...........................................................................
   @override
@@ -59,11 +61,18 @@ class DidCommand extends DirCommand<bool> {
   // ...........................................................................
   /// Returns previously set value
   @override
-  Future<bool> get({required Directory directory, required GgLog ggLog}) async {
+  Future<bool> get({
+    required Directory directory,
+    required GgLog ggLog,
+    bool? ignoreUnstaged,
+  }) async {
+    ignoreUnstaged ??= argResults?['ignoreUnstaged'] as bool? ?? false;
+
     final success = await state.readSuccess(
       directory: directory,
       key: stateKey,
       ggLog: ggLog,
+      ignoreUnstaged: ignoreUnstaged,
     );
 
     return success;
@@ -125,6 +134,16 @@ class DidCommand extends DirCommand<bool> {
   // ######################
   // Private
   // ######################
+
+  // ...........................................................................
+  void _addArgs() {
+    argParser.addFlag(
+      'ignoreUnstaged',
+      abbr: 'u',
+      help: 'Ignore unstaged files.',
+      defaultsTo: false,
+    );
+  }
 }
 
 /// Mock for [DidCommand]

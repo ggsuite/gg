@@ -11,6 +11,12 @@
 - Update gg\_merge to version 1.0.2
 - BREAKING CHANGE: V.5.0.0: Git must be set to EOF LF
 
+## [4.0.4] - 2025-08-16
+
+### Added
+
+- Add --ignoreUnstaged option to gg can commit and gg can push
+
 ## [4.0.3] - 2025-08-16
 
 ### Changed
@@ -354,6 +360,7 @@
 
 - Initial version
 
+[4.0.4]: https://github.com/inlavigo/gg/compare/4.0.3...4.0.4
 [4.0.3]: https://github.com/inlavigo/gg/compare/4.0.2...4.0.3
 [4.0.2]: https://github.com/inlavigo/gg/compare/4.0.1...4.0.2
 [4.0.1]: https://github.com/inlavigo/gg/compare/4.0.0...4.0.1
