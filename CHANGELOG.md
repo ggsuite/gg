@@ -1,21 +1,21 @@
 # Changelog
 
-## \[Unreleased\] - 2025-08-11
+### Changed
 
-### Added
-
-- Add message parameter to exec and get in do merge
+## [4.0.5] - 2026-01-20
 
 ### Changed
 
-- Update gg\_merge to version 1.0.2
-- BREAKING CHANGE: V.5.0.0: Git must be set to EOF LF
+- Ignore missing version in CHANGELOG when running pana because version is managed by gg
 
 ## [4.0.4] - 2025-08-16
 
 ### Added
 
 - Add --ignoreUnstaged option to gg can commit and gg can push
+- Update gg_merge to version 1.0.2
+- BREAKING CHANGE: V.5.0.0: Git must be set to EOF LF
+- Add message parameter to exec and get in do merge
 
 ## [4.0.3] - 2025-08-16
 
@@ -28,7 +28,7 @@
 ### Added
 
 - Add .gitattributes file
-- Add pubspeck.lock and .kidney\_status to ignored files
+- Add pubspeck.lock and .kidney_status to ignored files
 
 ## [4.0.1] - 2025-08-11
 
@@ -51,17 +51,17 @@
 
 ### Changed
 
-- Update gg\_test to version 1.1.7
+- Update gg_test to version 1.1.7
 
 ## [3.0.24] - 2025-07-09
 
 ### Changed
 
-- Update version of gg\_test
+- Update version of gg_test
 
 ### Removed
 
-- remove publish\_to: none
+- remove publish_to: none
 
 ## [3.0.23] - 2025-06-19
 
@@ -121,7 +121,7 @@
 
 ### Changed
 
-- Replace gg\_json by gg\_direct\_json
+- Replace gg_json by gg_direct_json
 
 ## [3.0.15] - 2024-10-03
 
@@ -178,7 +178,7 @@
 
 ### Changed
 
-- Update gg\_test to 1.0.19. Only failing error lines are shown, but not details.
+- Update gg_test to 1.0.19. Only failing error lines are shown, but not details.
 
 ## [3.0.7] - 2024-08-20
 
@@ -190,7 +190,7 @@
 
 ### Changed
 
-- Update to new version of gg\_tests
+- Update to new version of gg_tests
 
 ## [3.0.5] - 2024-06-21
 
@@ -242,7 +242,7 @@
 ### Removed
 
 - Upgrade check before pushing
-- dependency to gg\_install\_gg, remove ./check script
+- dependency to gg_install_gg, remove ./check script
 - Upgrading does not trigger a commit and a publish
 
 ## [3.0.0] - 2024-04-10
@@ -276,7 +276,7 @@
 
 ### Changed
 
-- Update latest changes on gg\_publish and gg\_git
+- Update latest changes on gg_publish and gg_git
 - Refactor tests
 
 ## [2.0.2] - 2024-04-06
@@ -342,7 +342,7 @@
 
 - Removed unused sample project
 - logStatus is replaced by GgStatusPrinter
-- isGitHub is replaced by gg\_is\_github
+- isGitHub is replaced by gg_is_github
 - Pipeline: remove --no-save-state flag
 
 ## [1.0.14] - 2024-04-05
@@ -360,6 +360,8 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/4.0.5...HEAD
+[4.0.5]: https://github.com/inlavigo/gg/compare/4.0.4...4.0.5
 [4.0.4]: https://github.com/inlavigo/gg/compare/4.0.3...4.0.4
 [4.0.3]: https://github.com/inlavigo/gg/compare/4.0.2...4.0.3
 [4.0.2]: https://github.com/inlavigo/gg/compare/4.0.1...4.0.2

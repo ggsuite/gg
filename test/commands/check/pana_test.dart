@@ -27,6 +27,10 @@ void main() {
     'test/data/pana_success_report.json',
   ).readAsStringSync();
 
+  final versionMissedReport = File(
+    'test/data/pana_version_in_changelog_missing.json',
+  ).readAsStringSync();
+
   // .........................................................................
   void mockPanaIsInstalled({
     required bool isInstalled,
@@ -147,6 +151,19 @@ void main() {
           expect(messages[0], contains('✅ Running pana'));
         });
       });
+
+      test(
+        'also, when version is not yet correctly set in CHANGELOG.md',
+        () async {
+          mockPanaResult(versionMissedReport);
+          // Run pana
+          await runner.run(['pana', '--input', d.path]);
+
+          // Check result
+          expect(messages[0], contains('⌛️ Running pana'));
+          expect(messages[1], contains('✅ Running pana'));
+        },
+      );
     });
 
     group('should fail ', () {
