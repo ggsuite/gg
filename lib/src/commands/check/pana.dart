@@ -8,9 +8,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
@@ -149,8 +149,10 @@ class Pana extends DirCommand<void> {
       // Parse the JSON output to get the score
       final jsonOutput =
           jsonDecode(result.stdout.toString()) as Map<String, dynamic>;
+      final allowedMissingPoints = _ignoreMissingVersionInChangeLog(jsonOutput);
       final grantedPoints = jsonOutput['scores']['grantedPoints'];
-      final maxPoints = jsonOutput['scores']['maxPoints'];
+      final maxPoints =
+          jsonOutput['scores']['maxPoints'] - allowedMissingPoints;
       final complete = grantedPoints == maxPoints;
       final points = '$grantedPoints/$maxPoints';
 
@@ -213,6 +215,34 @@ class Pana extends DirCommand<void> {
       ggLog(result.stderr.toString());
       throw Exception('Failed to install pana: ${result.stderr}');
     }
+  }
+
+  // ...........................................................................
+  int _ignoreMissingVersionInChangeLog(Map<String, dynamic> jsonOutput) {
+    final report = jsonOutput['report'] as Map<String, dynamic>;
+    final sections = (report['sections'] as List<dynamic>)
+        .cast<Map<String, dynamic>>();
+
+    for (final section in sections) {
+      final granted = section['grantedPoints'] as int;
+      final max = section['maxPoints'] as int;
+      final missingPoints = max - granted;
+
+      if (missingPoints == 0) {
+        continue;
+      }
+      final summary = section['summary'] as String;
+      final isVersionError = summary.contains(
+        RegExp(
+          r'`CHANGELOG.md` does not contain reference to the current version',
+        ),
+      );
+
+      if (isVersionError && missingPoints == 5) {
+        return missingPoints;
+      }
+    }
+    return 0;
   }
 }
 
