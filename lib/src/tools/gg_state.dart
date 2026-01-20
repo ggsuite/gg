@@ -39,12 +39,7 @@ class GgState {
 
   // ...........................................................................
   /// The file that might be ignored while reading the hash
-  static const ignoreFiles = [
-    '.gg.json',
-    'CHANGELOG.md',
-    'pubspec.lock',
-    '.kidney_status',
-  ];
+  static const ignoreFiles = ['.gg.json', 'CHANGELOG.md', '.kidney_status'];
 
   // ...........................................................................
   /// Returns previously set value
