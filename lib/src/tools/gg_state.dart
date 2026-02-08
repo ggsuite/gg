@@ -39,7 +39,13 @@ class GgState {
 
   // ...........................................................................
   /// The file that might be ignored while reading the hash
-  static const ignoreFiles = ['.gg.json', 'CHANGELOG.md', '.kidney_status'];
+  static const ignoreFiles = [
+    '.gg/',
+    '.gg.json',
+    '.gg/.gg.json',
+    'CHANGELOG.md',
+    '.kidney_status',
+  ];
 
   // ...........................................................................
   /// Returns previously set value
@@ -66,7 +72,7 @@ class GgState {
       return false;
     }
 
-    // Get the hash written to .gg.json
+    // Get the hash written to .gg/.gg.json
     final hashInCheckJson = await DirectJson.readFile<int>(
       file: _configFile(directory: directory),
       path: _hashPath(key).join('/'),
@@ -79,7 +85,7 @@ class GgState {
   }
 
   // ...........................................................................
-  /// Updates .gg.json and writes the success state for this key.
+  /// Updates .gg/.gg.json and writes the success state for this key.
   Future<void> writeSuccess({
     required Directory directory,
     required String key,
@@ -99,6 +105,9 @@ class GgState {
       return;
     }
 
+    // Ensure configuration directory exists before writing
+    await _ensureConfigDirectoryExists(directory);
+
     // Get the hash of the current commit
     final hash = await currentHash(
       directory: directory,
@@ -106,14 +115,14 @@ class GgState {
       ignoreUnstaged: ignoreUnstaged,
     );
 
-    // Write the hash to .gg.json
+    // Write the hash to .gg/.gg.json
     await DirectJson.writeFile(
       file: _configFile(directory: directory),
       path: _hashPath(key).join('/'),
       value: hash,
     );
 
-    // Ammend changes to .gg.json
+    // Ammend changes to .gg/.gg.json
     await _commitOrAmmendStateChanges(directory);
   }
 
@@ -133,7 +142,7 @@ class GgState {
   }
 
   // ...........................................................................
-  /// Replaces the hash in .gg.json with the current hash
+  /// Replaces the hash in .gg/.gg.json with the current hash
   Future<void> updateHash({
     required int hash,
     required Directory directory,
@@ -159,6 +168,7 @@ class GgState {
   // ...........................................................................
   /// Resets the success state
   Future<void> reset({required Directory directory}) async {
+    await _ensureConfigDirectoryExists(directory);
     await _configFile(directory: directory).writeAsString('{}');
   }
 
@@ -179,15 +189,33 @@ class GgState {
   List<String> _hashPath(String name) => [name, 'success', 'hash'];
 
   // ...........................................................................
+  /// Returns the configuration directory `.gg` inside the given [directory].
+  Directory _configDirectory({required Directory directory}) {
+    return Directory(join(directory.path, '.gg'));
+  }
+
+  // ...........................................................................
+  /// Ensures that the configuration directory `.gg` exists.
+  Future<void> _ensureConfigDirectoryExists(Directory directory) async {
+    final dir = _configDirectory(directory: directory);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+  }
+
+  // ...........................................................................
+  /// Returns the configuration file `.gg/.gg.json` inside the given
+  /// [directory].
   File _configFile({required Directory directory}) {
-    final filePath = join(directory.path, '.gg.json');
+    final dir = _configDirectory(directory: directory);
+    final filePath = join(dir.path, '.gg.json');
     final file = File(filePath);
     return file;
   }
 
   // ...........................................................................
   Future<void> _commitOrAmmendStateChanges(Directory directory) async {
-    // Check if only .gg.json is currently changed
+    // Check if only .gg/.gg.json is currently changed
     final modifiedFiles = await _modifiedFiles.get(
       directory: directory,
       ggLog: ggLog,
@@ -199,7 +227,8 @@ class GgState {
     }
 
     final onlyGgJsonChanged =
-        modifiedFiles.length == 1 && modifiedFiles.first == '.gg.json';
+        modifiedFiles.isNotEmpty &&
+        modifiedFiles.every((p) => p == '.gg/' || p == '.gg/.gg.json');
 
     // Remember if everything is committed and pushed
     final everythingWasCommitted = onlyGgJsonChanged;
@@ -211,7 +240,7 @@ class GgState {
     }
 
     // ...................................
-    // Otherwise commit or ammend .gg.json
+    // Otherwise commit or ammend .gg/.gg.json
 
     // Check if the repository has a remote
     final hasRemote = await _hasRemote.get(directory: directory, ggLog: ggLog);
@@ -220,11 +249,11 @@ class GgState {
 
     // ...........................
     // To have a clean git history,
-    // we will ammend changes to .gg.json to the last commit.
+    // we will ammend changes to .gg/.gg.json to the last commit.
     // - If everything was committed and pushed, create a new commit
     // - If everything was committed but not pushed, ammend to last commit
     final message = everythingWasPushed
-        ? 'Add: .gg.json check results'
+        ? 'Add: .gg/.gg.json check results'
         : await _headMessage.get(
             directory: directory,
             ggLog: ggLog,

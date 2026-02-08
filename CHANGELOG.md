@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [Unreleased]
+
+### Changed
+
+- move .gg.json to .gg/.gg.json and update related code/tests
+
 ## [4.0.6] - 2026-01-20
 
 ### Changed
@@ -366,6 +372,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/4.0.6...HEAD
 [4.0.6]: https://github.com/inlavigo/gg/compare/4.0.5...4.0.6
 [4.0.5]: https://github.com/inlavigo/gg/compare/4.0.4...4.0.5
 [4.0.4]: https://github.com/inlavigo/gg/compare/4.0.3...4.0.4

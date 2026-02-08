@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:gg/src/tools/gg_state.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
+import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -54,7 +55,7 @@ void main() {
   group('CheckState', () {
     group('writeSuccess(directory, success)', () {
       group('with success == true', () {
-        test('should write last change hash to .gg.json', () async {
+        test('should write last change hash to .gg/.gg.json', () async {
           await addAndCommitSampleFile(dLocal);
 
           // Get last changes hash
@@ -66,7 +67,7 @@ void main() {
           await ggState.writeSuccess(directory: dLocal, key: 'can-commit');
 
           // Check the file
-          final checkJson = File('${dLocal.path}/.gg.json');
+          final checkJson = File(join(dLocal.path, '.gg', '.gg.json'));
           await expectLater(await checkJson.exists(), isTrue);
           final contentsString = await checkJson.readAsString();
           final contents = json.decode(contentsString);
@@ -74,7 +75,7 @@ void main() {
         });
       });
 
-      group('should ammend changes to .gg.json to the last commit', () {
+      group('should ammend changes to .gg/.gg.json to the last commit', () {
         test('when previous changes were not already pushed', () async {
           // Let's create an inital commit
           await addAndCommitSampleFile(dLocal, fileName: 'file1.txt');
@@ -116,7 +117,7 @@ void main() {
               ggLog: ggLog,
               force: true,
             ),
-            ['.gg.json', 'file1.txt'],
+            ['.gg/.gg.json', 'file1.txt'],
           );
         });
       });
@@ -162,14 +163,15 @@ void main() {
           );
           expect(commitCount0, initialCommitCount + 1);
 
-          // - i.e. only .gg.json should be shown as modified in the last commit
+          // - i.e. only .gg/.gg.json should be shown as modified in the last
+          //   commit
           expect(
             await modifiedFiles.get(
               directory: dLocal,
               ggLog: ggLog,
               force: true,
             ),
-            ['.gg.json'],
+            ['.gg/.gg.json'],
           );
 
           // Executing the cluster again should not change anything
@@ -210,8 +212,11 @@ void main() {
     group('readSuccess(directory, key, ggLog)', () {
       group('should return', () {
         group('false', () {
-          test('if no .gg.json exists', () async {
-            expect(await File('${dLocal.path}/.gg.json').exists(), isFalse);
+          test('if no .gg/.gg.json exists', () async {
+            expect(
+              await File(join(dLocal.path, '.gg', '.gg.json')).exists(),
+              isFalse,
+            );
             final result = await ggState.readSuccess(
               directory: dLocal,
               ggLog: messages.add,
@@ -220,8 +225,12 @@ void main() {
             expect(result, isFalse);
           });
 
-          test('if .gg.json is empty', () async {
-            File('${dLocal.path}/.gg.json').writeAsStringSync('{}');
+          test('if .gg/.gg.json is empty', () async {
+            final ggDir = Directory(join(dLocal.path, '.gg'));
+            if (!ggDir.existsSync()) {
+              ggDir.createSync(recursive: true);
+            }
+            File(join(dLocal.path, '.gg', '.gg.json')).writeAsStringSync('{}');
 
             final result = await ggState.readSuccess(
               directory: dLocal,
@@ -302,7 +311,7 @@ void main() {
     });
 
     group('updateHash()', () {
-      group('replaces the hash in .gg.json with the current hash', () {
+      group('replaces the hash in .gg/.gg.json with the current hash', () {
         test('when current hash is different', () async {
           // Get last changes hash
           final hash = await LastChangesHash(

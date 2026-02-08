@@ -132,7 +132,11 @@ void main() {
         test('should (not) save the success state', () async {
           await addAndCommitSampleFile(d, fileName: 'file1.txt');
 
-          final ggJson = await File(join(d.path, '.gg.json')).create();
+          final ggDir = Directory(join(d.path, '.gg'));
+          if (!ggDir.existsSync()) {
+            ggDir.createSync(recursive: true);
+          }
+          final ggJson = await File(join(ggDir.path, '.gg.json')).create();
           final ggJsonBefore = await ggJson.readAsString();
 
           // Run the command with save-state == false

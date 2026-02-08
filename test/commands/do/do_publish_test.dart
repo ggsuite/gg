@@ -71,7 +71,12 @@ void main() {
       ggLog: ggLog,
     ).get(directory: d, ggLog: ggLog, ignoreFiles: GgState.ignoreFiles);
 
-    await File(join(d.path, '.gg.json')).writeAsString(
+    final ggDir = Directory(join(d.path, '.gg'));
+    if (!ggDir.existsSync()) {
+      await ggDir.create(recursive: true);
+    }
+
+    await File(join(ggDir.path, '.gg.json')).writeAsString(
       '{"canCommit":{"success":{"hash":$successHash}},'
       '"doCommit":{"success":{"hash":$successHash}},'
       '"canPush":{"success":{"hash":$successHash}},'
@@ -110,7 +115,7 @@ void main() {
       '## 1.2.3 - 2024-04-05\n\n- First version',
     );
 
-    // Create a .gg.json that has all preconditions for publishing
+    // Create a .gg/.gg.json that has all preconditions for publishing
     needsChangeHash = 12345;
 
     // Mock publishing
@@ -160,7 +165,7 @@ void main() {
         group('and not publish', () {
           test('when publishing was already successful', () async {
             await DirectJson.writeFile(
-              file: File(join(d.path, '.gg.json')),
+              file: File(join(d.path, '.gg', '.gg.json')),
               path: 'doPublish/success/hash',
               value: successHash,
             );
@@ -185,7 +190,7 @@ void main() {
 
                         // Mock needing publish
                         await DirectJson.writeFile(
-                          file: File(join(d.path, '.gg.json')),
+                          file: File(join(d.path, '.gg', '.gg.json')),
                           path: 'doPublish/success/hash',
                           value: needsChangeHash,
                         );
@@ -232,7 +237,7 @@ void main() {
                           'Prepare development of version 1.2.5',
                         );
 
-                        // Was .gg.json updated in a way that didCommit,
+                        // Was .gg/.gg.json updated in a way that didCommit,
                         // didPush and didPublish return true?
                         expect(
                           await DidCommit(
@@ -272,7 +277,7 @@ void main() {
 
                       // Mock needing publish
                       await DirectJson.writeFile(
-                        file: File(join(d.path, '.gg.json')),
+                        file: File(join(d.path, '.gg', '.gg.json')),
                         path: 'doPublish/success/hash',
                         value: needsChangeHash,
                       );
@@ -306,7 +311,7 @@ void main() {
 
                   // Mock needing publish
                   await DirectJson.writeFile(
-                    file: File(join(d.path, '.gg.json')),
+                    file: File(join(d.path, '.gg', '.gg.json')),
                     path: 'doPublish/success/hash',
                     value: needsChangeHash,
                   );
@@ -352,7 +357,7 @@ void main() {
 
               // Mock needing publish
               await DirectJson.writeFile(
-                file: File(join(d.path, '.gg.json')),
+                file: File(join(d.path, '.gg', '.gg.json')),
                 path: 'doPublish/success/hash',
                 value: needsChangeHash,
               );
@@ -386,7 +391,7 @@ void main() {
               ).get(directory: d, ggLog: ggLog);
               expect(headMessage, 'Prepare development of version 1.0.2');
 
-              // Was .gg.json updated in a way that didCommit,
+              // Was .gg/.gg.json updated in a way that didCommit,
               // didPush and didPublish return true?
               expect(
                 await DidCommit(ggLog: ggLog).get(directory: d, ggLog: ggLog),
@@ -417,7 +422,7 @@ void main() {
 
               // Mock needing publish
               await DirectJson.writeFile(
-                file: File(join(d.path, '.gg.json')),
+                file: File(join(d.path, '.gg', '.gg.json')),
                 path: 'doPublish/success/hash',
                 value: needsChangeHash,
               );
