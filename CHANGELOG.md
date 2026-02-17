@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add VersionSelector with interact support and related tests
+
 ### Changed
 
 - move .gg.json to .gg/.gg.json and update related code/tests
