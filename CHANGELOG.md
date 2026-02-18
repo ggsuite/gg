@@ -11,6 +11,7 @@
 ### Changed
 
 - move .gg.json to .gg/.gg.json and update related code/tests
+- Refactor do\_publish to add version selector and local merge step
 
 ## [4.0.6] - 2026-01-20
 

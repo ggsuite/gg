@@ -17,6 +17,8 @@ import 'package:path/path.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:test/test.dart';
 
+import '../../test_helpers/test_helpers.dart';
+
 void main() {
   final messages = <String>[];
   final ggLog = messages.add;
@@ -27,6 +29,7 @@ void main() {
   late CanPublish canPublish;
   late PublishedVersion publishedVersion;
   late IsVersionPrepared isVersionPrepared;
+  late VersionSelector versionSelector;
 
   late int successHash;
   late int needsChangeHash;
@@ -63,6 +66,15 @@ void main() {
         ),
       ).thenAnswer((_) async {
         return publishedVersionValue;
+      });
+
+  void mockVersionSelector() =>
+      when(
+        () => versionSelector.selectIncrement(
+          currentVersion: any(named: 'currentVersion'),
+        ),
+      ).thenAnswer((_) async {
+        return VersionIncrement.patch;
       });
 
   // ...........................................................................
@@ -115,6 +127,14 @@ void main() {
       '## 1.2.3 - 2024-04-05\n\n- First version',
     );
 
+    await createBranch(d, 'feat_abc');
+    await addAndCommitSampleFile(
+      d,
+      fileName: 'README.md',
+      content: 'This is the readme',
+    );
+    await pushLocalChangesUpstream(d, 'feat_abc');
+
     // Create a .gg/.gg.json that has all preconditions for publishing
     needsChangeHash = 12345;
 
@@ -136,6 +156,10 @@ void main() {
     canPublish = CanPublish(ggLog: ggLog, isVersionPrepared: isVersionPrepared);
     mockPublishedVersion();
 
+    versionSelector = MockVersionSelector();
+    registerFallbackValue(Version(0, 0, 0));
+    mockVersionSelector();
+
     // Instantiate with mocks
     doPublish = DoPublish(
       ggLog: ggLog,
@@ -149,6 +173,7 @@ void main() {
         ggLog: ggLog,
         publishedVersion: publishedVersion,
       ),
+      versionSelector: versionSelector,
     );
 
     await makeLastStateSuccessful();
@@ -210,13 +235,13 @@ void main() {
                           messages[i++],
                           contains('✅ Everything is fine.'),
                         );
+                        expect(messages[i++], contains('⌛️ Increase version'));
+                        expect(messages[i++], contains('✅ Increase version'));
                         expect(
                           messages[i++],
                           contains('Publishing was successful.'),
                         );
-                        expect(messages[i++], contains('✅ Tag 1.2.4 added.'));
-                        expect(messages[i++], contains('⌛️ Increase version'));
-                        expect(messages[i++], contains('✅ Increase version'));
+                        expect(messages[i++], contains('✅ Tag 1.2.5 added.'));
 
                         // Was a new version created?
                         final pubspec = await File(
@@ -226,7 +251,7 @@ void main() {
                           join(d.path, 'CHANGELOG.md'),
                         ).readAsString();
                         expect(pubspec, contains('version: 1.2.5'));
-                        expect(changeLog, contains('## [1.2.4] -'));
+                        expect(changeLog, contains('## [1.2.5] -'));
 
                         // Was the new version checked in?
                         final headMessage = await HeadMessage(
@@ -337,7 +362,11 @@ void main() {
 
           group('not to pub.dev', () {
             test('when »publish_to: none« is found in pubspec.yaml', () async {
-              doPublish = DoPublish(ggLog: ggLog, publish: publish);
+              doPublish = DoPublish(
+                ggLog: ggLog,
+                publish: publish,
+                versionSelector: versionSelector,
+              );
 
               // Prepare pubspec.yaml
               final pubspecFile = File(join(d.path, 'pubspec.yaml'));
@@ -373,9 +402,9 @@ void main() {
               var i = 0;
               expect(messages[i++], contains('Can publish?'));
               expect(messages[i++], contains('✅ Everything is fine.'));
-              expect(messages[i++], contains('Tag 1.0.1 added.'));
               expect(messages[i++], contains('⌛️ Increase version'));
               expect(messages[i++], contains('✅ Increase version'));
+              expect(messages[i++], contains('Tag 1.0.2 added.'));
 
               // Was a new version created?
               pubspec = await pubspecFile.readAsString();
@@ -383,7 +412,7 @@ void main() {
                 join(d.path, 'CHANGELOG.md'),
               ).readAsString();
               expect(pubspec, contains('version: 1.0.2'));
-              expect(changeLog, contains('## [1.0.1] -'));
+              expect(changeLog, contains('## [1.0.2] -'));
 
               // Was the new version checked in?
               final headMessage = await HeadMessage(
@@ -461,7 +490,10 @@ void main() {
     });
 
     test('should have a code coverage of 100%', () {
-      expect(DoPublish(ggLog: ggLog), isNotNull);
+      expect(
+        DoPublish(ggLog: ggLog, versionSelector: versionSelector),
+        isNotNull,
+      );
     });
   });
 }

@@ -6,6 +6,7 @@
 
 import 'package:gg_publish/gg_publish.dart';
 import 'package:interact/interact.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 /// Abstraction over interactive selection used by [VersionSelector].
@@ -81,3 +82,7 @@ class VersionSelector {
     }
   }
 }
+
+// .............................................................................
+/// A Mock for the VersionSelector class using Mocktail
+class MockVersionSelector extends Mock implements VersionSelector {}

@@ -34,6 +34,9 @@ class DoPublish extends DirCommand<void> {
     IsPublished? isPublished,
     changelog.Release? release,
     PublishTo? publishTo,
+    DoMerge? doMerge,
+    VersionSelector? versionSelector,
+    // coverage:ignore-start
   }) : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
        _publishToPubDev = publish ?? Publish(ggLog: ggLog),
        _state = state ?? GgState(ggLog: ggLog),
@@ -45,11 +48,13 @@ class DoPublish extends DirCommand<void> {
        _fromPubspec = fromPubspec ?? FromPubspec(ggLog: ggLog),
        _releaseChangelog = release ?? changelog.Release(ggLog: ggLog),
        _isPublished = isPublished ?? IsPublished(ggLog: ggLog),
-       _publishTo = publishTo ?? PublishTo(ggLog: ggLog) {
+       _publishTo = publishTo ?? PublishTo(ggLog: ggLog),
+       _doMerge = doMerge ?? DoMerge(ggLog: ggLog),
+       _versionSelector = versionSelector ?? VersionSelector() {
+    // coverage:ignore-end
     _addArgs();
   }
 
-  // ...........................................................................
   /// The key used to save the state of the command
   final String stateKey = 'doPublish';
 
@@ -101,6 +106,18 @@ class DoPublish extends DirCommand<void> {
     // Can publish?
     await _canPublish.exec(directory: directory, ggLog: ggLog);
 
+    // Perform local merge before publishing.
+    await _doMerge.get(
+      directory: directory,
+      ggLog: <String>[].add,
+      automerge: false,
+      local: true,
+      message: null,
+    );
+
+    // Increase version (interactive) before releasing the changelog.
+    await _addNextVersion(directory, ggLog);
+
     // Publish change log using cider
     await _prepareChangelog(directory: directory, ggLog: noLog);
 
@@ -135,11 +152,6 @@ class DoPublish extends DirCommand<void> {
 
     // Push tags to remote
     await _doPush.gitPush(directory: directory, force: false, pushTags: true);
-
-    // Prepare next version
-    if (_shouldIncreaseVersion) {
-      await _addNextVersion(directory, ggLog);
-    }
   }
 
   // ######################
@@ -158,6 +170,8 @@ class DoPublish extends DirCommand<void> {
   final changelog.Release _releaseChangelog;
   final IsPublished _isPublished;
   final PublishTo _publishTo;
+  final DoMerge _doMerge;
+  final VersionSelector _versionSelector;
 
   // ...........................................................................
   Future<void> _prepareChangelog({
@@ -188,8 +202,10 @@ class DoPublish extends DirCommand<void> {
 
   // ...........................................................................
   Future<void> _addNextVersion(Directory directory, GgLog ggLog) async {
-    // Define increment
-    const increment = VersionIncrement.patch;
+    // Respect CLI flag --[no-]increase-version.
+    if (!_shouldIncreaseVersion) {
+      return;
+    }
 
     // Remember current hash
     final hashBefore = await _state.currentHash(
@@ -197,26 +213,30 @@ class DoPublish extends DirCommand<void> {
       ggLog: ggLog,
     );
 
-    // Get version in pubspec.yaml
-    final publishedVersion = await _fromPubspec.fromDirectory(
+    // Get current version from pubspec.yaml
+    final currentVersion = await _fromPubspec.fromDirectory(
       directory: directory,
     );
 
-    // Prepare the next version
+    // Let the user select the desired increment.
+    final increment = await _versionSelector.selectIncrement(
+      currentVersion: currentVersion,
+    );
+
+    // Prepare the next version according to the selected increment.
     await _prepareNextVersion.exec(
       directory: directory,
       ggLog: ggLog,
       increment: increment,
-      publishedVersion: publishedVersion,
+      publishedVersion: currentVersion,
     );
 
-    // Update state
+    // Update state hashes so previous successful commands stay valid.
     await _state.updateHash(hash: hashBefore, directory: directory);
 
-    // Get new version
+    // Read the new version and commit the version bump.
     final newVersion = await _fromPubspec.fromDirectory(directory: directory);
 
-    // Commit changes to change log
     await _commit.commit(
       ggLog: ggLog,
       directory: directory,
@@ -224,9 +244,6 @@ class DoPublish extends DirCommand<void> {
       message: 'Prepare development of version $newVersion',
       ammendWhenNotPushed: false,
     );
-
-    // Push commits to remote
-    await _doPush.gitPush(directory: directory, force: false);
   }
 
   // ...........................................................................
