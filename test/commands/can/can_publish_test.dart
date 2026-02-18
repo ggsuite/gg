@@ -72,6 +72,8 @@ void main() {
     d = Directory.systemTemp.createTempSync();
     await initGit(d);
     await addAndCommitSampleFile(d);
+    await createBranch(d, 'feat_abc');
+
     File(
       join(d.path, 'pubspec.yaml'),
     ).writeAsStringSync('name: test\nrepository: https://foo.com');
@@ -90,6 +92,8 @@ void main() {
         await canPublish.exec(directory: d, ggLog: ggLog);
         var count = 0;
         expect(messages[count++], yellow('Can publish?'));
+        expect(messages[count++], contains('Current branch is feature branch'));
+        expect(messages[count++], contains('Current branch is feature branch'));
         expect(messages[count++], 'isVersionPrepared');
         expect(messages[count++], contains('⌛️ CHANGELOG.md has right format'));
         expect(messages[count++], contains('✅ CHANGELOG.md has right format'));

@@ -7,6 +7,7 @@
 ### Added
 
 - Add VersionSelector with interact support and related tests
+- Add IsFeatureBranch to CanPublish and update dependencies
 
 ### Changed
 

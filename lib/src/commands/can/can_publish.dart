@@ -22,8 +22,10 @@ class CanPublish extends CommandCluster {
     IsVersionPrepared? isVersionPrepared,
     Pana? pana,
     HasRightFormat? changeLogHasRightFormat,
+    IsFeatureBranch? isFeatureBranch,
   }) : super(
          commands: [
+           isFeatureBranch ?? IsFeatureBranch(ggLog: ggLog),
            isVersionPrepared ??
                IsVersionPrepared(ggLog: ggLog, treatUnpublishedAsOk: true),
            changeLogHasRightFormat ?? HasRightFormat(ggLog: ggLog),
