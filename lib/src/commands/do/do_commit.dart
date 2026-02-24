@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/tools/gg_state.dart';
-import 'package:gg_ai_commit_message/src/commands/commit_message.dart';
+import 'package:gg_ai_commit_message/gg_ai_commit_message.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_changelog/gg_changelog.dart' as cl;
 import 'package:gg_console_colors/gg_console_colors.dart';
@@ -51,14 +51,14 @@ class DoCommit extends DirCommand<void> {
     GgState? state,
     cl.Add? addToChangeLog,
     CommitMessageCommand? commitMessageCommand,
-  })  : _processWrapper = processWrapper,
-        _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
-        _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
-        _commit = commit ?? Commit(ggLog: ggLog),
-        state = state ?? GgState(ggLog: ggLog),
-        _addToChangeLog = addToChangeLog ?? cl.Add(ggLog: ggLog),
-        _commitMessageCommand =
-            commitMessageCommand ?? CommitMessageCommand(ggLog: ggLog) {
+  }) : _processWrapper = processWrapper,
+       _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
+       _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
+       _commit = commit ?? Commit(ggLog: ggLog),
+       state = state ?? GgState(ggLog: ggLog),
+       _addToChangeLog = addToChangeLog ?? cl.Add(ggLog: ggLog),
+       _commitMessageCommand =
+           commitMessageCommand ?? CommitMessageCommand(ggLog: ggLog) {
     _addParam();
   }
 
@@ -71,15 +71,14 @@ class DoCommit extends DirCommand<void> {
     cl.LogType? logType,
     bool? updateChangeLog,
     bool? force,
-  }) =>
-      get(
-        directory: directory,
-        ggLog: ggLog,
-        message: message,
-        logType: logType,
-        updateChangeLog: updateChangeLog,
-        force: force,
-      );
+  }) => get(
+    directory: directory,
+    ggLog: ggLog,
+    message: message,
+    logType: logType,
+    updateChangeLog: updateChangeLog,
+    force: force,
+  );
 
   // ...........................................................................
   @override
@@ -155,7 +154,7 @@ class DoCommit extends DirCommand<void> {
       await _writeMessageIntoChangeLog(
         directory: directory,
         message: message,
-        logType: logType!,
+        logType: logType,
         repoUrl: repoUrl,
         commit: isCommittedViaGit,
       );
@@ -166,7 +165,7 @@ class DoCommit extends DirCommand<void> {
       await gitAddAndCommit(
         directory: directory,
         message: message,
-        logType: logType!,
+        logType: logType,
       );
       ggLog(yellow('Checks successful. Commit successful.'));
     } else {
@@ -277,7 +276,7 @@ class DoCommit extends DirCommand<void> {
     final generated = await _commitMessageCommand.get(
       directory: directory,
       ggLog: ggLog,
-      interactive: false,
+      interactive: true,
     );
 
     if (generated == null || generated.trim().isEmpty) {
