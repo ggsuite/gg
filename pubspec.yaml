@@ -31,6 +31,8 @@ dependencies:
   matcher: ^0.12.16+1
   gg_direct_json: ^2.0.0
   gg_merge: ^1.0.2
+  gg_ai_commit_message:
+    path: ../gg_ai_commit_message
 
 dev_dependencies:
   fake_async: ^1.3.1

@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/tools/gg_state.dart';
+import 'package:gg_ai_commit_message/src/commands/commit_message.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_changelog/gg_changelog.dart' as cl;
 import 'package:gg_console_colors/gg_console_colors.dart';
@@ -35,7 +36,7 @@ cl.LogType _stringToLogType(String e) {
   return cl.LogType.changed;
 }
 
-// .............................................................................
+// ............................................................................
 /// Does a commit of the current directory.
 class DoCommit extends DirCommand<void> {
   /// Constructor
@@ -49,12 +50,15 @@ class DoCommit extends DirCommand<void> {
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     GgState? state,
     cl.Add? addToChangeLog,
-  }) : _processWrapper = processWrapper,
-       _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
-       _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
-       _commit = commit ?? Commit(ggLog: ggLog),
-       state = state ?? GgState(ggLog: ggLog),
-       _addToChangeLog = addToChangeLog ?? cl.Add(ggLog: ggLog) {
+    CommitMessageCommand? commitMessageCommand,
+  })  : _processWrapper = processWrapper,
+        _isGitCommitted = isCommitted ?? IsCommitted(ggLog: ggLog),
+        _canCommit = canCommit ?? CanCommit(ggLog: ggLog),
+        _commit = commit ?? Commit(ggLog: ggLog),
+        state = state ?? GgState(ggLog: ggLog),
+        _addToChangeLog = addToChangeLog ?? cl.Add(ggLog: ggLog),
+        _commitMessageCommand =
+            commitMessageCommand ?? CommitMessageCommand(ggLog: ggLog) {
     _addParam();
   }
 
@@ -67,14 +71,15 @@ class DoCommit extends DirCommand<void> {
     cl.LogType? logType,
     bool? updateChangeLog,
     bool? force,
-  }) => get(
-    directory: directory,
-    ggLog: ggLog,
-    message: message,
-    logType: logType,
-    updateChangeLog: updateChangeLog,
-    force: force,
-  );
+  }) =>
+      get(
+        directory: directory,
+        ggLog: ggLog,
+        message: message,
+        logType: logType,
+        updateChangeLog: updateChangeLog,
+        force: force,
+      );
 
   // ...........................................................................
   @override
@@ -112,18 +117,29 @@ class DoCommit extends DirCommand<void> {
       }
     }
 
-    // Check needed options
-    try {
-      message ??= _getMessageFromArgs();
-      logType ??= _getLogTypeFromMessage(message);
-    } catch (e) {
-      // type and message are only needed when there are uncommitted changes.
-      if (!isCommittedViaGit) {
-        rethrow;
-      } else {
-        logType = cl.LogType.changed;
-        message = '';
+    // Determine commit message and log type.
+    if (!isCommittedViaGit) {
+      // No message passed in programmatically? Try CLI args first.
+      if (message == null) {
+        final argMessage = _getMessageFromArgs();
+        if (argMessage != null) {
+          message = argMessage;
+        } else {
+          // No message provided at all -> use AI-generated commit message.
+          message = await _generateCommitMessage(
+            directory: directory,
+            ggLog: ggLog,
+          );
+        }
       }
+
+      // Infer log type if not provided.
+      logType ??= _getLogTypeFromMessage(message);
+    } else {
+      // Everything is already committed.
+      // Message is optional in this case and only used for logging.
+      message ??= '';
+      logType ??= cl.LogType.changed;
     }
 
     final repoUrl = await _repositoryUrl(directory);
@@ -139,7 +155,7 @@ class DoCommit extends DirCommand<void> {
       await _writeMessageIntoChangeLog(
         directory: directory,
         message: message,
-        logType: logType,
+        logType: logType!,
         repoUrl: repoUrl,
         commit: isCommittedViaGit,
       );
@@ -150,7 +166,7 @@ class DoCommit extends DirCommand<void> {
       await gitAddAndCommit(
         directory: directory,
         message: message,
-        logType: logType,
+        logType: logType!,
       );
       ggLog(yellow('Checks successful. Commit successful.'));
     } else {
@@ -188,6 +204,7 @@ class DoCommit extends DirCommand<void> {
   final CanCommit _canCommit;
   final Commit _commit;
   final cl.Add _addToChangeLog;
+  final CommitMessageCommand _commitMessageCommand;
 
   // ...........................................................................
   void _addParam() {
@@ -253,6 +270,24 @@ class DoCommit extends DirCommand<void> {
   }
 
   // ...........................................................................
+  Future<String> _generateCommitMessage({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    final generated = await _commitMessageCommand.get(
+      directory: directory,
+      ggLog: ggLog,
+      interactive: false,
+    );
+
+    if (generated == null || generated.trim().isEmpty) {
+      throw Exception(helpOnMissingMessage);
+    }
+
+    return generated.trim();
+  }
+
+  // ...........................................................................
   cl.LogType _getLogTypeFromMessage(String message) {
     try {
       return _stringToLogType(message);
@@ -262,10 +297,10 @@ class DoCommit extends DirCommand<void> {
   }
 
   // ...........................................................................
-  String _getMessageFromArgs() {
-    final String message = (argResults?['message'] ?? '') as String;
+  String? _getMessageFromArgs() {
+    final message = (argResults?['message'] ?? '') as String;
     if (message.isEmpty) {
-      throw Exception(helpOnMissingMessage);
+      return null;
     }
 
     return message;
@@ -274,9 +309,9 @@ class DoCommit extends DirCommand<void> {
   // ...........................................................................
   Future<String> _repositoryUrl(Directory directory) async {
     final pubspec = await File('${directory.path}/pubspec.yaml').readAsString();
-    RegExp regExp = RegExp(r'^\s*repository:\s*(.+)$', multiLine: true);
-    Match? match = regExp.firstMatch(pubspec);
-    String? repositoryUrl = match?.group(1)?.replaceAll(RegExp(r'/$'), '');
+    final regExp = RegExp(r'^\s*repository:\s*(.+)$', multiLine: true);
+    final match = regExp.firstMatch(pubspec);
+    final repositoryUrl = match?.group(1)?.replaceAll(RegExp(r'/$'), '');
     if (repositoryUrl == null) {
       throw Exception('No »repository:« found in pubspec.yaml');
     }
@@ -338,6 +373,6 @@ class DoCommit extends DirCommand<void> {
   }
 }
 
-// .............................................................................
+// ............................................................................
 /// Mock for [DoCommit].
 class MockDoCommit extends MockDirCommand<void> implements DoCommit {}

@@ -8,12 +8,15 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/commands/do/do_commit.dart';
+import 'package:gg_ai_commit_message/src/commands/commit_message.dart';
 import 'package:gg_changelog/gg_changelog.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class MockCommitMessageCommand extends Mock implements CommitMessageCommand {}
 
 void main() {
   late Directory d;
@@ -23,6 +26,7 @@ void main() {
   late CommandRunner<void> runner;
 
   late CanCommit canCommit;
+  late CommitMessageCommand commitMessageCommand;
 
   // ...........................................................................
   void mockCanCommit() {
@@ -35,6 +39,16 @@ void main() {
         force: null,
       ),
     ).thenAnswer((_) => Future.value());
+  }
+
+  void mockCommitMessageCommand() {
+    when(
+      () => commitMessageCommand.get(
+        directory: any(named: 'directory'),
+        ggLog: any(named: 'ggLog'),
+        interactive: any(named: 'interactive'),
+      ),
+    ).thenAnswer((_) async => 'AI commit message');
   }
 
   // ...........................................................................
@@ -64,8 +78,15 @@ void main() {
     canCommit = MockCanCommit();
     mockCanCommit();
 
+    commitMessageCommand = MockCommitMessageCommand();
+    mockCommitMessageCommand();
+
     // Create command
-    doCommit = DoCommit(ggLog: ggLog, canCommit: canCommit);
+    doCommit = DoCommit(
+      ggLog: ggLog,
+      canCommit: canCommit,
+      commitMessageCommand: commitMessageCommand,
+    );
 
     // Create runner
     runner = CommandRunner<void>('test', 'test');
@@ -175,6 +196,7 @@ void main() {
                   'commit',
                   '-i',
                   d.path,
+                  'add',
                   '-m',
                   'add My very special commit message',
                 ]);
@@ -319,31 +341,35 @@ void main() {
         });
 
         group('when no commit message and no log type is provided', () {
-          test('but everything is already committed', () async {
+          test('and there are uncommitted changes', () async {
             // Add uncommitted file
             await addFileWithoutCommitting(d);
 
-            // Execute command without messsage and log type.
-            // It should fail, because we have uncommitted changes
-            late String exception;
+            // Execute command without message and log type.
+            await doCommit.exec(
+              directory: d,
+              ggLog: ggLog,
+              message: null,
+              logType: null,
+            );
 
-            try {
-              await doCommit.exec(
-                directory: d,
-                ggLog: ggLog,
-                message: null,
-                logType: null,
-              );
-            } catch (e) {
-              exception = e.toString();
-            }
-            expect(exception, contains(doCommit.helpOnMissingMessage));
+            // Commit should have been performed with AI generated message.
+            expect(
+              messages.last,
+              yellow('Checks successful. Commit successful.'),
+            );
 
-            // Commit everything.
-            // Run the command again without message and log type.
-            // It should succeed, because everything is already committed.
-            await commitFile(d, sampleFileName, message: 'Message');
+            verify(
+              () => commitMessageCommand.get(
+                directory: any(named: 'directory'),
+                ggLog: any(named: 'ggLog'),
+                interactive: false,
+              ),
+            ).called(1);
+          });
 
+          test('and everything is already committed', () async {
+            // Everything already committed here
             await doCommit.exec(
               directory: d,
               ggLog: ggLog,
@@ -354,6 +380,14 @@ void main() {
             expect(
               messages.last,
               yellow('Checks successful. Nothing to commit.'),
+            );
+
+            verifyNever(
+              () => commitMessageCommand.get(
+                directory: any(named: 'directory'),
+                ggLog: any(named: 'ggLog'),
+                interactive: any(named: 'interactive'),
+              ),
             );
           });
         });
@@ -383,6 +417,7 @@ void main() {
             ggLog: ggLog,
             canCommit: canCommit,
             processWrapper: processWrapper,
+            commitMessageCommand: commitMessageCommand,
           );
 
           late String exception;
@@ -432,6 +467,7 @@ void main() {
             ggLog: ggLog,
             canCommit: canCommit,
             processWrapper: processWrapper,
+            commitMessageCommand: commitMessageCommand,
           );
 
           late String exception;
@@ -454,23 +490,40 @@ void main() {
           // Add an uncommitted file
           await addFileWithoutCommitting(d);
 
-          // Execute the command
-          final doCommit = DoCommit(ggLog: ggLog, canCommit: canCommit);
+          final aiMock = MockCommitMessageCommand();
+          when(
+            () => aiMock.get(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+              interactive: any(named: 'interactive'),
+            ),
+          ).thenAnswer((_) async => 'AI commit message');
 
-          late String exception;
+          final doCommit = DoCommit(
+            ggLog: ggLog,
+            canCommit: canCommit,
+            commitMessageCommand: aiMock,
+          );
 
-          try {
-            await doCommit.exec(
-              directory: d,
-              ggLog: ggLog,
-              message: null, // no message
-              logType: LogType.added,
-            );
-          } catch (e) {
-            exception = e.toString();
-          }
+          await doCommit.exec(
+            directory: d,
+            ggLog: ggLog,
+            message: null, // no message
+            logType: LogType.added,
+          );
 
-          expect(exception, 'Exception: ${doCommit.helpOnMissingMessage}');
+          expect(
+            messages.last,
+            yellow('Checks successful. Commit successful.'),
+          );
+
+          verify(
+            () => aiMock.get(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+              interactive: false,
+            ),
+          ).called(1);
         });
 
         test('when pubspec.yaml does not contain a repo URL', () async {
