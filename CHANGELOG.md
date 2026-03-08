@@ -2,7 +2,7 @@
 
 ### Changed
 
-## [Unreleased]
+## [4.0.7] - 2026-03-08
 
 ### Added
 
@@ -13,6 +13,10 @@
 
 - move .gg.json to .gg/.gg.json and update related code/tests
 - Refactor do\_publish to add version selector and local merge step
+
+### Fixed
+
+- Fix copy right header in auto created Test files
 
 ## [4.0.6] - 2026-01-20
 
@@ -378,7 +382,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/4.0.6...HEAD
+[4.0.7]: https://github.com/inlavigo/gg/compare/4.0.6...4.0.7
 [4.0.6]: https://github.com/inlavigo/gg/compare/4.0.5...4.0.6
 [4.0.5]: https://github.com/inlavigo/gg/compare/4.0.4...4.0.5
 [4.0.4]: https://github.com/inlavigo/gg/compare/4.0.3...4.0.4
