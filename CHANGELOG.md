@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [Unreleased]
+
+### Changed
+
+- Change commit message to 'Finish development of version X'
+
 ## [5.0.0] - 2026-03-16
 
 ### Added
@@ -396,6 +402,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/5.0.0...HEAD
 [5.0.0]: https://github.com/inlavigo/gg/compare/4.0.7...5.0.0
 [4.0.7]: https://github.com/inlavigo/gg/compare/4.0.6...4.0.7
 [4.0.6]: https://github.com/inlavigo/gg/compare/4.0.5...4.0.6

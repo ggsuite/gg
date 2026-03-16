@@ -247,7 +247,7 @@ class DoPublish extends DirCommand<void> {
       ggLog: ggLog,
       directory: directory,
       doStage: true,
-      message: 'Prepare development of version $newVersion',
+      message: 'Finish development of version $newVersion',
       ammendWhenNotPushed: false,
     );
   }

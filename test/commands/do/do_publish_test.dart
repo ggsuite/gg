@@ -262,7 +262,7 @@ void main() {
                         ).get(directory: d, ggLog: ggLog);
                         expect(
                           headMessage,
-                          'Prepare development of version 1.2.4',
+                          'Finish development of version 1.2.4',
                         );
 
                         // Was .gg/.gg.json updated in a way that didCommit,
@@ -421,7 +421,7 @@ void main() {
               final headMessage = await HeadMessage(
                 ggLog: ggLog,
               ).get(directory: d, ggLog: ggLog);
-              expect(headMessage, 'Prepare development of version 1.0.2');
+              expect(headMessage, 'Finish development of version 1.0.2');
 
               // Was .gg/.gg.json updated in a way that didCommit,
               // didPush and didPublish return true?
