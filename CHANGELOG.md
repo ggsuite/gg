@@ -2,7 +2,7 @@
 
 ### Changed
 
-## [Unreleased]
+## [5.0.0] - 2026-03-16
 
 ### Added
 
@@ -396,7 +396,7 @@
 
 - Initial version
 
-[Unreleased]: https://github.com/inlavigo/gg/compare/4.0.7...HEAD
+[5.0.0]: https://github.com/inlavigo/gg/compare/4.0.7...5.0.0
 [4.0.7]: https://github.com/inlavigo/gg/compare/4.0.6...4.0.7
 [4.0.6]: https://github.com/inlavigo/gg/compare/4.0.5...4.0.6
 [4.0.5]: https://github.com/inlavigo/gg/compare/4.0.4...4.0.5
