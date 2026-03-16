@@ -114,7 +114,7 @@ void main() {
 
     // Setup a pubspec.yaml and a CHANGELOG.md with right versions
     await File(join(d.path, 'pubspec.yaml')).writeAsString(
-      'name: gg\n\nversion: 1.2.4\n'
+      'name: gg\n\nversion: 1.2.3\n'
       'repository: https://github.com/inlavigo/gg.git',
     );
 
@@ -174,6 +174,7 @@ void main() {
         publishedVersion: publishedVersion,
       ),
       versionSelector: versionSelector,
+      publishedVersion: publishedVersion,
     );
 
     await makeLastStateSuccessful();
@@ -212,6 +213,8 @@ void main() {
                           success: true,
                           askBeforePublishing: true,
                         );
+                        publishedVersionValue = Version(1, 2, 3);
+                        mockPublishedVersion();
 
                         // Mock needing publish
                         await DirectJson.writeFile(
@@ -241,7 +244,7 @@ void main() {
                           messages[i++],
                           contains('Publishing was successful.'),
                         );
-                        expect(messages[i++], contains('✅ Tag 1.2.5 added.'));
+                        expect(messages[i++], contains('✅ Tag 1.2.4 added.'));
 
                         // Was a new version created?
                         final pubspec = await File(
@@ -250,8 +253,8 @@ void main() {
                         final changeLog = await File(
                           join(d.path, 'CHANGELOG.md'),
                         ).readAsString();
-                        expect(pubspec, contains('version: 1.2.5'));
-                        expect(changeLog, contains('## [1.2.5] -'));
+                        expect(pubspec, contains('version: 1.2.4'));
+                        expect(changeLog, contains('## [1.2.4] -'));
 
                         // Was the new version checked in?
                         final headMessage = await HeadMessage(
@@ -259,7 +262,7 @@ void main() {
                         ).get(directory: d, ggLog: ggLog);
                         expect(
                           headMessage,
-                          'Prepare development of version 1.2.5',
+                          'Prepare development of version 1.2.4',
                         );
 
                         // Was .gg/.gg.json updated in a way that didCommit,
@@ -491,7 +494,11 @@ void main() {
 
     test('should have a code coverage of 100%', () {
       expect(
-        DoPublish(ggLog: ggLog, versionSelector: versionSelector),
+        DoPublish(
+          ggLog: ggLog,
+          versionSelector: versionSelector,
+          publishedVersion: publishedVersion,
+        ),
         isNotNull,
       );
     });

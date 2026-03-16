@@ -15,6 +15,7 @@ import 'package:gg_log/gg_log.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:gg_version/gg_version.dart';
 import 'package:path/path.dart';
+import 'package:pub_semver/pub_semver.dart';
 
 /// Publishes the current directory.
 class DoPublish extends DirCommand<void> {
@@ -36,6 +37,7 @@ class DoPublish extends DirCommand<void> {
     PublishTo? publishTo,
     DoMerge? doMerge,
     VersionSelector? versionSelector,
+    PublishedVersion? publishedVersion,
     // coverage:ignore-start
   }) : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
        _publishToPubDev = publish ?? Publish(ggLog: ggLog),
@@ -50,7 +52,8 @@ class DoPublish extends DirCommand<void> {
        _isPublished = isPublished ?? IsPublished(ggLog: ggLog),
        _publishTo = publishTo ?? PublishTo(ggLog: ggLog),
        _doMerge = doMerge ?? DoMerge(ggLog: ggLog),
-       _versionSelector = versionSelector ?? VersionSelector() {
+       _versionSelector = versionSelector ?? VersionSelector(),
+       _publishedVersion = publishedVersion ?? PublishedVersion(ggLog: ggLog) {
     // coverage:ignore-end
     _addArgs();
   }
@@ -172,6 +175,7 @@ class DoPublish extends DirCommand<void> {
   final PublishTo _publishTo;
   final DoMerge _doMerge;
   final VersionSelector _versionSelector;
+  final PublishedVersion _publishedVersion;
 
   // ...........................................................................
   Future<void> _prepareChangelog({
@@ -213,9 +217,11 @@ class DoPublish extends DirCommand<void> {
       ggLog: ggLog,
     );
 
-    // Get current version from pubspec.yaml
-    final currentVersion = await _fromPubspec.fromDirectory(
+    // Prefer the published version. If the package was never published,
+    // fall back to the version from pubspec.yaml.
+    final currentVersion = await _currentVersionForIncrementSelection(
       directory: directory,
+      ggLog: ggLog,
     );
 
     // Let the user select the desired increment.
@@ -244,6 +250,24 @@ class DoPublish extends DirCommand<void> {
       message: 'Prepare development of version $newVersion',
       ammendWhenNotPushed: false,
     );
+  }
+
+  // ...........................................................................
+  /// Resolve the version used as baseline for selecting the next increment.
+  Future<Version> _currentVersionForIncrementSelection({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    final publishedVersion = await _publishedVersion.get(
+      ggLog: ggLog,
+      directory: directory,
+    );
+
+    if (publishedVersion != Version(0, 0, 0)) {
+      return publishedVersion;
+    }
+
+    return _fromPubspec.fromDirectory(directory: directory);
   }
 
   // ...........................................................................

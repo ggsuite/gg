@@ -87,14 +87,13 @@ void main() {
   // ...........................................................................
   group('CanPublish', () {
     group('run()', () {
-      test('should run the sub commands', () async {
+      test('should run the sub commands except IsVersionPrepared', () async {
         mockCommands();
         await canPublish.exec(directory: d, ggLog: ggLog);
         var count = 0;
         expect(messages[count++], yellow('Can publish?'));
         expect(messages[count++], contains('Current branch is feature branch'));
         expect(messages[count++], contains('Current branch is feature branch'));
-        expect(messages[count++], 'isVersionPrepared');
         expect(messages[count++], contains('⌛️ CHANGELOG.md has right format'));
         expect(messages[count++], contains('✅ CHANGELOG.md has right format'));
         expect(messages[count++], 'didCommit');

@@ -2,6 +2,20 @@
 
 ### Changed
 
+## [Unreleased]
+
+### Added
+
+- Add do\_checkout command to support branch checkout with stash
+
+### Changed
+
+- Apply git stash if checkout fails and rethrow the error
+
+### Removed
+
+- Remove IsVersionPrepared check from CanPublish command flow
+
 ## [4.0.7] - 2026-03-08
 
 ### Added
@@ -382,6 +396,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/4.0.7...HEAD
 [4.0.7]: https://github.com/inlavigo/gg/compare/4.0.6...4.0.7
 [4.0.6]: https://github.com/inlavigo/gg/compare/4.0.5...4.0.6
 [4.0.5]: https://github.com/inlavigo/gg/compare/4.0.4...4.0.5

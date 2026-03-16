@@ -27,6 +27,7 @@ export 'src/commands/did/did_push.dart';
 export 'src/commands/did/did_upgrade.dart';
 // Do
 export 'src/commands/do.dart';
+export 'src/commands/do/do_checkout.dart';
 export 'src/commands/do/do_commit.dart';
 export 'src/commands/do/do_maintain.dart';
 export 'src/commands/do/do_merge.dart';
