@@ -19,6 +19,7 @@ void main() {
   final ggLog = messages.add;
   late CommandRunner<void> runner;
   late DoCheckout doCheckout;
+  late MockCanCheckout canCheckout;
   late MockIsPushed isPushed;
   late MockGgProcessWrapper processWrapper;
 
@@ -26,10 +27,13 @@ void main() {
     messages.clear();
     d = await Directory.systemTemp.createTemp();
     registerFallbackValue(d);
+    canCheckout = MockCanCheckout();
     isPushed = MockIsPushed();
     processWrapper = MockGgProcessWrapper();
+    canCheckout.mockExec(result: null, directory: d, ggLog: ggLog);
     doCheckout = DoCheckout(
       ggLog: ggLog,
+      canCheckout: canCheckout,
       isPushed: isPushed,
       processWrapper: processWrapper,
     );
@@ -51,6 +55,28 @@ void main() {
   }
 
   group('DoCheckout', () {
+    test('should execute CanCheckout before git commands', () async {
+      when(
+        () => isPushed.get(
+          directory: d,
+          ggLog: ggLog,
+          ignoreUnCommittedChanges: true,
+        ),
+      ).thenAnswer((_) async => true);
+
+      mockGitCommand(['stash']);
+      mockGitCommand(['checkout', '-b', 'feat_test']);
+      mockGitCommand(['stash', 'apply']);
+
+      await doCheckout.exec(
+        directory: d,
+        ggLog: ggLog,
+        branchName: 'feat_test',
+      );
+
+      verify(() => canCheckout.exec(directory: d, ggLog: ggLog)).called(1);
+    });
+
     test('should reset soft when unpushed commits exist', () async {
       when(
         () => isPushed.get(
@@ -71,6 +97,7 @@ void main() {
         branchName: 'feat_test',
       );
 
+      verify(() => canCheckout.exec(directory: d, ggLog: ggLog)).called(1);
       verify(
         () => isPushed.get(
           directory: d,
@@ -122,6 +149,7 @@ void main() {
         branchName: 'feat_test',
       );
 
+      verify(() => canCheckout.exec(directory: d, ggLog: ggLog)).called(1);
       verifyNever(
         () => processWrapper.run('git', [
           'reset',
@@ -151,7 +179,7 @@ void main() {
       when(
         () => isPushed.get(
           directory: any(named: 'directory'),
-          ggLog: ggLog,
+          ggLog: any(named: 'ggLog'),
           ignoreUnCommittedChanges: true,
         ),
       ).thenAnswer((_) async => true);
@@ -203,6 +231,7 @@ void main() {
         ),
       );
 
+      verify(() => canCheckout.exec(directory: d, ggLog: ggLog)).called(1);
       verify(
         () => processWrapper.run('git', ['stash'], workingDirectory: d.path),
       ).called(1);
@@ -219,6 +248,39 @@ void main() {
           'apply',
         ], workingDirectory: d.path),
       ).called(1);
+    });
+
+    test('should throw when CanCheckout fails', () async {
+      canCheckout.mockExec(
+        result: null,
+        directory: d,
+        ggLog: ggLog,
+        doThrow: true,
+        message: 'Cannot checkout.',
+      );
+
+      await expectLater(
+        () => doCheckout.exec(
+          directory: d,
+          ggLog: ggLog,
+          branchName: 'feat_test',
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'toString()',
+            contains('Cannot checkout.'),
+          ),
+        ),
+      );
+
+      verifyNever(
+        () => processWrapper.run(
+          'git',
+          any(),
+          workingDirectory: any(named: 'workingDirectory'),
+        ),
+      );
     });
 
     test('should throw when stash fails', () async {

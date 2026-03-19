@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [Unreleased]
+
+### Fixed
+
+- Fix mock param in do\_checkout\_test and update checkout error check
+
 ## [5.0.1] - 2026-03-16
 
 ### Changed
@@ -402,6 +408,7 @@
 
 - Initial version
 
+[Unreleased]: https://github.com/inlavigo/gg/compare/5.0.1...HEAD
 [5.0.1]: https://github.com/inlavigo/gg/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/inlavigo/gg/compare/4.0.7...5.0.0
 [4.0.7]: https://github.com/inlavigo/gg/compare/4.0.6...4.0.7

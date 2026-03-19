@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) 2025 Göran Hegenberg. All Rights Reserved.
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -8,6 +8,7 @@ library;
 
 // Can
 export 'src/commands/can.dart';
+export 'src/commands/can/can_checkout.dart';
 export 'src/commands/can/can_commit.dart';
 export 'src/commands/can/can_merge.dart';
 export 'src/commands/can/can_publish.dart';

@@ -6,6 +6,7 @@
 
 import 'dart:io';
 
+import 'package:gg/gg.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
@@ -18,15 +19,18 @@ class DoCheckout extends DirCommand<void> {
     required super.ggLog,
     super.name = 'checkout',
     super.description = 'Checks out a new branch and reapplies local changes.',
+    CanCheckout? canCheckout,
     IsPushed? isPushed,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     // coverage:ignore-start
-  }) : _isPushed = isPushed ?? IsPushed(ggLog: ggLog),
+  }) : _canCheckout = canCheckout ?? CanCheckout(ggLog: ggLog),
+       _isPushed = isPushed ?? IsPushed(ggLog: ggLog),
        _processWrapper = processWrapper {
     // coverage:ignore-end
     _addArgs();
   }
 
+  final CanCheckout _canCheckout;
   final IsPushed _isPushed;
   final GgProcessWrapper _processWrapper;
 
@@ -45,6 +49,8 @@ class DoCheckout extends DirCommand<void> {
   }) async {
     await check(directory: directory);
     branchName ??= _branchNameFromArgs();
+
+    await _canCheckout.exec(directory: directory, ggLog: ggLog);
 
     final hasNoUnpushedCommits = await _isPushed.get(
       directory: directory,
