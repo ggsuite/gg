@@ -11,6 +11,7 @@ import 'package:gg_args/gg_args.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
+import 'package:gg_status_printer/gg_status_printer.dart';
 
 /// Checks out a new branch while preserving local changes.
 class DoCheckout extends DirCommand<void> {
@@ -52,13 +53,55 @@ class DoCheckout extends DirCommand<void> {
 
     await _canCheckout.exec(directory: directory, ggLog: ggLog);
 
-    final hasNoUnpushedCommits = await _isPushed.get(
+    await GgStatusPrinter<void>(
+      message: 'stash changes and do checkout',
+      ggLog: ggLog,
+    ).logTask(
+      task: () async {
+        await _stashChangesAndCheckout(
+          directory: directory,
+          ggLog: ggLog,
+          branchName: branchName!,
+        );
+      },
+      success: (_) => true,
+    );
+  }
+
+  /// Adds CLI arguments for the command.
+  void _addArgs() {
+    argParser.addOption(
+      'branch-name',
+      abbr: 'b',
+      help: 'The name of the branch to create and check out.',
+    );
+  }
+
+  /// Returns the branch name from CLI arguments or throws if it is missing.
+  String _branchNameFromArgs() {
+    final branchName = argResults?['branch-name'] as String? ?? '';
+    if (branchName.isEmpty) {
+      throw Exception(
+        'Missing branch name. Run again with --branch-name <branch_name>.',
+      );
+    }
+
+    return branchName;
+  }
+
+  /// Stashes local changes, performs the checkout, and reapplies the stash.
+  Future<void> _stashChangesAndCheckout({
+    required Directory directory,
+    required GgLog ggLog,
+    required String branchName,
+  }) async {
+    final everythingIsPushed = await _isPushed.get(
       directory: directory,
       ggLog: ggLog,
       ignoreUnCommittedChanges: true,
     );
 
-    if (!hasNoUnpushedCommits) {
+    if (!everythingIsPushed) {
       await _runGitCommand(
         directory: directory,
         args: ['reset', '--soft', 'origin/main'],
@@ -92,27 +135,6 @@ class DoCheckout extends DirCommand<void> {
       args: ['stash', 'apply'],
       errorMessage: 'git stash apply failed',
     );
-  }
-
-  /// Adds CLI arguments for the command.
-  void _addArgs() {
-    argParser.addOption(
-      'branch-name',
-      abbr: 'b',
-      help: 'The name of the branch to create and check out.',
-    );
-  }
-
-  /// Returns the branch name from CLI arguments or throws if it is missing.
-  String _branchNameFromArgs() {
-    final branchName = argResults?['branch-name'] as String? ?? '';
-    if (branchName.isEmpty) {
-      throw Exception(
-        'Missing branch name. Run again with --branch-name <branch_name>.',
-      );
-    }
-
-    return branchName;
   }
 
   /// Executes a git command and throws when it fails.

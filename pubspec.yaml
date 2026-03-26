@@ -1,6 +1,6 @@
 name: gg
 description: A collection of checks and actions like analyzing, linting, testing, code coverage, committing, pushing, publishing.
-version: 5.1.0
+version: 6.0.0
 repository: https://github.com/inlavigo/gg.git
 
 environment:
@@ -30,7 +30,7 @@ dependencies:
   gg_is_github: ^1.0.6
   matcher: ^0.12.19
   gg_direct_json: ^2.0.1
-  gg_merge: ^1.0.3
+  gg_merge: ^1.0.4
   interact: ^2.2.0
 
 dev_dependencies:
