@@ -2,6 +2,13 @@
 
 ### Changed
 
+## [6.0.0] - 2026-03-26
+
+### Changed
+
+- Refactor do\_publish to use gitPush with pushTags and update tests
+- Wrap checkout logic in status printer for progress output
+
 ## [5.1.0] - 2026-03-19
 
 ### Fixed
@@ -408,6 +415,7 @@
 
 - Initial version
 
+[6.0.0]: https://github.com/inlavigo/gg/compare/5.1.0...6.0.0
 [5.1.0]: https://github.com/inlavigo/gg/compare/5.0.1...5.1.0
 [5.0.1]: https://github.com/inlavigo/gg/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/inlavigo/gg/compare/4.0.7...5.0.0

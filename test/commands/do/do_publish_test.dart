@@ -228,7 +228,6 @@ void main() {
                           directory: d,
                           ggLog: ggLog,
                           askBeforePublishing: ask,
-                          addVersionTag: true,
                         );
 
                         // Were the steps performed?
@@ -260,10 +259,7 @@ void main() {
                         final headMessage = await HeadMessage(
                           ggLog: ggLog,
                         ).get(directory: d, ggLog: ggLog);
-                        expect(
-                          headMessage,
-                          'Finish development of version 1.2.4',
-                        );
+                        expect(headMessage, 'Merged feat_abc into main');
 
                         // Was .gg/.gg.json updated in a way that didCommit,
                         // didPush and didPublish return true?
@@ -373,11 +369,10 @@ void main() {
 
               // Prepare pubspec.yaml
               final pubspecFile = File(join(d.path, 'pubspec.yaml'));
-              const nextVersion = '1.0.1';
-              const currentVersion = '1.0.0';
+              const currentVersion = '1.0.1';
               await addAndCommitVersions(
                 d,
-                pubspec: nextVersion,
+                pubspec: currentVersion,
                 changeLog: 'Unreleased',
                 gitHead: currentVersion,
                 appendToPubspec: '\npublish_to: none', // No publish to pub.dev
@@ -395,11 +390,7 @@ void main() {
               );
 
               // Publish
-              await doPublish.exec(
-                directory: d,
-                ggLog: ggLog,
-                addVersionTag: true,
-              );
+              await doPublish.exec(directory: d, ggLog: ggLog);
 
               // Were the steps performed?
               var i = 0;
@@ -421,7 +412,7 @@ void main() {
               final headMessage = await HeadMessage(
                 ggLog: ggLog,
               ).get(directory: d, ggLog: ggLog);
-              expect(headMessage, 'Finish development of version 1.0.2');
+              expect(headMessage, 'Merged feat_abc into main');
 
               // Was .gg/.gg.json updated in a way that didCommit,
               // didPush and didPublish return true?
@@ -467,7 +458,6 @@ void main() {
                   directory: d,
                   ggLog: ggLog,
                   askBeforePublishing: false,
-                  addVersionTag: true,
                 );
               } catch (e) {
                 exception = e.toString();

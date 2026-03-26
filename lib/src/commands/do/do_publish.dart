@@ -58,8 +58,20 @@ class DoPublish extends DirCommand<void> {
     _addArgs();
   }
 
-  /// The key used to save the state of the command
+  /// The key used to save the state of the command.
   final String stateKey = 'doPublish';
+
+  /// The key used to save the prepared version state.
+  final String stateKeyDoPrepareVersion = 'doPrepareVersion';
+
+  /// The key used to save the pub.dev publishing state.
+  final String stateKeyDoPublishPubDev = 'doPublishPubDev';
+
+  /// The key used to save the merge state.
+  final String stateKeyDoMerge = 'doMerge';
+
+  /// The key used to save the git publishing state.
+  final String stateKeyDoPublishGit = 'doPublishGit';
 
   // ...........................................................................
   @override
@@ -67,12 +79,10 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
-    bool? addVersionTag,
   }) => get(
     directory: directory,
     ggLog: ggLog,
     askBeforePublishing: askBeforePublishing,
-    addVersionTag: addVersionTag,
   );
 
   // ...........................................................................
@@ -81,7 +91,6 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
-    bool? addVersionTag,
   }) async {
     // Does directory exist?
     await check(directory: directory);
@@ -99,61 +108,72 @@ class DoPublish extends DirCommand<void> {
       return;
     }
 
-    // Should ask before publishing?
-    askBeforePublishing = await _shouldAskBeforePublishing(
-      directory,
-      ggLog,
-      askBeforePublishing,
-    );
-
     // Can publish?
     await _canPublish.exec(directory: directory, ggLog: ggLog);
 
-    // Perform local merge before publishing.
-    await _doMerge.get(
+    final didPrepareVersion = await _state.readSuccess(
       directory: directory,
-      ggLog: <String>[].add,
-      automerge: false,
-      local: true,
-      message: null,
+      key: stateKeyDoPublishPubDev,
+      ggLog: ggLog,
     );
 
-    // Increase version (interactive) before releasing the changelog.
-    await _addNextVersion(directory, ggLog);
+    if (!didPrepareVersion) {
+      await _prepareVersion(directory: directory, ggLog: ggLog, noLog: noLog);
 
-    // Publish change log using cider
-    await _prepareChangelog(directory: directory, ggLog: noLog);
+      await _state.writeSuccess(
+        directory: directory,
+        key: stateKeyDoPrepareVersion,
+      );
+    }
 
-    // Publish on pub.dev
-    final publishToPubDev = await _shouldPublishToPubDev(directory, ggLog);
+    final didPublishPubDev = await _didPublishPubDevOrVersionAlreadyPublished(
+      directory: directory,
+      ggLog: ggLog,
+    );
 
-    if (publishToPubDev) {
-      await _publishToPubDev.exec(
+    if (!didPublishPubDev) {
+      await _publishToPubDevIfNeeded(
         directory: directory,
         ggLog: ggLog,
         askBeforePublishing: askBeforePublishing,
+      );
+
+      await _state.writeSuccess(
+        directory: directory,
+        key: stateKeyDoPublishPubDev,
+      );
+    }
+
+    final didMerge = await _state.readSuccess(
+      directory: directory,
+      key: stateKeyDoMerge,
+      ggLog: ggLog,
+    );
+
+    if (!didMerge) {
+      await _merge(directory: directory);
+
+      await _state.writeSuccess(directory: directory, key: stateKeyDoMerge);
+    }
+
+    final didPublishGit = await _state.readSuccess(
+      directory: directory,
+      key: stateKeyDoPublishGit,
+      ggLog: ggLog,
+    );
+
+    if (!didPublishGit) {
+      await _publishGit(directory: directory, ggLog: ggLog);
+
+      await _state.writeSuccess(
+        directory: directory,
+        key: stateKeyDoPublishGit,
       );
     }
 
     // Save state
     await _state.writeSuccess(directory: directory, key: stateKey);
 
-    // Push commits to remote
-    await _doPush.exec(
-      directory: directory,
-      ggLog: (_) {}, // coverage:ignore-line
-      force: false,
-    );
-
-    // Add git version tag
-    if (addVersionTag ?? _shouldAddVersionTag) {
-      await _addVersionTag.exec(
-        directory: directory,
-        ggLog: (msg) => ggLog('✅ $msg'),
-      );
-    }
-
-    // Push tags to remote
     await _doPush.gitPush(directory: directory, force: false, pushTags: true);
   }
 
@@ -176,6 +196,104 @@ class DoPublish extends DirCommand<void> {
   final DoMerge _doMerge;
   final VersionSelector _versionSelector;
   final PublishedVersion _publishedVersion;
+
+  // ...........................................................................
+  /// Returns true when pub.dev publishing was already completed or is obsolete.
+  Future<bool> _didPublishPubDevOrVersionAlreadyPublished({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    final didPublishPubDev = await _state.readSuccess(
+      directory: directory,
+      key: stateKeyDoPublishPubDev,
+      ggLog: ggLog,
+    );
+
+    if (didPublishPubDev) {
+      return true;
+    }
+
+    final currentVersion = await _fromPubspec.get(
+      directory: directory,
+      ggLog: <String>[].add,
+    );
+    try {
+      final publishedVersion = await _publishedVersion.get(
+        directory: directory,
+        ggLog: <String>[].add,
+      );
+
+      return currentVersion == publishedVersion;
+      // coverage:ignore-start
+    } catch (e) {
+      ggLog(yellow('$e'));
+      ggLog(yellow('Assuming that the package is not published on pub.dev'));
+
+      return false;
+    }
+    // coverage:ignore-end
+  }
+
+  // ...........................................................................
+  /// Prepare the next version and release the changelog.
+  Future<void> _prepareVersion({
+    required Directory directory,
+    required GgLog ggLog,
+    required GgLog noLog,
+  }) async {
+    await _addNextVersion(directory, ggLog);
+    await _prepareChangelog(directory: directory, ggLog: noLog);
+  }
+
+  // ...........................................................................
+  /// Publish to pub.dev when the package should be published there.
+  Future<void> _publishToPubDevIfNeeded({
+    required Directory directory,
+    required GgLog ggLog,
+    required bool? askBeforePublishing,
+  }) async {
+    final publishToPubDev = await _shouldPublishToPubDev(directory, ggLog);
+
+    if (!publishToPubDev) {
+      return;
+    }
+
+    final shouldAskBeforePublishing = await _shouldAskBeforePublishing(
+      directory,
+      ggLog,
+      askBeforePublishing,
+    );
+
+    await _publishToPubDev.exec(
+      directory: directory,
+      ggLog: ggLog,
+      askBeforePublishing: shouldAskBeforePublishing,
+    );
+  }
+
+  // ...........................................................................
+  /// Perform the local merge and push commits afterwards.
+  Future<void> _merge({required Directory directory}) async {
+    await _doMerge.get(
+      directory: directory,
+      ggLog: <String>[].add,
+      automerge: false,
+      local: true,
+      message: null,
+    );
+  }
+
+  // ...........................................................................
+  /// Add the version tag and push tags to the remote.
+  Future<void> _publishGit({
+    required Directory directory,
+    required GgLog ggLog,
+  }) async {
+    await _addVersionTag.exec(
+      directory: directory,
+      ggLog: (msg) => ggLog('✅ $msg'),
+    );
+  }
 
   // ...........................................................................
   Future<void> _prepareChangelog({
@@ -326,10 +444,6 @@ class DoPublish extends DirCommand<void> {
       argResults?['ask-before-publishing'] as bool? ?? true;
 
   // ...........................................................................
-  bool get _shouldAddVersionTag =>
-      argResults?['add-version-tag'] as bool? ?? false;
-
-  // ...........................................................................
   bool get _shouldIncreaseVersion =>
       argResults?['increase-version'] as bool? ?? true;
 
@@ -339,14 +453,6 @@ class DoPublish extends DirCommand<void> {
       'ask-before-publishing',
       abbr: 'a',
       help: 'Ask for confirmation before publishing to pub.dev.',
-      defaultsTo: true,
-      negatable: true,
-    );
-
-    argParser.addFlag(
-      'add-version-tag',
-      abbr: 'v',
-      help: 'Add no version tag to git after publishing.',
       defaultsTo: true,
       negatable: true,
     );
