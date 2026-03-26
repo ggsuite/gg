@@ -174,6 +174,7 @@ class DoPublish extends DirCommand<void> {
     // Save state
     await _state.writeSuccess(directory: directory, key: stateKey);
 
+    await _doPush.gitPush(directory: directory, force: false);
     await _doPush.gitPush(directory: directory, force: false, pushTags: true);
   }
 
