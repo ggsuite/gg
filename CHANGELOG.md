@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [6.0.5] - 2026-03-27
+
+### Fixed
+
+- bugfix-closed-client
+
 ## [6.0.4] - 2026-03-27
 
 ### Changed
@@ -453,6 +459,7 @@
 
 > > > > > > > Stashed changes
 
+[6.0.5]: https://github.com/inlavigo/gg/compare/6.0.4...6.0.5
 [6.0.4]: https://github.com/inlavigo/gg/compare/6.0.3...6.0.4
 [6.0.3]: https://github.com/inlavigo/gg/compare/6.0.2...6.0.3
 [6.0.2]: https://github.com/inlavigo/gg/compare/6.0.1...6.0.2

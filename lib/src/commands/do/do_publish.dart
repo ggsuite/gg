@@ -53,7 +53,7 @@ class DoPublish extends DirCommand<void> {
        _publishTo = publishTo ?? PublishTo(ggLog: ggLog),
        _doMerge = doMerge ?? DoMerge(ggLog: ggLog),
        _versionSelector = versionSelector ?? VersionSelector(),
-       _publishedVersion = publishedVersion ?? PublishedVersion(ggLog: ggLog) {
+       _publishedVersion = publishedVersion {
     // coverage:ignore-end
     _addArgs();
   }
@@ -89,6 +89,8 @@ class DoPublish extends DirCommand<void> {
     required GgLog ggLog,
     bool? askBeforePublishing,
   }) async {
+    _publishedVersion ??= PublishedVersion(ggLog: ggLog);
+
     // Does directory exist?
     await check(directory: directory);
     void noLog(_) {} // coverage:ignore-line
@@ -182,7 +184,7 @@ class DoPublish extends DirCommand<void> {
   final PublishTo _publishTo;
   final DoMerge _doMerge;
   final VersionSelector _versionSelector;
-  final PublishedVersion _publishedVersion;
+  PublishedVersion? _publishedVersion;
 
   // ...........................................................................
   /// Returns true when pub.dev publishing was already completed or is obsolete.
@@ -205,7 +207,7 @@ class DoPublish extends DirCommand<void> {
       ggLog: <String>[].add,
     );
     try {
-      final publishedVersion = await _publishedVersion.get(
+      final publishedVersion = await _publishedVersion!.get(
         directory: directory,
         ggLog: <String>[].add,
       );
@@ -363,7 +365,7 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
   }) async {
-    final publishedVersion = await _publishedVersion.get(
+    final publishedVersion = await _publishedVersion!.get(
       ggLog: ggLog,
       directory: directory,
     );
