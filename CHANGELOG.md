@@ -2,6 +2,26 @@
 
 ### Changed
 
+## [6.0.3] - 2026-03-27
+
+# <<<<<<< Updated upstream
+
+### Changed
+
+- kidney: changed references to git
+
+### Fixed
+
+- bugfix tagging in gg do publish
+
+## [6.0.2] - 2026-03-27
+
+> > > > > > > Stashed changes
+
+### Changed
+
+- kidney: changed references to path
+
 ## [6.0.1] - 2026-03-26
 
 ### Added
@@ -421,6 +441,14 @@
 
 - Initial version
 
+# <<<<<<< Updated upstream
+
+[Unreleased](https://github.com/inlavigo/gg/compare/6.0.2...HEAD): https://github.com/inlavigo/gg/compare/6.0.1...HEAD
+
+> > > > > > > Stashed changes
+
+[6.0.3]: https://github.com/inlavigo/gg/compare/6.0.2...6.0.3
+[6.0.2]: https://github.com/inlavigo/gg/compare/6.0.1...6.0.2
 [6.0.1]: https://github.com/inlavigo/gg/compare/6.0.0...6.0.1
 [6.0.0]: https://github.com/inlavigo/gg/compare/5.1.0...6.0.0
 [5.1.0]: https://github.com/inlavigo/gg/compare/5.0.1...5.1.0

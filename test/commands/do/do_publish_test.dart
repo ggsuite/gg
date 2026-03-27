@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) 2025 Göran Hegenberg. All Rights Reserved.
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -109,7 +109,7 @@ void main() {
     await addRemoteToLocal(local: d, remote: dRemote);
     publishedVersionValue = Version.parse('1.2.3');
 
-    // Clear messagesa
+    // Clear messages
     messages.clear();
 
     // Setup a pubspec.yaml and a CHANGELOG.md with right versions
@@ -289,7 +289,7 @@ void main() {
 
                   group('has not been published before', () {
                     test('and askForConfirmation is true', () async {
-                      /// Mock that the package was never published before
+                      // Mock that the package was never published before
                       publishedVersionValue = Version(0, 0, 0);
                       mockPublishedVersion();
 
@@ -375,7 +375,7 @@ void main() {
                 pubspec: currentVersion,
                 changeLog: 'Unreleased',
                 gitHead: currentVersion,
-                appendToPubspec: '\npublish_to: none', // No publish to pub.dev
+                appendToPubspec: '\npublish_to: none',
               );
               var pubspec = await pubspecFile.readAsString();
               expect(pubspec, contains('version: 1.0.1'));
@@ -439,7 +439,7 @@ void main() {
         group('when the package is published the first time', () {
           group('has not been published before', () {
             test('and askForConfirmation is false', () async {
-              /// Mock that the package was never published before
+              // Mock that the package was never published before
               publishedVersionValue = Version(0, 0, 0);
               mockPublishedVersion();
 

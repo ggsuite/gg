@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) 2025 Göran Hegenberg. All Rights Reserved.
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -70,9 +70,6 @@ class DoPublish extends DirCommand<void> {
   /// The key used to save the merge state.
   final String stateKeyDoMerge = 'doMerge';
 
-  /// The key used to save the git publishing state.
-  final String stateKeyDoPublishGit = 'doPublishGit';
-
   // ...........................................................................
   @override
   Future<void> exec({
@@ -110,6 +107,8 @@ class DoPublish extends DirCommand<void> {
 
     // Can publish?
     await _canPublish.exec(directory: directory, ggLog: ggLog);
+
+    await _doPush.gitPush(directory: directory, force: false);
 
     final didPrepareVersion = await _state.readSuccess(
       directory: directory,
@@ -156,25 +155,12 @@ class DoPublish extends DirCommand<void> {
       await _state.writeSuccess(directory: directory, key: stateKeyDoMerge);
     }
 
-    final didPublishGit = await _state.readSuccess(
-      directory: directory,
-      key: stateKeyDoPublishGit,
-      ggLog: ggLog,
-    );
-
-    if (!didPublishGit) {
-      await _publishGit(directory: directory, ggLog: ggLog);
-
-      await _state.writeSuccess(
-        directory: directory,
-        key: stateKeyDoPublishGit,
-      );
-    }
-
     // Save state
     await _state.writeSuccess(directory: directory, key: stateKey);
 
     await _doPush.gitPush(directory: directory, force: false);
+
+    await _publishGit(directory: directory, ggLog: ggLog);
     await _doPush.gitPush(directory: directory, force: false, pushTags: true);
   }
 
