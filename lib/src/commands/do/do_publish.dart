@@ -111,6 +111,8 @@ class DoPublish extends DirCommand<void> {
     // Can publish?
     await _canPublish.exec(directory: directory, ggLog: ggLog);
 
+    await _doPush.gitPush(directory: directory, force: false);
+
     final didPrepareVersion = await _state.readSuccess(
       directory: directory,
       key: stateKeyDoPublishPubDev,
