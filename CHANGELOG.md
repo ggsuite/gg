@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [6.0.2] - 2026-03-27
+
+### Changed
+
+- Push feature branch on publish
+
 ## [6.0.1] - 2026-03-26
 
 ### Added
@@ -421,6 +427,7 @@
 
 - Initial version
 
+[6.0.2]: https://github.com/inlavigo/gg/compare/6.0.1...6.0.2
 [6.0.1]: https://github.com/inlavigo/gg/compare/6.0.0...6.0.1
 [6.0.0]: https://github.com/inlavigo/gg/compare/5.1.0...6.0.0
 [5.1.0]: https://github.com/inlavigo/gg/compare/5.0.1...5.1.0
