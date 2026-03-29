@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [6.1.0] - 2026-03-29
+
+### Added
+
+- Add message to do publish
+
 ## [6.0.5] - 2026-03-27
 
 ### Fixed
@@ -459,6 +465,7 @@
 
 > > > > > > > Stashed changes
 
+[6.1.0]: https://github.com/inlavigo/gg/compare/6.0.5...6.1.0
 [6.0.5]: https://github.com/inlavigo/gg/compare/6.0.4...6.0.5
 [6.0.4]: https://github.com/inlavigo/gg/compare/6.0.3...6.0.4
 [6.0.3]: https://github.com/inlavigo/gg/compare/6.0.2...6.0.3

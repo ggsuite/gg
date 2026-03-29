@@ -432,6 +432,31 @@ void main() {
               );
             });
           });
+
+          test('passes a custom merge message '
+              'to the final merge step', () async {
+            const customMessage = 'My custom merge message';
+
+            mockPublishIsSuccessful(success: true, askBeforePublishing: false);
+
+            await DirectJson.writeFile(
+              file: File(join(d.path, '.gg', '.gg.json')),
+              path: 'doPublish/success/hash',
+              value: needsChangeHash,
+            );
+
+            await doPublish.exec(
+              directory: d,
+              ggLog: ggLog,
+              askBeforePublishing: false,
+              message: customMessage,
+            );
+
+            final headMessage = await HeadMessage(
+              ggLog: ggLog,
+            ).get(directory: d, ggLog: ggLog);
+            expect(headMessage, customMessage);
+          });
         });
       });
 

@@ -76,10 +76,12 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
+    String? message,
   }) => get(
     directory: directory,
     ggLog: ggLog,
     askBeforePublishing: askBeforePublishing,
+    message: message,
   );
 
   // ...........................................................................
@@ -88,8 +90,10 @@ class DoPublish extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
+    String? message,
   }) async {
     _publishedVersion ??= PublishedVersion(ggLog: ggLog);
+    message ??= _messageFromArgs;
 
     // Does directory exist?
     await check(directory: directory);
@@ -152,7 +156,7 @@ class DoPublish extends DirCommand<void> {
     );
 
     if (!didMerge) {
-      await _merge(directory: directory);
+      await _merge(directory: directory, message: message);
 
       await _state.writeSuccess(directory: directory, key: stateKeyDoMerge);
     }
@@ -262,13 +266,16 @@ class DoPublish extends DirCommand<void> {
 
   // ...........................................................................
   /// Perform the local merge and push commits afterwards.
-  Future<void> _merge({required Directory directory}) async {
+  Future<void> _merge({
+    required Directory directory,
+    required String? message,
+  }) async {
     await _doMerge.get(
       directory: directory,
       ggLog: <String>[].add,
       automerge: false,
       local: true,
-      message: null,
+      message: message,
     );
   }
 
@@ -437,6 +444,9 @@ class DoPublish extends DirCommand<void> {
       argResults?['increase-version'] as bool? ?? true;
 
   // ...........................................................................
+  String? get _messageFromArgs => argResults?['message'] as String?;
+
+  // ...........................................................................
   void _addArgs() {
     argParser.addFlag(
       'ask-before-publishing',
@@ -452,6 +462,12 @@ class DoPublish extends DirCommand<void> {
       help: 'Increase version after publishing.',
       defaultsTo: true,
       negatable: true,
+    );
+
+    argParser.addOption(
+      'message',
+      abbr: 'm',
+      help: 'The merge commit message used for the final merge step.',
     );
   }
 }
