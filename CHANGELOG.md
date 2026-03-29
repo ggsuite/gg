@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [6.1.1] - 2026-03-29
+
+### Fixed
+
+- Bugfix http client
+
 ## [6.1.0] - 2026-03-29
 
 ### Added
@@ -465,6 +471,7 @@
 
 > > > > > > > Stashed changes
 
+[6.1.1]: https://github.com/inlavigo/gg/compare/6.1.0...6.1.1
 [6.1.0]: https://github.com/inlavigo/gg/compare/6.0.5...6.1.0
 [6.0.5]: https://github.com/inlavigo/gg/compare/6.0.4...6.0.5
 [6.0.4]: https://github.com/inlavigo/gg/compare/6.0.3...6.0.4
