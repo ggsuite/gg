@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [6.1.3] - 2026-04-07
+
+### Changed
+
+- Kidney: changed references to pub.dev
+
 ## [6.1.2] - 2026-03-30
 
 ## [6.1.1] - 2026-03-29
@@ -473,6 +479,7 @@
 
 > > > > > > > Stashed changes
 
+[6.1.3]: https://github.com/inlavigo/gg/compare/6.1.2...6.1.3
 [6.1.2]: https://github.com/inlavigo/gg/compare/6.1.1...6.1.2
 [6.1.1]: https://github.com/inlavigo/gg/compare/6.1.0...6.1.1
 [6.1.0]: https://github.com/inlavigo/gg/compare/6.0.5...6.1.0
