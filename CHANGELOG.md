@@ -6,6 +6,8 @@
 
 - Initial implementation
 
+## [2.5.1] - 2026-04-08
+
 ## [2.5.0] - 2026-04-08
 
 ### Changed
@@ -52,6 +54,7 @@
 
 - commit
 
+[2.5.1]: https://github.com/ggsuite/kd/compare/2.5.0...2.5.1
 [2.5.0]: https://github.com/ggsuite/kd/compare/2.4.0...2.5.0
 [2.4.0]: https://github.com/ggsuite/kd/compare/2.3.0...2.4.0
 [2.3.0]: https://github.com/ggsuite/kd/compare/2.2.2...2.3.0
