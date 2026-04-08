@@ -6,6 +6,12 @@
 
 - Initial implementation
 
+## [2.5.0] - 2026-04-08
+
+### Changed
+
+- kidney: changed references to local
+
 ## [2.4.0] - 2026-04-07
 
 ## [2.3.0] - 2026-04-01
@@ -46,6 +52,7 @@
 
 - commit
 
+[2.5.0]: https://github.com/ggsuite/kd/compare/2.4.0...2.5.0
 [2.4.0]: https://github.com/ggsuite/kd/compare/2.3.0...2.4.0
 [2.3.0]: https://github.com/ggsuite/kd/compare/2.2.2...2.3.0
 [2.2.2]: https://github.com/ggsuite/kd/compare/2.2.1...2.2.2
