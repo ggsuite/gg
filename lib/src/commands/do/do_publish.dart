@@ -12,10 +12,15 @@ import 'package:gg_changelog/gg_changelog.dart' as changelog;
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
+import 'package:gg_process/gg_process.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:gg_version/gg_version.dart';
+import 'package:interact/interact.dart';
 import 'package:path/path.dart';
 import 'package:pub_semver/pub_semver.dart';
+
+/// Typedef for confirming feature branch deletion.
+typedef ConfirmDeleteFeatureBranch = bool Function(String branchName);
 
 /// Publishes the current directory.
 class DoPublish extends DirCommand<void> {
@@ -38,6 +43,9 @@ class DoPublish extends DirCommand<void> {
     DoMerge? doMerge,
     VersionSelector? versionSelector,
     PublishedVersion? publishedVersion,
+    GgProcessWrapper processWrapper = const GgProcessWrapper(),
+    LocalBranch? localBranch,
+    ConfirmDeleteFeatureBranch? confirmDeleteFeatureBranch,
     // coverage:ignore-start
   }) : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
        _publishToPubDev = publish ?? Publish(ggLog: ggLog),
@@ -53,7 +61,11 @@ class DoPublish extends DirCommand<void> {
        _publishTo = publishTo ?? PublishTo(ggLog: ggLog),
        _doMerge = doMerge ?? DoMerge(ggLog: ggLog),
        _versionSelector = versionSelector ?? VersionSelector(),
-       _publishedVersion = publishedVersion {
+       _publishedVersion = publishedVersion,
+       _processWrapper = processWrapper,
+       _localBranch = localBranch ?? LocalBranch(ggLog: ggLog),
+       _confirmDeleteFeatureBranch =
+           confirmDeleteFeatureBranch ?? _defaultConfirmDeleteFeatureBranch {
     // coverage:ignore-end
     _addArgs();
   }
@@ -70,27 +82,28 @@ class DoPublish extends DirCommand<void> {
   /// The key used to save the merge state.
   final String stateKeyDoMerge = 'doMerge';
 
-  // ...........................................................................
   @override
   Future<void> exec({
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
     String? message,
+    bool? deleteFeatureBranch,
   }) => get(
     directory: directory,
     ggLog: ggLog,
     askBeforePublishing: askBeforePublishing,
     message: message,
+    deleteFeatureBranch: deleteFeatureBranch,
   );
 
-  // ...........................................................................
   @override
   Future<void> get({
     required Directory directory,
     required GgLog ggLog,
     bool? askBeforePublishing,
     String? message,
+    bool? deleteFeatureBranch,
   }) async {
     _publishedVersion ??= PublishedVersion(ggLog: ggLog);
     message ??= _messageFromArgs;
@@ -98,6 +111,16 @@ class DoPublish extends DirCommand<void> {
     // Does directory exist?
     await check(directory: directory);
     void noLog(_) {} // coverage:ignore-line
+
+    final branchName = await _localBranch.get(
+      directory: directory,
+      ggLog: <String>[].add,
+    );
+
+    final shouldDelete = await _resolveDeleteFeatureBranch(
+      branchName: branchName,
+      deleteFeatureBranch: deleteFeatureBranch,
+    );
 
     // Did already publish?
     final isDone = await _state.readSuccess(
@@ -166,15 +189,14 @@ class DoPublish extends DirCommand<void> {
 
     await _doPush.gitPush(directory: directory, force: false);
 
+    if (shouldDelete) {
+      await _deleteFeatureBranch(directory: directory, branchName: branchName);
+    }
+
     await _publishGit(directory: directory, ggLog: ggLog);
     await _doPush.gitPush(directory: directory, force: false, pushTags: true);
   }
 
-  // ######################
-  // Private
-  // ######################
-
-  // ...........................................................................
   final Publish _publishToPubDev;
   final CanPublish _canPublish;
   final GgState _state;
@@ -189,8 +211,10 @@ class DoPublish extends DirCommand<void> {
   final DoMerge _doMerge;
   final VersionSelector _versionSelector;
   PublishedVersion? _publishedVersion;
+  final GgProcessWrapper _processWrapper;
+  final LocalBranch _localBranch;
+  final ConfirmDeleteFeatureBranch _confirmDeleteFeatureBranch;
 
-  // ...........................................................................
   /// Returns true when pub.dev publishing was already completed or is obsolete.
   Future<bool> _didPublishPubDevOrVersionAlreadyPublished({
     required Directory directory,
@@ -227,7 +251,6 @@ class DoPublish extends DirCommand<void> {
     // coverage:ignore-end
   }
 
-  // ...........................................................................
   /// Prepare the next version and release the changelog.
   Future<void> _prepareVersion({
     required Directory directory,
@@ -238,7 +261,6 @@ class DoPublish extends DirCommand<void> {
     await _prepareChangelog(directory: directory, ggLog: noLog);
   }
 
-  // ...........................................................................
   /// Publish to pub.dev when the package should be published there.
   Future<void> _publishToPubDevIfNeeded({
     required Directory directory,
@@ -264,7 +286,6 @@ class DoPublish extends DirCommand<void> {
     );
   }
 
-  // ...........................................................................
   /// Perform the local merge and push commits afterwards.
   Future<void> _merge({
     required Directory directory,
@@ -279,7 +300,6 @@ class DoPublish extends DirCommand<void> {
     );
   }
 
-  // ...........................................................................
   /// Add the version tag and push tags to the remote.
   Future<void> _publishGit({
     required Directory directory,
@@ -291,24 +311,20 @@ class DoPublish extends DirCommand<void> {
     );
   }
 
-  // ...........................................................................
+  /// Prepare the changelog for release and commit the result.
   Future<void> _prepareChangelog({
     required Directory directory,
     required GgLog ggLog,
   }) async {
-    // Remember current hash
     final hashBefore = await _state.currentHash(
       directory: directory,
       ggLog: ggLog,
     );
 
-    // Release the changelog
     await _releaseChangelog.exec(directory: directory, ggLog: ggLog);
 
-    // Update state
     await _state.updateHash(hash: hashBefore, directory: directory);
 
-    // Commit changes to change log
     await _commit.commit(
       ggLog: ggLog,
       directory: directory,
@@ -318,32 +334,26 @@ class DoPublish extends DirCommand<void> {
     );
   }
 
-  // ...........................................................................
+  /// Increases the version according to the selected increment.
   Future<void> _addNextVersion(Directory directory, GgLog ggLog) async {
-    // Respect CLI flag --[no-]increase-version.
     if (!_shouldIncreaseVersion) {
       return;
     }
 
-    // Remember current hash
     final hashBefore = await _state.currentHash(
       directory: directory,
       ggLog: ggLog,
     );
 
-    // Prefer the published version. If the package was never published,
-    // fall back to the version from pubspec.yaml.
     final currentVersion = await _currentVersionForIncrementSelection(
       directory: directory,
       ggLog: ggLog,
     );
 
-    // Let the user select the desired increment.
     final increment = await _versionSelector.selectIncrement(
       currentVersion: currentVersion,
     );
 
-    // Prepare the next version according to the selected increment.
     await _prepareNextVersion.exec(
       directory: directory,
       ggLog: ggLog,
@@ -351,10 +361,8 @@ class DoPublish extends DirCommand<void> {
       publishedVersion: currentVersion,
     );
 
-    // Update state hashes so previous successful commands stay valid.
     await _state.updateHash(hash: hashBefore, directory: directory);
 
-    // Read the new version and commit the version bump.
     final newVersion = await _fromPubspec.fromDirectory(directory: directory);
 
     await _commit.commit(
@@ -366,7 +374,6 @@ class DoPublish extends DirCommand<void> {
     );
   }
 
-  // ...........................................................................
   /// Resolve the version used as baseline for selecting the next increment.
   Future<Version> _currentVersionForIncrementSelection({
     required Directory directory,
@@ -384,7 +391,7 @@ class DoPublish extends DirCommand<void> {
     return _fromPubspec.fromDirectory(directory: directory);
   }
 
-  // ...........................................................................
+  /// Returns whether publishing confirmation should be shown.
   Future<bool> _shouldAskBeforePublishing(
     Directory directory,
     GgLog ggLog,
@@ -392,35 +399,25 @@ class DoPublish extends DirCommand<void> {
   ) async {
     askBeforePublishing ??= _askBeforePublishingFromParam;
 
-    // Where should the package be published?
     final target = await _publishTo.fromDirectory(directory);
     final publishToNone = target == 'none';
     if (publishToNone) {
       return false;
     }
 
-    // Check package was published before
     final wasPublishedBefore = await _isPublished.get(
       directory: directory,
       ggLog: ggLog,
     );
 
-    // When --ask-for-confirmation is true, always ask
     if (askBeforePublishing) {
       return true;
     }
 
-    // When --ask-for-confirmation is false,
-    // don't ask, when package is already published
     if (wasPublishedBefore) {
       return false;
     }
 
-    /// If the package was never published before,
-    /// and askBeforePublishing is false,
-    /// throw an exception.
-    /// Before publishing the package the first time,
-    /// always ask.
     throw Exception(
       'The package was never published to pub.dev before. '
       'Please call »gg do push« with »--ask-before-publishing« '
@@ -428,25 +425,76 @@ class DoPublish extends DirCommand<void> {
     );
   }
 
-  // ...........................................................................
+  /// Returns whether the package should be published to pub.dev.
   Future<bool> _shouldPublishToPubDev(Directory directory, GgLog ggLog) async {
     final pubspecFile = File(join(directory.path, 'pubspec.yaml'));
     final pubspec = await pubspecFile.readAsString();
     return !pubspec.contains(RegExp(r'publish_to:'));
   }
 
-  // ...........................................................................
+  /// Resolves whether the feature branch should be deleted after publishing.
+  Future<bool> _resolveDeleteFeatureBranch({
+    required String branchName,
+    required bool? deleteFeatureBranch,
+  }) async {
+    if (deleteFeatureBranch != null) {
+      return deleteFeatureBranch;
+    }
+
+    if (_deleteFeatureBranchWasProvided) {
+      return _deleteFeatureBranchFromArgs;
+    }
+
+    return _confirmDeleteFeatureBranch(branchName);
+  }
+
+  /// Deletes the provided feature branch on the remote.
+  Future<void> _deleteFeatureBranch({
+    required Directory directory,
+    required String branchName,
+  }) async {
+    final result = await _processWrapper.run('git', <String>[
+      'push',
+      'origin',
+      '--delete',
+      branchName,
+    ], workingDirectory: directory.path);
+
+    if (result.exitCode != 0) {
+      throw Exception(
+        'git push origin --delete $branchName failed: ${result.stderr}',
+      );
+    }
+
+    ggLog(green('Deleted remote feature branch $branchName.'));
+  }
+
   bool get _askBeforePublishingFromParam =>
       argResults?['ask-before-publishing'] as bool? ?? true;
 
-  // ...........................................................................
   bool get _shouldIncreaseVersion =>
       argResults?['increase-version'] as bool? ?? true;
 
-  // ...........................................................................
+  bool get _deleteFeatureBranchFromArgs =>
+      argResults?['delete-feature-branch'] as bool? ?? false;
+
+  bool get _deleteFeatureBranchWasProvided =>
+      argResults?.wasParsed('delete-feature-branch') ?? false;
+
   String? get _messageFromArgs => argResults?['message'] as String?;
 
-  // ...........................................................................
+  // coverage:ignore-start
+  static bool _defaultConfirmDeleteFeatureBranch(String branchName) {
+    final selection = Select(
+      prompt: 'Delete feature branch $branchName on origin?',
+      options: const <String>['Yes', 'No'],
+      initialIndex: 1,
+    ).interact();
+
+    return selection == 0;
+  }
+  // coverage:ignore-end
+
   void _addArgs() {
     argParser.addFlag(
       'ask-before-publishing',
@@ -461,6 +509,13 @@ class DoPublish extends DirCommand<void> {
       abbr: 'c',
       help: 'Increase version after publishing.',
       defaultsTo: true,
+      negatable: true,
+    );
+
+    argParser.addFlag(
+      'delete-feature-branch',
+      help: 'Delete the current feature branch on origin after publishing.',
+      defaultsTo: false,
       negatable: true,
     );
 

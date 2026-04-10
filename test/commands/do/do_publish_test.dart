@@ -6,11 +6,13 @@
 
 import 'dart:io';
 
+import 'package:args/command_runner.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_direct_json/gg_direct_json.dart';
 import 'package:gg_git/gg_git.dart';
 import 'package:gg_git/gg_git_test_helpers.dart';
+import 'package:gg_process/gg_process.dart';
 import 'package:gg_publish/gg_publish.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
@@ -30,6 +32,8 @@ void main() {
   late PublishedVersion publishedVersion;
   late IsVersionPrepared isVersionPrepared;
   late VersionSelector versionSelector;
+  late MockGgProcessWrapper processWrapper;
+  late MockLocalBranch localBranch;
 
   late int successHash;
   late int needsChangeHash;
@@ -145,6 +149,24 @@ void main() {
     );
     registerFallbackValue(d);
     publish = MockPublish();
+    processWrapper = MockGgProcessWrapper();
+    localBranch = MockLocalBranch();
+
+    when(
+      () => localBranch.get(
+        directory: any(named: 'directory'),
+        ggLog: any(named: 'ggLog'),
+      ),
+    ).thenAnswer((_) async => 'feat_abc');
+
+    when(
+      () => processWrapper.run('git', [
+        'push',
+        'origin',
+        '--delete',
+        'feat_abc',
+      ], workingDirectory: d.path),
+    ).thenAnswer((_) async => ProcessResult(0, 0, '', ''));
 
     publishedVersion = MockPublishedVersion();
 
@@ -175,6 +197,8 @@ void main() {
       ),
       versionSelector: versionSelector,
       publishedVersion: publishedVersion,
+      processWrapper: processWrapper,
+      localBranch: localBranch,
     );
 
     await makeLastStateSuccessful();
@@ -228,6 +252,7 @@ void main() {
                           directory: d,
                           ggLog: ggLog,
                           askBeforePublishing: ask,
+                          deleteFeatureBranch: false,
                         );
 
                         // Were the steps performed?
@@ -311,6 +336,7 @@ void main() {
                         directory: d,
                         ggLog: ggLog,
                         askBeforePublishing: true,
+                        deleteFeatureBranch: false,
                       );
 
                       // Check
@@ -345,6 +371,7 @@ void main() {
                     directory: d,
                     ggLog: ggLog,
                     askBeforePublishing: false,
+                    deleteFeatureBranch: false,
                   );
 
                   // Check result
@@ -365,6 +392,8 @@ void main() {
                 ggLog: ggLog,
                 publish: publish,
                 versionSelector: versionSelector,
+                processWrapper: processWrapper,
+                localBranch: localBranch,
               );
 
               // Prepare pubspec.yaml
@@ -390,7 +419,11 @@ void main() {
               );
 
               // Publish
-              await doPublish.exec(directory: d, ggLog: ggLog);
+              await doPublish.exec(
+                directory: d,
+                ggLog: ggLog,
+                deleteFeatureBranch: false,
+              );
 
               // Were the steps performed?
               var i = 0;
@@ -450,6 +483,7 @@ void main() {
               ggLog: ggLog,
               askBeforePublishing: false,
               message: customMessage,
+              deleteFeatureBranch: false,
             );
 
             final headMessage = await HeadMessage(
@@ -457,6 +491,237 @@ void main() {
             ).get(directory: d, ggLog: ggLog);
             expect(headMessage, customMessage);
           });
+
+          test(
+            'deletes the feature branch when requested explicitly',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              await doPublish.exec(
+                directory: d,
+                ggLog: ggLog,
+                askBeforePublishing: false,
+                deleteFeatureBranch: true,
+              );
+
+              verify(
+                () => processWrapper.run('git', [
+                  'push',
+                  'origin',
+                  '--delete',
+                  'feat_abc',
+                ], workingDirectory: d.path),
+              ).called(1);
+              expect(
+                messages[messages.length - 2],
+                contains('Deleted remote feature branch feat_abc.'),
+              );
+            },
+          );
+
+          test(
+            'does not delete the feature branch when disabled explicitly',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              await doPublish.exec(
+                directory: d,
+                ggLog: ggLog,
+                askBeforePublishing: false,
+                deleteFeatureBranch: false,
+              );
+
+              verifyNever(
+                () => processWrapper.run('git', [
+                  'push',
+                  'origin',
+                  '--delete',
+                  'feat_abc',
+                ], workingDirectory: d.path),
+              );
+            },
+          );
+
+          test(
+            'asks whether to delete the feature branch when not specified',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              var promptBranchName = '';
+              final doPublishWithPrompt = DoPublish(
+                ggLog: ggLog,
+                publish: publish,
+                prepareNextVersion: PrepareNextVersion(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                canPublish: canPublish,
+                isPublished: IsPublished(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                versionSelector: versionSelector,
+                publishedVersion: publishedVersion,
+                processWrapper: processWrapper,
+                localBranch: localBranch,
+                confirmDeleteFeatureBranch: (branchName) {
+                  promptBranchName = branchName;
+                  return true;
+                },
+              );
+
+              await doPublishWithPrompt.exec(
+                directory: d,
+                ggLog: ggLog,
+                askBeforePublishing: false,
+              );
+
+              expect(promptBranchName, 'feat_abc');
+              verify(
+                () => processWrapper.run('git', [
+                  'push',
+                  'origin',
+                  '--delete',
+                  'feat_abc',
+                ], workingDirectory: d.path),
+              ).called(1);
+            },
+          );
+
+          test('uses CLI delete-feature-branch flag when provided', () async {
+            mockPublishIsSuccessful(success: true, askBeforePublishing: false);
+
+            await DirectJson.writeFile(
+              file: File(join(d.path, '.gg', '.gg.json')),
+              path: 'doPublish/success/hash',
+              value: needsChangeHash,
+            );
+
+            final cliDoPublish = DoPublish(
+              ggLog: ggLog,
+              publish: publish,
+              prepareNextVersion: PrepareNextVersion(
+                ggLog: ggLog,
+                publishedVersion: publishedVersion,
+              ),
+              canPublish: canPublish,
+              isPublished: IsPublished(
+                ggLog: ggLog,
+                publishedVersion: publishedVersion,
+              ),
+              versionSelector: versionSelector,
+              publishedVersion: publishedVersion,
+              processWrapper: processWrapper,
+              localBranch: localBranch,
+              confirmDeleteFeatureBranch: (_) {
+                fail('Prompt must not be used when flag is provided.');
+              },
+            );
+
+            final runner = CommandRunner<void>('gg', 'gg')
+              ..addCommand(cliDoPublish);
+
+            await runner.run([
+              'publish',
+              '-i',
+              d.path,
+              '--no-ask-before-publishing',
+              '--delete-feature-branch',
+            ]);
+
+            verify(
+              () => processWrapper.run('git', [
+                'push',
+                'origin',
+                '--delete',
+                'feat_abc',
+              ], workingDirectory: d.path),
+            ).called(1);
+          });
+
+          test(
+            'uses CLI no-delete-feature-branch flag when provided',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              final cliDoPublish = DoPublish(
+                ggLog: ggLog,
+                publish: publish,
+                prepareNextVersion: PrepareNextVersion(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                canPublish: canPublish,
+                isPublished: IsPublished(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                versionSelector: versionSelector,
+                publishedVersion: publishedVersion,
+                processWrapper: processWrapper,
+                localBranch: localBranch,
+                confirmDeleteFeatureBranch: (_) {
+                  fail('Prompt must not be used when flag is provided.');
+                },
+              );
+
+              final runner = CommandRunner<void>('gg', 'gg')
+                ..addCommand(cliDoPublish);
+
+              await runner.run([
+                'publish',
+                '-i',
+                d.path,
+                '--no-ask-before-publishing',
+                '--no-delete-feature-branch',
+              ]);
+
+              verifyNever(
+                () => processWrapper.run('git', [
+                  'push',
+                  'origin',
+                  '--delete',
+                  'feat_abc',
+                ], workingDirectory: d.path),
+              );
+            },
+          );
         });
       });
 
@@ -483,6 +748,7 @@ void main() {
                   directory: d,
                   ggLog: ggLog,
                   askBeforePublishing: false,
+                  deleteFeatureBranch: false,
                 );
               } catch (e) {
                 exception = e.toString();
@@ -504,6 +770,43 @@ void main() {
             });
           });
         });
+
+        test('when deleting the feature branch fails', () async {
+          mockPublishIsSuccessful(success: true, askBeforePublishing: false);
+
+          await DirectJson.writeFile(
+            file: File(join(d.path, '.gg', '.gg.json')),
+            path: 'doPublish/success/hash',
+            value: needsChangeHash,
+          );
+
+          when(
+            () => processWrapper.run('git', [
+              'push',
+              'origin',
+              '--delete',
+              'feat_abc',
+            ], workingDirectory: d.path),
+          ).thenAnswer((_) async => ProcessResult(0, 1, '', 'Some error'));
+
+          late String exception;
+
+          try {
+            await doPublish.exec(
+              directory: d,
+              ggLog: ggLog,
+              askBeforePublishing: false,
+              deleteFeatureBranch: true,
+            );
+          } catch (e) {
+            exception = e.toString();
+          }
+
+          expect(
+            exception,
+            'Exception: git push origin --delete feat_abc failed: Some error',
+          );
+        });
       });
     });
 
@@ -513,9 +816,15 @@ void main() {
           ggLog: ggLog,
           versionSelector: versionSelector,
           publishedVersion: publishedVersion,
+          processWrapper: processWrapper,
+          localBranch: localBranch,
         ),
         isNotNull,
       );
     });
   });
 }
+
+class MockGgProcessWrapper extends Mock implements GgProcessWrapper {}
+
+class MockLocalBranch extends Mock implements LocalBranch {}
