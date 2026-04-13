@@ -4,6 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:gg/gg.dart';
@@ -21,6 +22,9 @@ import 'package:pub_semver/pub_semver.dart';
 
 /// Typedef for confirming feature branch deletion.
 typedef ConfirmDeleteFeatureBranch = bool Function(String branchName);
+
+/// Typedef for editing the merge message interactively.
+typedef EditMessage = Future<String?> Function(String initialMessage);
 
 /// Publishes the current directory.
 class DoPublish extends DirCommand<void> {
@@ -46,6 +50,7 @@ class DoPublish extends DirCommand<void> {
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
     LocalBranch? localBranch,
     ConfirmDeleteFeatureBranch? confirmDeleteFeatureBranch,
+    EditMessage? editMessage,
     // coverage:ignore-start
   }) : _canPublish = canPublish ?? CanPublish(ggLog: ggLog),
        _publishToPubDev = publish ?? Publish(ggLog: ggLog),
@@ -65,7 +70,8 @@ class DoPublish extends DirCommand<void> {
        _processWrapper = processWrapper,
        _localBranch = localBranch ?? LocalBranch(ggLog: ggLog),
        _confirmDeleteFeatureBranch =
-           confirmDeleteFeatureBranch ?? _defaultConfirmDeleteFeatureBranch {
+           confirmDeleteFeatureBranch ?? _defaultConfirmDeleteFeatureBranch,
+       _editMessage = editMessage ?? _defaultEditMessage {
     // coverage:ignore-end
     _addArgs();
   }
@@ -106,7 +112,10 @@ class DoPublish extends DirCommand<void> {
     bool? deleteFeatureBranch,
   }) async {
     _publishedVersion ??= PublishedVersion(ggLog: ggLog);
-    message ??= _messageFromArgs;
+    message = await _resolveMergeMessage(
+      directory: directory,
+      message: message,
+    );
 
     // Does directory exist?
     await check(directory: directory);
@@ -214,6 +223,7 @@ class DoPublish extends DirCommand<void> {
   final GgProcessWrapper _processWrapper;
   final LocalBranch _localBranch;
   final ConfirmDeleteFeatureBranch _confirmDeleteFeatureBranch;
+  final EditMessage _editMessage;
 
   /// Returns true when pub.dev publishing was already completed or is obsolete.
   Future<bool> _didPublishPubDevOrVersionAlreadyPublished({
@@ -432,6 +442,45 @@ class DoPublish extends DirCommand<void> {
     return !pubspec.contains(RegExp(r'publish_to:'));
   }
 
+  /// Resolves the merge message from parameters, args, or .ticket.
+  Future<String?> _resolveMergeMessage({
+    required Directory directory,
+    required String? message,
+  }) async {
+    if (message != null) {
+      return message;
+    }
+
+    final messageFromArgs = _messageFromArgs;
+    if (messageFromArgs != null) {
+      return messageFromArgs;
+    }
+
+    final initialMessage = await _readTicketDescription(directory) ?? '';
+    return _editMessage(initialMessage);
+  }
+
+  /// Reads the optional description from the .ticket file.
+  Future<String?> _readTicketDescription(Directory directory) async {
+    final ticketFile = File(join(directory.path, '.ticket'));
+    if (!await ticketFile.exists()) {
+      return null;
+    }
+
+    final raw = await ticketFile.readAsString();
+    final decoded = jsonDecode(raw);
+    if (decoded is! Map<String, dynamic>) {
+      return null;
+    }
+
+    final description = decoded['description']?.toString().trim();
+    if (description == null || description.isEmpty) {
+      return null;
+    }
+
+    return description;
+  }
+
   /// Resolves whether the feature branch should be deleted after publishing.
   Future<bool> _resolveDeleteFeatureBranch({
     required String branchName,
@@ -492,6 +541,15 @@ class DoPublish extends DirCommand<void> {
     ).interact();
 
     return selection == 0;
+  }
+
+  /// Opens an interactive editor for the merge message.
+  static Future<String?> _defaultEditMessage(String initialMessage) async {
+    return Input(
+      prompt: 'Edit merge message',
+      defaultValue: initialMessage,
+      initialText: initialMessage,
+    ).interact();
   }
   // coverage:ignore-end
 

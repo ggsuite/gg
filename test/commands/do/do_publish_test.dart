@@ -4,6 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -493,6 +494,176 @@ void main() {
           });
 
           test(
+            'loads merge message from .ticket and allows editing when not provided',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              await File(join(d.path, '.ticket')).writeAsString(
+                jsonEncode(<String, String>{
+                  'issue_id': 'feat_abc',
+                  'description': 'Ticket merge message',
+                }),
+              );
+
+              var initialMessage = '';
+              final doPublishWithEditor = DoPublish(
+                ggLog: ggLog,
+                publish: publish,
+                prepareNextVersion: PrepareNextVersion(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                canPublish: canPublish,
+                isPublished: IsPublished(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                versionSelector: versionSelector,
+                publishedVersion: publishedVersion,
+                processWrapper: processWrapper,
+                localBranch: localBranch,
+                editMessage: (message) async {
+                  initialMessage = message;
+                  return 'Edited merge message';
+                },
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              await doPublishWithEditor.exec(
+                directory: d,
+                ggLog: ggLog,
+                askBeforePublishing: false,
+                deleteFeatureBranch: false,
+              );
+
+              expect(initialMessage, 'Ticket merge message');
+
+              final headMessage = await HeadMessage(
+                ggLog: ggLog,
+              ).get(directory: d, ggLog: ggLog);
+              expect(headMessage, 'Edited merge message');
+            },
+          );
+
+          test(
+            'uses empty initial merge message when .ticket is missing and message is not provided',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              var initialMessage = 'not set';
+              final doPublishWithEditor = DoPublish(
+                ggLog: ggLog,
+                publish: publish,
+                prepareNextVersion: PrepareNextVersion(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                canPublish: canPublish,
+                isPublished: IsPublished(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                versionSelector: versionSelector,
+                publishedVersion: publishedVersion,
+                processWrapper: processWrapper,
+                localBranch: localBranch,
+                editMessage: (message) async {
+                  initialMessage = message;
+                  return 'Edited without ticket';
+                },
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              await doPublishWithEditor.exec(
+                directory: d,
+                ggLog: ggLog,
+                askBeforePublishing: false,
+                deleteFeatureBranch: false,
+              );
+
+              expect(initialMessage, '');
+
+              final headMessage = await HeadMessage(
+                ggLog: ggLog,
+              ).get(directory: d, ggLog: ggLog);
+              expect(headMessage, 'Edited without ticket');
+            },
+          );
+
+          test(
+            'does not open editor when merge message is provided programmatically',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              await File(join(d.path, '.ticket')).writeAsString(
+                jsonEncode(<String, String>{
+                  'issue_id': 'feat_abc',
+                  'description': 'Ticket merge message',
+                }),
+              );
+
+              final doPublishWithEditor = DoPublish(
+                ggLog: ggLog,
+                publish: publish,
+                prepareNextVersion: PrepareNextVersion(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                canPublish: canPublish,
+                isPublished: IsPublished(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                versionSelector: versionSelector,
+                publishedVersion: publishedVersion,
+                processWrapper: processWrapper,
+                localBranch: localBranch,
+                editMessage: (_) async {
+                  fail('Editor must not be opened when message is provided.');
+                },
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              await doPublishWithEditor.exec(
+                directory: d,
+                ggLog: ggLog,
+                askBeforePublishing: false,
+                message: 'Programmatic merge message',
+                deleteFeatureBranch: false,
+              );
+
+              final headMessage = await HeadMessage(
+                ggLog: ggLog,
+              ).get(directory: d, ggLog: ggLog);
+              expect(headMessage, 'Programmatic merge message');
+            },
+          );
+
+          test(
             'deletes the feature branch when requested explicitly',
             () async {
               mockPublishIsSuccessful(
@@ -720,6 +891,70 @@ void main() {
                   'feat_abc',
                 ], workingDirectory: d.path),
               );
+            },
+          );
+
+          test(
+            'uses CLI message without opening editor when provided',
+            () async {
+              mockPublishIsSuccessful(
+                success: true,
+                askBeforePublishing: false,
+              );
+
+              await File(join(d.path, '.ticket')).writeAsString(
+                jsonEncode(<String, String>{
+                  'issue_id': 'feat_abc',
+                  'description': 'Ticket merge message',
+                }),
+              );
+
+              await DirectJson.writeFile(
+                file: File(join(d.path, '.gg', '.gg.json')),
+                path: 'doPublish/success/hash',
+                value: needsChangeHash,
+              );
+
+              final cliDoPublish = DoPublish(
+                ggLog: ggLog,
+                publish: publish,
+                prepareNextVersion: PrepareNextVersion(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                canPublish: canPublish,
+                isPublished: IsPublished(
+                  ggLog: ggLog,
+                  publishedVersion: publishedVersion,
+                ),
+                versionSelector: versionSelector,
+                publishedVersion: publishedVersion,
+                processWrapper: processWrapper,
+                localBranch: localBranch,
+                editMessage: (_) async {
+                  fail(
+                    'Editor must not be opened when CLI message is provided.',
+                  );
+                },
+              );
+
+              final runner = CommandRunner<void>('gg', 'gg')
+                ..addCommand(cliDoPublish);
+
+              await runner.run([
+                'publish',
+                '-i',
+                d.path,
+                '--no-ask-before-publishing',
+                '--message',
+                'CLI merge message',
+                '--no-delete-feature-branch',
+              ]);
+
+              final headMessage = await HeadMessage(
+                ggLog: ggLog,
+              ).get(directory: d, ggLog: ggLog);
+              expect(headMessage, 'CLI merge message');
             },
           );
         });
