@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) 2025 Göran Hegenberg. All Rights Reserved.
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -7,41 +7,41 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:gg/src/commands/do.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
 import 'package:test/test.dart';
 
 void main() {
   late Directory d;
-  late Do doCommand;
+  late Create createCommand;
   final messages = <String>[];
   late CommandRunner<void> runner;
 
   setUp(() {
     d = Directory.systemTemp.createTempSync();
     messages.clear();
-    doCommand = Do(ggLog: messages.add);
-    runner = CommandRunner<void>('test', 'test')..addCommand(doCommand);
+    createCommand = Create(ggLog: messages.add);
+    runner = CommandRunner<void>('test', 'test')..addCommand(createCommand);
   });
 
   tearDown(() {
     d.deleteSync(recursive: true);
   });
 
-  group('Do', () {
-    test('should work fine', () async {
+  group('Create', () {
+    test('should show ticket as subcommand', () async {
       await capturePrint(
         code: () async {
-          await runner.run(['do', '--help']);
+          await runner.run(['create', '--help']);
         },
         ggLog: messages.add,
       );
 
       expect(
         messages.first,
-        contains('Provide actions or commit, push, publish.'),
+        contains('Create development artifacts like ticket branches.'),
       );
-      expect(messages.first, contains('create'));
+      expect(messages.first, contains('ticket'));
     });
   });
 }

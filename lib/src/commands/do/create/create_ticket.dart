@@ -4,6 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:gg/gg.dart';
@@ -12,14 +13,15 @@ import 'package:gg_git/gg_git.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_process/gg_process.dart';
 import 'package:gg_status_printer/gg_status_printer.dart';
+import 'package:path/path.dart' as path;
 
-/// Checks out a new branch while preserving local changes.
-class DoCheckout extends DirCommand<void> {
+/// Creates a ticket branch while preserving local changes.
+class CreateTicket extends DirCommand<void> {
   /// Constructor.
-  DoCheckout({
+  CreateTicket({
     required super.ggLog,
-    super.name = 'checkout',
-    super.description = 'Checks out a new branch and reapplies local changes.',
+    super.name = 'ticket',
+    super.description = 'Creates a ticket branch and reapplies local changes.',
     CanCheckout? canCheckout,
     IsPushed? isPushed,
     GgProcessWrapper processWrapper = const GgProcessWrapper(),
@@ -40,16 +42,30 @@ class DoCheckout extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     String? branchName,
-  }) => get(directory: directory, ggLog: ggLog, branchName: branchName);
+    String? message,
+  }) => get(
+    directory: directory,
+    ggLog: ggLog,
+    branchName: branchName,
+    message: message,
+  );
 
   @override
   Future<void> get({
     required Directory directory,
     required GgLog ggLog,
     String? branchName,
+    String? message,
   }) async {
     await check(directory: directory);
+
+    final isCliInvocation = branchName == null;
     branchName ??= _branchNameFromArgs();
+    message ??= argResults?['message'] as String?;
+
+    if (isCliInvocation && (message == null || message.isEmpty)) {
+      throw Exception('Missing message. Run again with --message <message>.');
+    }
 
     await _canCheckout.exec(directory: directory, ggLog: ggLog);
 
@@ -62,6 +78,7 @@ class DoCheckout extends DirCommand<void> {
           directory: directory,
           ggLog: ggLog,
           branchName: branchName!,
+          message: message,
         );
       },
       success: (_) => true,
@@ -70,11 +87,17 @@ class DoCheckout extends DirCommand<void> {
 
   /// Adds CLI arguments for the command.
   void _addArgs() {
-    argParser.addOption(
-      'branch-name',
-      abbr: 'b',
-      help: 'The name of the branch to create and check out.',
-    );
+    argParser
+      ..addOption(
+        'branch-name',
+        abbr: 'b',
+        help: 'The name of the branch to create and check out.',
+      )
+      ..addOption(
+        'message',
+        abbr: 'm',
+        help: 'Ticket description written to the .ticket file.',
+      );
   }
 
   /// Returns the branch name from CLI arguments or throws if it is missing.
@@ -94,6 +117,7 @@ class DoCheckout extends DirCommand<void> {
     required Directory directory,
     required GgLog ggLog,
     required String branchName,
+    String? message,
   }) async {
     final everythingIsPushed = await _isPushed.get(
       directory: directory,
@@ -135,6 +159,31 @@ class DoCheckout extends DirCommand<void> {
       args: ['stash', 'apply'],
       errorMessage: 'git stash apply failed',
     );
+
+    await _writeTicketFile(
+      directory: directory,
+      branchName: branchName,
+      message: message,
+    );
+  }
+
+  /// Writes the .ticket file when [message] is not null.
+  Future<void> _writeTicketFile({
+    required Directory directory,
+    required String branchName,
+    required String? message,
+  }) async {
+    if (message == null) {
+      return;
+    }
+
+    final ticketFile = File(path.join(directory.path, '.ticket'));
+    final data = <String, String>{
+      'issue_id': branchName,
+      'description': message,
+    };
+
+    await ticketFile.writeAsString(jsonEncode(data));
   }
 
   /// Executes a git command and throws when it fails.
@@ -155,5 +204,5 @@ class DoCheckout extends DirCommand<void> {
   }
 }
 
-/// Mock for [DoCheckout].
-class MockDoCheckout extends MockDirCommand<void> implements DoCheckout {}
+/// Mock for [CreateTicket].
+class MockCreateTicket extends MockDirCommand<void> implements CreateTicket {}

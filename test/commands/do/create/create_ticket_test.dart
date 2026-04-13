@@ -4,6 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -18,7 +19,7 @@ void main() {
   final messages = <String>[];
   final ggLog = messages.add;
   late CommandRunner<void> runner;
-  late DoCheckout doCheckout;
+  late CreateTicket createTicket;
   late MockCanCheckout canCheckout;
   late MockIsPushed isPushed;
   late MockGgProcessWrapper processWrapper;
@@ -31,13 +32,13 @@ void main() {
     isPushed = MockIsPushed();
     processWrapper = MockGgProcessWrapper();
     canCheckout.mockExec(result: null, directory: d, ggLog: ggLog);
-    doCheckout = DoCheckout(
+    createTicket = CreateTicket(
       ggLog: ggLog,
       canCheckout: canCheckout,
       isPushed: isPushed,
       processWrapper: processWrapper,
     );
-    runner = CommandRunner<void>('gg', 'gg')..addCommand(doCheckout);
+    runner = CommandRunner<void>('gg', 'gg')..addCommand(createTicket);
   });
 
   tearDown(() async {
@@ -54,7 +55,7 @@ void main() {
     ).thenAnswer((_) async => ProcessResult(0, exitCode, '', stderr));
   }
 
-  group('DoCheckout', () {
+  group('CreateTicket', () {
     test('should execute CanCheckout before git commands', () async {
       when(
         () => isPushed.get(
@@ -68,7 +69,7 @@ void main() {
       mockGitCommand(['checkout', '-b', 'feat_test']);
       mockGitCommand(['stash', 'apply']);
 
-      await doCheckout.exec(
+      await createTicket.exec(
         directory: d,
         ggLog: ggLog,
         branchName: 'feat_test',
@@ -91,7 +92,7 @@ void main() {
       mockGitCommand(['checkout', '-b', 'feat_test']);
       mockGitCommand(['stash', 'apply']);
 
-      await doCheckout.exec(
+      await createTicket.exec(
         directory: d,
         ggLog: ggLog,
         branchName: 'feat_test',
@@ -143,7 +144,7 @@ void main() {
       mockGitCommand(['checkout', '-b', 'feat_test']);
       mockGitCommand(['stash', 'apply']);
 
-      await doCheckout.exec(
+      await createTicket.exec(
         directory: d,
         ggLog: ggLog,
         branchName: 'feat_test',
@@ -188,7 +189,15 @@ void main() {
       mockGitCommand(['checkout', '-b', 'feat_cli']);
       mockGitCommand(['stash', 'apply']);
 
-      await runner.run(['checkout', '-i', d.path, '-b', 'feat_cli']);
+      await runner.run([
+        'ticket',
+        '-i',
+        d.path,
+        '-b',
+        'feat_cli',
+        '-m',
+        'CLI message',
+      ]);
 
       verify(
         () => processWrapper.run('git', [
@@ -197,6 +206,14 @@ void main() {
           'feat_cli',
         ], workingDirectory: d.path),
       ).called(1);
+
+      final ticketFile = File('${d.path}${Platform.pathSeparator}.ticket');
+      expect(ticketFile.existsSync(), isTrue);
+
+      final content =
+          jsonDecode(ticketFile.readAsStringSync()) as Map<String, dynamic>;
+      expect(content['issue_id'], equals('feat_cli'));
+      expect(content['description'], equals('CLI message'));
     });
 
     test('should apply stash and rethrow when checkout fails', () async {
@@ -217,7 +234,7 @@ void main() {
       mockGitCommand(['stash', 'apply']);
 
       await expectLater(
-        () => doCheckout.exec(
+        () => createTicket.exec(
           directory: d,
           ggLog: ggLog,
           branchName: 'feat_test',
@@ -260,7 +277,7 @@ void main() {
       );
 
       await expectLater(
-        () => doCheckout.exec(
+        () => createTicket.exec(
           directory: d,
           ggLog: ggLog,
           branchName: 'feat_test',
@@ -295,7 +312,7 @@ void main() {
       mockGitCommand(['stash'], exitCode: 1, stderr: 'Some error');
 
       expect(
-        () => doCheckout.exec(
+        () => createTicket.exec(
           directory: d,
           ggLog: ggLog,
           branchName: 'feat_test',
@@ -312,7 +329,7 @@ void main() {
 
     test('should throw when branch name is missing', () async {
       expect(
-        () => doCheckout.exec(directory: d, ggLog: ggLog),
+        () => createTicket.exec(directory: d, ggLog: ggLog),
         throwsA(
           isA<Exception>().having(
             (e) => e.toString(),
@@ -323,5 +340,78 @@ void main() {
         ),
       );
     });
+
+    test('should throw on CLI when message is missing', () async {
+      expect(
+        () => runner.run(['ticket', '-i', d.path, '-b', 'feat_cli']),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'toString()',
+            'Exception: Missing message. Run again with --message <message>.',
+          ),
+        ),
+      );
+    });
+
+    test(
+      'should write .ticket file when message is provided programmatically',
+      () async {
+        when(
+          () => isPushed.get(
+            directory: d,
+            ggLog: ggLog,
+            ignoreUnCommittedChanges: true,
+          ),
+        ).thenAnswer((_) async => true);
+
+        mockGitCommand(['stash']);
+        mockGitCommand(['checkout', '-b', 'feat_test']);
+        mockGitCommand(['stash', 'apply']);
+
+        await createTicket.exec(
+          directory: d,
+          ggLog: ggLog,
+          branchName: 'feat_test',
+          message: 'Programmatic message',
+        );
+
+        final ticketFile = File('${d.path}${Platform.pathSeparator}.ticket');
+        expect(ticketFile.existsSync(), isTrue);
+
+        final content =
+            jsonDecode(ticketFile.readAsStringSync()) as Map<String, dynamic>;
+        expect(content['issue_id'], equals('feat_test'));
+        expect(content['description'], equals('Programmatic message'));
+      },
+    );
+
+    test(
+      'should not write .ticket file when message is null programmatically',
+      () async {
+        when(
+          () => isPushed.get(
+            directory: d,
+            ggLog: ggLog,
+            ignoreUnCommittedChanges: true,
+          ),
+        ).thenAnswer((_) async => true);
+
+        mockGitCommand(['stash']);
+        mockGitCommand(['checkout', '-b', 'feat_test']);
+        mockGitCommand(['stash', 'apply']);
+
+        await createTicket.exec(
+          directory: d,
+          ggLog: ggLog,
+          branchName: 'feat_test',
+        );
+
+        final ticketFile = File('${d.path}${Platform.pathSeparator}.ticket');
+        expect(ticketFile.existsSync(), isFalse);
+      },
+    );
   });
 }
+
+class MockGgProcessWrapper extends Mock implements GgProcessWrapper {}

@@ -30,11 +30,11 @@ class Do extends Command<void> {
 
   // ...........................................................................
   void _initSubCommands(DepsOfDo deps) {
+    addSubcommand(deps.create);
     addSubcommand(deps.doCommit);
     addSubcommand(deps.doPush);
     addSubcommand(deps.doPublish);
     addSubcommand(deps.doUpgrade);
-    addSubcommand(deps.doCheckout);
     addSubcommand(DoMaintain(ggLog: ggLog));
     addSubcommand(deps.doMerge);
   }
@@ -46,21 +46,24 @@ class DepsOfDo {
   /// Constructor
   DepsOfDo({
     required this.ggLog,
+    Create? create,
     DoCommit? doCommit,
     DoPush? doPush,
     DoPublish? doPublish,
     DoUpgrade? doUpgrade,
-    DoCheckout? doCheckout,
     DoMerge? doMerge,
-  }) : doCommit = doCommit ?? DoCommit(ggLog: ggLog),
+  }) : create = create ?? Create(ggLog: ggLog),
+       doCommit = doCommit ?? DoCommit(ggLog: ggLog),
        doPush = doPush ?? DoPush(ggLog: ggLog),
        doPublish = doPublish ?? DoPublish(ggLog: ggLog),
        doUpgrade = doUpgrade ?? DoUpgrade(ggLog: ggLog),
-       doCheckout = doCheckout ?? DoCheckout(ggLog: ggLog),
        doMerge = doMerge ?? DoMerge(ggLog: ggLog);
 
   /// The log function
   final GgLog ggLog;
+
+  /// The create command
+  final Create create;
 
   /// The can commit command
   final DoCommit doCommit;
@@ -73,9 +76,6 @@ class DepsOfDo {
 
   /// The do upgrade command
   final DoUpgrade doUpgrade;
-
-  /// The do checkout command
-  final DoCheckout doCheckout;
 
   /// The do merge command
   final DoMerge doMerge;
