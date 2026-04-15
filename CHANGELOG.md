@@ -2,6 +2,8 @@
 
 ### Changed
 
+## [6.3.1] - 2026-04-15
+
 ## [6.3.0] - 2026-04-13
 
 ## [6.2.0] - 2026-04-13
@@ -489,6 +491,7 @@
 
 > > > > > > > Stashed changes
 
+[6.3.1]: https://github.com/inlavigo/gg/compare/6.3.0...6.3.1
 [6.3.0]: https://github.com/inlavigo/gg/compare/6.2.0...6.3.0
 [6.2.0]: https://github.com/inlavigo/gg/compare/6.1.4...6.2.0
 [6.1.4]: https://github.com/inlavigo/gg/compare/6.1.3...6.1.4
