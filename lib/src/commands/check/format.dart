@@ -6,82 +6,44 @@
 
 import 'dart:io';
 
+import 'package:gg/src/tools/formatter.dart';
+import 'package:gg/src/tools/project_type.dart';
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_is_github/gg_is_github.dart';
 import 'package:gg_log/gg_log.dart';
-import 'package:gg_process/gg_process.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_status_printer/gg_status_printer.dart';
-import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
 
-/// Runs dart format on the source code
+/// Applies formatting to the source code, dispatching to the right
+/// [Formatter] based on the detected [ProjectType].
 class Format extends DirCommand<void> {
-  /// Constructor
-  Format({required super.ggLog, this.processWrapper = const GgProcessWrapper()})
-    : super(name: 'format', description: 'Runs »dart format«.');
+  /// Constructor.
+  Format({
+    required super.ggLog,
+    Formatter? dartFormatter,
+    Formatter? typeScriptFormatter,
+  }) : _dartFormatter = dartFormatter ?? const DartFormatter(),
+       _typeScriptFormatter =
+           typeScriptFormatter ?? const TypeScriptFormatter(),
+       super(name: 'format', description: 'Runs the project formatter.');
+
+  final Formatter _dartFormatter;
+  final Formatter _typeScriptFormatter;
 
   // ...........................................................................
-  /// Executes the command
   @override
   Future<void> get({required Directory directory, required GgLog ggLog}) async {
     await check(directory: directory);
 
-    final statusPrinter = GgStatusPrinter<ProcessResult>(
-      ggLog: ggLog,
-      message: 'Running "dart format"',
-    );
+    final formatter = switch (detectProjectType(directory)) {
+      ProjectType.dart || ProjectType.flutter => _dartFormatter,
+      ProjectType.typescript => _typeScriptFormatter,
+    };
 
-    statusPrinter.logStatus(GgStatusPrinterStatus.running);
-
-    final result = await processWrapper.run('dart', [
-      'format',
-      '.',
-      '-o',
-      'write',
-      '--set-exit-if-changed',
-    ], workingDirectory: directory.path);
-
-    if (result.exitCode == 0) {
-      statusPrinter.logStatus(GgStatusPrinterStatus.success);
-    }
-
-    if (result.exitCode != 0) {
-      final stdErr = result.stderr as String;
-      final stdOut = result.stdout as String;
-      final std = '$stdErr\n$stdOut';
-
-      final files = ErrorInfoReader().filePathes(std);
-
-      // When running on git hub, log the file that have been changed
-      if (isGitHub && files.isNotEmpty) {
-        statusPrinter.logStatus(GgStatusPrinterStatus.error);
-
-        // Log hint
-        ggLog(yellow('The following files were formatted:'));
-        final filesRed = files.map((e) => '- ${red(e)}').join('\n');
-        ggLog(filesRed);
-
-        throw Exception('dart format failed.');
-      }
-
-      // When no files have changed, but an error occurred log the error
-      if (files.isEmpty) {
-        statusPrinter.logStatus(GgStatusPrinterStatus.error);
-        ggLog(brightBlack('std'));
-        throw Exception('dart format failed.');
-      }
-
-      statusPrinter.logStatus(GgStatusPrinterStatus.success);
-    }
+    await formatter.run(directory: directory, ggLog: ggLog);
   }
-
-  /// The process wrapper used to execute shell processes
-  final GgProcessWrapper processWrapper;
 }
 
 // .............................................................................
-/// A mocktail mock
+/// A mocktail mock.
 class MockFormat extends mocktail.Mock implements Format {}

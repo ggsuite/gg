@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/tools/gg_state.dart';
+import 'package:gg/src/tools/repository_url.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_changelog/gg_changelog.dart' as cl;
 import 'package:gg_console_colors/gg_console_colors.dart';
@@ -126,7 +127,7 @@ class DoCommit extends DirCommand<void> {
       }
     }
 
-    final repoUrl = await _repositoryUrl(directory);
+    final repoUrl = await readRepositoryUrl(directory);
 
     // Is everything fine? Skip checks when --force is used
     if (force != true) {
@@ -269,18 +270,6 @@ class DoCommit extends DirCommand<void> {
     }
 
     return message;
-  }
-
-  // ...........................................................................
-  Future<String> _repositoryUrl(Directory directory) async {
-    final pubspec = await File('${directory.path}/pubspec.yaml').readAsString();
-    RegExp regExp = RegExp(r'^\s*repository:\s*(.+)$', multiLine: true);
-    Match? match = regExp.firstMatch(pubspec);
-    String? repositoryUrl = match?.group(1)?.replaceAll(RegExp(r'/$'), '');
-    if (repositoryUrl == null) {
-      throw Exception('No »repository:« found in pubspec.yaml');
-    }
-    return repositoryUrl;
   }
 
   // ...........................................................................

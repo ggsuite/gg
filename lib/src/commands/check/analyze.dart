@@ -6,72 +6,43 @@
 
 import 'dart:io';
 
+import 'package:gg/src/tools/analyzer.dart';
+import 'package:gg/src/tools/project_type.dart';
 import 'package:gg_args/gg_args.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
-import 'package:gg_process/gg_process.dart';
-import 'package:gg_status_printer/gg_status_printer.dart';
-import 'package:gg_test/gg_test.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 
 // #############################################################################
 
-/// Runs dart analyze on the source code
+/// Runs static analysis on the source code, dispatching to the right
+/// [Analyzer] based on the detected [ProjectType].
 class Analyze extends DirCommand<void> {
-  /// Constructor
+  /// Constructor.
   Analyze({
     required super.ggLog,
-    this.processWrapper = const GgProcessWrapper(),
-  }) : super(name: 'analyze', description: 'Runs »dart analyze«.');
+    Analyzer? dartAnalyzer,
+    Analyzer? typeScriptAnalyzer,
+  }) : _dartAnalyzer = dartAnalyzer ?? const DartAnalyzer(),
+       _typeScriptAnalyzer = typeScriptAnalyzer ?? const TypeScriptAnalyzer(),
+       super(name: 'analyze', description: 'Runs static analysis.');
+
+  final Analyzer _dartAnalyzer;
+  final Analyzer _typeScriptAnalyzer;
 
   // ...........................................................................
-  /// Executes the command
   @override
   Future<void> get({required Directory directory, required GgLog ggLog}) async {
     await check(directory: directory);
 
-    final statusPrinter = GgStatusPrinter<ProcessResult>(
-      ggLog: ggLog,
-      message: 'Running "dart analyze"',
-    );
+    final analyzer = switch (detectProjectType(directory)) {
+      ProjectType.dart || ProjectType.flutter => _dartAnalyzer,
+      ProjectType.typescript => _typeScriptAnalyzer,
+    };
 
-    statusPrinter.logStatus(GgStatusPrinterStatus.running);
-
-    final result = await processWrapper.run('dart', [
-      'analyze',
-      '--fatal-infos',
-      '--fatal-warnings',
-    ], workingDirectory: directory.path);
-
-    statusPrinter.logStatus(
-      result.exitCode == 0
-          ? GgStatusPrinterStatus.success
-          : GgStatusPrinterStatus.error,
-    );
-
-    if (result.exitCode != 0) {
-      final files = [
-        ...ErrorInfoReader().filePathes(result.stderr as String),
-        ...ErrorInfoReader().filePathes(result.stdout as String),
-      ];
-
-      // Log hint
-      ggLog(yellow('There are analyzer errors:'));
-
-      // Log files
-      final filesRed = files.map((e) => red('- $e')).join('\n');
-      ggLog(filesRed);
-
-      throw Exception(
-        'Analyze failed. Run "${blue('dart analyze')}" to see details.',
-      );
-    }
+    await analyzer.run(directory: directory, ggLog: ggLog);
   }
-
-  /// The process wrapper used to execute shell processes
-  final GgProcessWrapper processWrapper;
 }
 
 // .............................................................................
-/// A mocktail mock
+/// A mocktail mock.
 class MockAnalyze extends mocktail.Mock implements Analyze {}

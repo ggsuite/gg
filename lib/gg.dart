@@ -40,8 +40,13 @@ export 'src/commands/do/do_upgrade.dart';
 export 'src/commands/info.dart';
 export 'src/gg.dart';
 // Tools
+export 'src/tools/analyzer.dart';
 export 'src/tools/carriage_return.dart';
 export 'src/tools/checks.dart';
+export 'src/tools/formatter.dart';
 export 'src/tools/command_cluster.dart';
 export 'src/tools/gg_state.dart';
+export 'src/tools/project_type.dart';
+export 'src/tools/repository_url.dart';
+export 'src/tools/type_script_package_manager.dart';
 export 'src/tools/version_selector.dart';

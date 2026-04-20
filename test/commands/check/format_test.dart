@@ -10,7 +10,6 @@ import 'package:args/command_runner.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_is_github/gg_is_github.dart';
-import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
@@ -20,14 +19,19 @@ void main() {
   late CommandRunner<void> runner;
   late Directory tmpDir;
 
+  setUpAll(() {
+    registerFallbackValue(Directory(''));
+  });
+
   // ...........................................................................
   setUp(() {
     testIsGitHub = false;
     messages.clear();
     runner = CommandRunner<void>('test', 'test');
-    final format = Format(ggLog: messages.add);
-    runner.addCommand(format);
+    runner.addCommand(Format(ggLog: messages.add));
     tmpDir = Directory.systemTemp.createTempSync();
+    // A valid pubspec.yaml makes `detectProjectType` return ProjectType.dart.
+    File('${tmpDir.path}/pubspec.yaml').writeAsStringSync('name: foo\n');
   });
 
   // ...........................................................................
@@ -49,19 +53,16 @@ void main() {
 
   group('Format', () {
     group('run()', () {
-      // .......................................................................
       group('should print a usage description', () {
         test('when called with args=[--help]', () async {
           await capturePrint(
             ggLog: messages.add,
             code: () => runner.run(['format', '--help']),
           );
-
-          expect(messages.last, contains('Runs »dart format«.'));
+          expect(messages.last, contains('Runs the project formatter.'));
         });
       });
 
-      // .......................................................................
       group('should throw', () {
         test('if input is missing', () async {
           await expectLater(
@@ -76,69 +77,87 @@ void main() {
           );
         });
 
-        group('if formatting errors are int the code', () {
-          group('and test are running', () {
-            test('on GitHub', () async {
-              testIsGitHub = true;
-
-              await createSampleFiles();
-
-              // Run the command
-              await expectLater(
-                () => runner.run(['format', '--input', tmpDir.path]),
-                throwsA(
-                  isA<Exception>().having(
-                    (e) => e.toString(),
-                    'message',
-                    contains('Exception: dart format failed.'),
-                  ),
-                ),
-              );
-
-              // An error should have been logged
-              expect(messages[0], contains('⌛️ Running "dart format"'));
-              expect(messages[1], contains('❌ Running "dart format"'));
-            });
-
-            test('locally', () async {
-              testIsGitHub = false;
-
-              await createSampleFiles();
-
-              // Run the command
-              await runner.run(['format', '--input', tmpDir.path]);
-
-              // An error should have been logged
-              expect(messages[0], contains('⌛️ Running "dart format"'));
-              expect(messages[1], contains('✅ Running "dart format"'));
-            });
-          });
+        test('if the project type cannot be detected', () async {
+          final emptyDir = Directory.systemTemp.createTempSync();
+          try {
+            await expectLater(
+              () => runner.run(['format', '--input', emptyDir.path]),
+              throwsA(isA<Exception>()),
+            );
+          } finally {
+            emptyDir.deleteSync(recursive: true);
+          }
         });
 
-        test('if dart format does exit with error', () async {
-          // Create a mock process wrapper
-          final processWrapper = MockGgProcessWrapper();
-
-          // Configure runner and command
-          final runner = CommandRunner<void>('test', 'test');
-          runner.addCommand(
-            Format(ggLog: messages.add, processWrapper: processWrapper),
-          );
-
-          // Make process wrapper returning an error
+        test('when the injected typescript formatter throws', () async {
+          final tsDir = Directory.systemTemp.createTempSync();
+          File('${tsDir.path}/package.json').writeAsStringSync('{}');
+          File('${tsDir.path}/tsconfig.json').writeAsStringSync('{}');
+          final mockFormatter = MockFormatter();
           when(
-            () => processWrapper.run(
-              any(),
-              any(),
-              workingDirectory: any(named: 'workingDirectory'),
+            () => mockFormatter.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
             ),
-          ).thenAnswer(
-            (_) => Future.value(ProcessResult(1, 1, 'stdout', 'stderr')),
+          ).thenThrow(Exception('ts boom'));
+
+          final localRunner = CommandRunner<void>('test', 'test');
+          localRunner.addCommand(
+            Format(ggLog: messages.add, typeScriptFormatter: mockFormatter),
           );
 
-          // Run the command
+          try {
+            await expectLater(
+              () => localRunner.run(['format', '--input', tsDir.path]),
+              throwsA(
+                isA<Exception>().having(
+                  (e) => e.toString(),
+                  'message',
+                  contains('ts boom'),
+                ),
+              ),
+            );
+          } finally {
+            tsDir.deleteSync(recursive: true);
+          }
+        });
+
+        test('when the injected formatter throws', () async {
+          final mockFormatter = MockFormatter();
+          when(
+            () => mockFormatter.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+            ),
+          ).thenThrow(Exception('boom'));
+
+          final localRunner = CommandRunner<void>('test', 'test');
+          localRunner.addCommand(
+            Format(ggLog: messages.add, dartFormatter: mockFormatter),
+          );
+
           await expectLater(
-            () => runner.run(['format', tmpDir.path]),
+            () => localRunner.run(['format', '--input', tmpDir.path]),
+            throwsA(
+              isA<Exception>().having(
+                (e) => e.toString(),
+                'message',
+                contains('boom'),
+              ),
+            ),
+          );
+        });
+      });
+
+      // .......................................................................
+      // Integration tests against the real `dart format` binary.
+      group('dart formatter integration', () {
+        test('fails on GitHub when files need formatting', () async {
+          testIsGitHub = true;
+          await createSampleFiles();
+
+          await expectLater(
+            () => runner.run(['format', '--input', tmpDir.path]),
             throwsA(
               isA<Exception>().having(
                 (e) => e.toString(),
@@ -148,20 +167,57 @@ void main() {
             ),
           );
 
-          // An error should have been logged
           expect(messages[0], contains('⌛️ Running "dart format"'));
           expect(messages[1], contains('❌ Running "dart format"'));
         });
+
+        test('succeeds locally and rewrites files in place', () async {
+          testIsGitHub = false;
+          await createSampleFiles();
+
+          await runner.run(['format', '--input', tmpDir.path]);
+
+          expect(messages[0], contains('⌛️ Running "dart format"'));
+          expect(messages[1], contains('✅ Running "dart format"'));
+        });
+
+        test('succeeds when there is nothing to format', () async {
+          await runner.run(['format', '--input', tmpDir.path]);
+          expect(messages[0], contains('⌛️ Running "dart format"'));
+          expect(messages[1], contains('✅ Running "dart format"'));
+        });
       });
 
-      // .......................................................................
-      group('should succeed', () {
-        group('when called with right input param', () {
-          test('and no format errors in code', () async {
-            await runner.run(['format', '--input', tmpDir.path]);
-            expect(messages[0], contains('⌛️ Running "dart format"'));
-            expect(messages[1], contains('✅ Running "dart format"'));
-          });
+      group('should dispatch', () {
+        test('Flutter projects to the dart formatter', () async {
+          final flutterDir = Directory.systemTemp.createTempSync();
+          File('${flutterDir.path}/pubspec.yaml').writeAsStringSync(
+            'name: foo\nflutter:\n  uses-material-design: true\n',
+          );
+          final mockFormatter = MockFormatter();
+          when(
+            () => mockFormatter.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+            ),
+          ).thenAnswer((_) async {});
+
+          final localRunner = CommandRunner<void>('test', 'test');
+          localRunner.addCommand(
+            Format(ggLog: messages.add, dartFormatter: mockFormatter),
+          );
+
+          try {
+            await localRunner.run(['format', '--input', flutterDir.path]);
+            verify(
+              () => mockFormatter.run(
+                directory: any(named: 'directory'),
+                ggLog: any(named: 'ggLog'),
+              ),
+            ).called(1);
+          } finally {
+            flutterDir.deleteSync(recursive: true);
+          }
         });
       });
     });

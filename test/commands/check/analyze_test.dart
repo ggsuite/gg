@@ -9,8 +9,6 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
 import 'package:gg/gg.dart';
-import 'package:gg_console_colors/gg_console_colors.dart';
-import 'package:gg_process/gg_process.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -19,12 +17,17 @@ void main() {
   late CommandRunner<void> runner;
   late Directory tmpDir;
 
+  setUpAll(() {
+    registerFallbackValue(Directory(''));
+  });
+
   setUp(() {
     messages.clear();
     runner = CommandRunner<void>('test', 'test');
-    final analyze = Analyze(ggLog: messages.add);
-    runner.addCommand(analyze);
+    runner.addCommand(Analyze(ggLog: messages.add));
     tmpDir = Directory.systemTemp.createTempSync();
+    // A valid pubspec.yaml makes `detectProjectType` return ProjectType.dart.
+    File('${tmpDir.path}/pubspec.yaml').writeAsStringSync('name: foo\n');
   });
 
   tearDown(() {
@@ -41,7 +44,7 @@ void main() {
             code: () => runner.run(['analyze', '--help']),
           );
 
-          expect(messages.last, contains('Runs »dart analyze«.'));
+          expect(messages.last, contains('Runs static analysis.'));
         });
       });
 
@@ -60,55 +63,133 @@ void main() {
           );
         });
 
-        test('if dart analyze does exit with error', () async {
-          // Create a mock process wrapper
-          final processWrapper = MockGgProcessWrapper();
-
-          // Configure runner and command
-          final runner = CommandRunner<void>('test', 'test');
-          runner.addCommand(
-            Analyze(ggLog: messages.add, processWrapper: processWrapper),
-          );
-
-          // Make process wrapper returning an error
+        test('if the underlying analyzer fails', () async {
+          final mockAnalyzer = MockAnalyzer();
           when(
-            () => processWrapper.run(
-              any(),
-              any(),
-              workingDirectory: any(named: 'workingDirectory'),
+            () => mockAnalyzer.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
             ),
-          ).thenAnswer(
-            (_) => Future.value(ProcessResult(1, 1, 'stdout', 'stderr')),
+          ).thenThrow(Exception('boom'));
+
+          final localRunner = CommandRunner<void>('test', 'test');
+          localRunner.addCommand(
+            Analyze(ggLog: messages.add, dartAnalyzer: mockAnalyzer),
           );
 
-          // Run the command
           await expectLater(
-            () => runner.run(['analyze', tmpDir.path]),
+            () => localRunner.run(['analyze', '--input', tmpDir.path]),
             throwsA(
               isA<Exception>().having(
                 (e) => e.toString(),
                 'message',
-
-                'Exception: Analyze failed. '
-                    'Run "${blue('dart analyze')}" to see details.',
+                contains('boom'),
               ),
             ),
           );
+        });
 
-          // An error should have been logged
-          expect(messages[0], contains('⌛️ Running "dart analyze"'));
-          expect(messages[1], contains('❌ Running "dart analyze"'));
+        test('if the project type cannot be detected', () async {
+          final emptyDir = Directory.systemTemp.createTempSync();
+          try {
+            await expectLater(
+              () => runner.run(['analyze', '--input', emptyDir.path]),
+              throwsA(isA<Exception>()),
+            );
+          } finally {
+            emptyDir.deleteSync(recursive: true);
+          }
+        });
+
+        test('when the injected typescript analyzer throws', () async {
+          final tsDir = Directory.systemTemp.createTempSync();
+          File('${tsDir.path}/package.json').writeAsStringSync('{}');
+          File('${tsDir.path}/tsconfig.json').writeAsStringSync('{}');
+          final mockAnalyzer = MockAnalyzer();
+          when(
+            () => mockAnalyzer.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+            ),
+          ).thenThrow(Exception('ts boom'));
+
+          final localRunner = CommandRunner<void>('test', 'test');
+          localRunner.addCommand(
+            Analyze(ggLog: messages.add, typeScriptAnalyzer: mockAnalyzer),
+          );
+
+          try {
+            await expectLater(
+              () => localRunner.run(['analyze', '--input', tsDir.path]),
+              throwsA(
+                isA<Exception>().having(
+                  (e) => e.toString(),
+                  'message',
+                  contains('ts boom'),
+                ),
+              ),
+            );
+          } finally {
+            tsDir.deleteSync(recursive: true);
+          }
         });
       });
 
       // .......................................................................
       group('should succeed', () {
-        group('when called with right input param', () {
-          test('and no analyze errors in code', () async {
-            await runner.run(['analyze', '--input', tmpDir.path]);
-            expect(messages[0], contains('⌛️ Running "dart analyze"'));
-            expect(messages[1], contains('✅ Running "dart analyze"'));
-          });
+        test('when the injected analyzer returns without throwing', () async {
+          final mockAnalyzer = MockAnalyzer();
+          when(
+            () => mockAnalyzer.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+            ),
+          ).thenAnswer((_) async {});
+
+          final localRunner = CommandRunner<void>('test', 'test');
+          localRunner.addCommand(
+            Analyze(ggLog: messages.add, dartAnalyzer: mockAnalyzer),
+          );
+
+          await localRunner.run(['analyze', '--input', tmpDir.path]);
+
+          verify(
+            () => mockAnalyzer.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+            ),
+          ).called(1);
+        });
+
+        test('dispatches Flutter projects to the dart analyzer', () async {
+          final flutterDir = Directory.systemTemp.createTempSync();
+          File('${flutterDir.path}/pubspec.yaml').writeAsStringSync(
+            'name: foo\nflutter:\n  uses-material-design: true\n',
+          );
+          final mockAnalyzer = MockAnalyzer();
+          when(
+            () => mockAnalyzer.run(
+              directory: any(named: 'directory'),
+              ggLog: any(named: 'ggLog'),
+            ),
+          ).thenAnswer((_) async {});
+
+          final localRunner = CommandRunner<void>('test', 'test');
+          localRunner.addCommand(
+            Analyze(ggLog: messages.add, dartAnalyzer: mockAnalyzer),
+          );
+
+          try {
+            await localRunner.run(['analyze', '--input', flutterDir.path]);
+            verify(
+              () => mockAnalyzer.run(
+                directory: any(named: 'directory'),
+                ggLog: any(named: 'ggLog'),
+              ),
+            ).called(1);
+          } finally {
+            flutterDir.deleteSync(recursive: true);
+          }
         });
       });
     });

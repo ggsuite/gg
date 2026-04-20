@@ -34,6 +34,7 @@ void main() {
 
       test('should allow to run the code from command line', () async {
         final tmp = Directory.systemTemp.createTempSync();
+        File('${tmp.path}/pubspec.yaml').writeAsStringSync('name: foo\n');
 
         await capturePrint(
           ggLog: messages.add,
