@@ -169,10 +169,21 @@ class DoPublish extends DirCommand<void> {
     );
 
     if (!didPublishPubDev) {
+      final hashBeforePubDev = await _state.currentHash(
+        directory: directory,
+        ggLog: ggLog,
+      );
+
       await _publishToPubDevIfNeeded(
         directory: directory,
         ggLog: ggLog,
         askBeforePublishing: askBeforePublishing,
+      );
+
+      await _commitPubspecLockIfChanged(
+        directory: directory,
+        ggLog: ggLog,
+        hashBefore: hashBeforePubDev,
       );
 
       await _state.writeSuccess(
@@ -432,6 +443,33 @@ class DoPublish extends DirCommand<void> {
       'The package was never published to pub.dev before. '
       'Please call »gg do push« with »--ask-before-publishing« '
       'when publishing the first time.',
+    );
+  }
+
+  /// Commits pubspec.lock if it was modified during pub.dev publishing.
+  Future<void> _commitPubspecLockIfChanged({
+    required Directory directory,
+    required GgLog ggLog,
+    required int hashBefore,
+  }) async {
+    final result = await _processWrapper.run('git', [
+      'status',
+      '--porcelain',
+      'pubspec.lock',
+    ], workingDirectory: directory.path);
+
+    if (result.stdout.toString().trim().isEmpty) {
+      return;
+    }
+
+    await _state.updateHash(hash: hashBefore, directory: directory);
+
+    await _commit.commit(
+      ggLog: ggLog,
+      directory: directory,
+      doStage: true,
+      message: 'Update pubspec.lock',
+      ammendWhenNotPushed: true,
     );
   }
 

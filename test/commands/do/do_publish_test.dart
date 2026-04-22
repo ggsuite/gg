@@ -205,6 +205,14 @@ void main() {
       ], workingDirectory: d.path),
     ).thenAnswer((_) async => ProcessResult(0, 0, '', ''));
 
+    when(
+      () => processWrapper.run('git', [
+        'status',
+        '--porcelain',
+        'pubspec.lock',
+      ], workingDirectory: d.path),
+    ).thenAnswer((_) async => ProcessResult(0, 0, '', ''));
+
     publishedVersion = MockPublishedVersion();
 
     isVersionPrepared = IsVersionPrepared(
@@ -425,6 +433,54 @@ void main() {
                 });
               });
             });
+          });
+
+          test('commits pubspec.lock if modified during publishing', () async {
+            when(
+              () => publish.exec(
+                directory: dMock(),
+                ggLog: ggLog,
+                askBeforePublishing: false,
+              ),
+            ).thenAnswer((_) async {
+              await File(
+                join(d.path, 'pubspec.lock'),
+              ).writeAsString('packages: {}\n');
+              publishedVersionValue = Version.parse('1.2.4');
+            });
+
+            when(
+              () => processWrapper.run('git', [
+                'status',
+                '--porcelain',
+                'pubspec.lock',
+              ], workingDirectory: d.path),
+            ).thenAnswer(
+              (_) async => ProcessResult(0, 0, ' M pubspec.lock', ''),
+            );
+
+            await DirectJson.writeFile(
+              file: File(join(d.path, '.gg', '.gg.json')),
+              path: 'doPublish/success/hash',
+              value: needsChangeHash,
+            );
+
+            await doPublish.exec(
+              directory: d,
+              ggLog: ggLog,
+              askBeforePublishing: false,
+              deleteFeatureBranch: false,
+            );
+
+            expect(
+              await DidCommit(ggLog: ggLog).get(directory: d, ggLog: ggLog),
+              isTrue,
+            );
+
+            expect(
+              await DidPublish(ggLog: ggLog).get(directory: d, ggLog: ggLog),
+              isTrue,
+            );
           });
 
           group('not to pub.dev', () {
