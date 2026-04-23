@@ -556,6 +556,39 @@ void main() {
     });
   });
 
+  group('DoCommit on TypeScript project', () {
+    setUp(() async {
+      // Replace Dart project with a TypeScript one
+      await File('${d.path}/pubspec.yaml').delete();
+      await addAndCommitSampleFile(
+        d,
+        fileName: 'package.json',
+        content: '{"name": "x"}',
+      );
+      await addAndCommitSampleFile(d, fileName: 'tsconfig.json', content: '{}');
+    });
+
+    test('should skip CHANGELOG.md update and commit successfully', () async {
+      // Add uncommitted file
+      await addFileWithoutCommitting(d);
+
+      final changelogFile = File('${d.path}/CHANGELOG.md');
+      final changeLogBefore = await changelogFile.readAsString();
+
+      await doCommit.exec(
+        directory: d,
+        ggLog: ggLog,
+        message: 'My commit',
+        logType: LogType.added,
+      );
+
+      // CHANGELOG.md should not have been touched
+      expect(await changelogFile.readAsString(), changeLogBefore);
+
+      expect(messages.last, yellow('Checks successful. Commit successful.'));
+    });
+  });
+
   group('DoCommit --force', () {
     test('should bypass checks and commit programmatically', () async {
       // Add uncommitted file

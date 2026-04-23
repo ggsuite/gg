@@ -1,1 +1,1 @@
-{"issue_id":"CDM-1312","description":"Bugfix: Committing of modified pubspec.lock while gg do publish"}
+{"issue_id":"bugfix-gg-do-commit-typescript","description":"Bugfix: gg do commit on typescript"}

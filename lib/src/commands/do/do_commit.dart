@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:gg/src/commands/can/can_commit.dart';
 import 'package:gg/src/tools/gg_state.dart';
+import 'package:gg/src/tools/project_type.dart';
 import 'package:gg/src/tools/repository_url.dart';
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_changelog/gg_changelog.dart' as cl;
@@ -127,7 +128,14 @@ class DoCommit extends DirCommand<void> {
       }
     }
 
-    final repoUrl = await readRepositoryUrl(directory);
+    // CHANGELOG update currently depends on cider, which requires
+    // pubspec.yaml. Skip it for TypeScript projects until we have a
+    // TypeScript-native changelog writer.
+    final projectType = detectProjectType(directory);
+    final supportsChangeLog =
+        projectType == ProjectType.dart || projectType == ProjectType.flutter;
+
+    final repoUrl = supportsChangeLog ? await readRepositoryUrl(directory) : '';
 
     // Is everything fine? Skip checks when --force is used
     if (force != true) {
@@ -136,7 +144,7 @@ class DoCommit extends DirCommand<void> {
 
     // Update changelog when a message is given
     updateChangeLog ??= argResults?['log'] as bool? ?? true;
-    if (updateChangeLog) {
+    if (updateChangeLog && supportsChangeLog) {
       await _writeMessageIntoChangeLog(
         directory: directory,
         message: message,
