@@ -2,6 +2,13 @@
 
 ### Changed
 
+## [7.0.3] - 2026-04-23
+
+### Changed
+
+- Refactor: resolve delete-feature-branch only when needed
+- Create ticket for lazy-resolve-delete-feature-branch
+
 ## [7.0.2] - 2026-04-23
 
 ## [7.0.1] - 2026-04-22
@@ -497,6 +504,7 @@
 
 > > > > > > > Stashed changes
 
+[7.0.3]: https://github.com/inlavigo/gg/compare/7.0.2...7.0.3
 [7.0.2]: https://github.com/inlavigo/gg/compare/7.0.1...7.0.2
 [7.0.1]: https://github.com/inlavigo/gg/compare/7.0.0...7.0.1
 [7.0.0]: https://github.com/inlavigo/gg/compare/6.3.1...7.0.0

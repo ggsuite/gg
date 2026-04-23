@@ -1,1 +1,1 @@
-{"issue_id":"bugfix-gg-do-commit-typescript","description":"Bugfix: gg do commit on typescript"}
+{"issue_id":"lazy-resolve-delete-feature-branch","description":"Resolve delete-feature-branch only when needed"}

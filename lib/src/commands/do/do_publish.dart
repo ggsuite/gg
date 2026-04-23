@@ -126,11 +126,6 @@ class DoPublish extends DirCommand<void> {
       ggLog: <String>[].add,
     );
 
-    final shouldDelete = await _resolveDeleteFeatureBranch(
-      branchName: branchName,
-      deleteFeatureBranch: deleteFeatureBranch,
-    );
-
     // Did already publish?
     final isDone = await _state.readSuccess(
       directory: directory,
@@ -208,6 +203,11 @@ class DoPublish extends DirCommand<void> {
     await _state.writeSuccess(directory: directory, key: stateKey);
 
     await _doPush.gitPush(directory: directory, force: false);
+
+    final shouldDelete = await _resolveDeleteFeatureBranch(
+      branchName: branchName,
+      deleteFeatureBranch: deleteFeatureBranch,
+    );
 
     if (shouldDelete) {
       await _deleteFeatureBranch(directory: directory, branchName: branchName);
