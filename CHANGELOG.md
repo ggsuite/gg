@@ -2,6 +2,12 @@
 
 ### Changed
 
+## [7.0.4] - 2026-04-28
+
+### Changed
+
+- Execute git fetch and git pull on the main branch before merging in gg do merge
+
 ## [7.0.3] - 2026-04-23
 
 ### Changed
@@ -504,6 +510,7 @@
 
 > > > > > > > Stashed changes
 
+[7.0.4]: https://github.com/inlavigo/gg/compare/7.0.3...7.0.4
 [7.0.3]: https://github.com/inlavigo/gg/compare/7.0.2...7.0.3
 [7.0.2]: https://github.com/inlavigo/gg/compare/7.0.1...7.0.2
 [7.0.1]: https://github.com/inlavigo/gg/compare/7.0.0...7.0.1

@@ -11,6 +11,8 @@ import 'package:gg_args/gg_args.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_merge/gg_merge.dart' as gg_merge;
+import 'package:gg_process/gg_process.dart';
+import 'package:gg_publish/gg_publish.dart' as gg_publish;
 
 /// Performs the merge operation.
 class DoMerge extends DirCommand<void> {
@@ -21,8 +23,12 @@ class DoMerge extends DirCommand<void> {
     super.description = 'Performs the merge operation.',
     GgState? state,
     gg_merge.DoMerge? doMerge,
+    gg_publish.MainBranch? mainBranch,
+    GgProcessWrapper processWrapper = const GgProcessWrapper(),
   }) : _state = state ?? GgState(ggLog: ggLog),
-       _doMerge = doMerge ?? gg_merge.DoMerge(ggLog: ggLog) {
+       _doMerge = doMerge ?? gg_merge.DoMerge(ggLog: ggLog),
+       _mainBranch = mainBranch ?? gg_publish.MainBranch(ggLog: ggLog),
+       _processWrapper = processWrapper {
     argParser.addFlag(
       'automerge',
       abbr: 'a',
@@ -46,6 +52,8 @@ class DoMerge extends DirCommand<void> {
 
   final GgState _state;
   final gg_merge.DoMerge _doMerge;
+  final gg_publish.MainBranch _mainBranch;
+  final GgProcessWrapper _processWrapper;
 
   /// The key used to save the state of the command
   final String stateKey = 'doMerge';
@@ -89,6 +97,9 @@ class DoMerge extends DirCommand<void> {
       return;
     }
 
+    // Update local main branch via fetch + pull
+    await _fetchAndPullMain(directory: directory);
+
     // Perform merge using gg_merge
     await _doMerge.get(
       directory: directory,
@@ -100,6 +111,73 @@ class DoMerge extends DirCommand<void> {
 
     // Save state
     await _state.writeSuccess(directory: directory, key: stateKey);
+  }
+
+  /// Fetches and pulls the main branch before performing the merge.
+  Future<void> _fetchAndPullMain({required Directory directory}) async {
+    final mainBranchName = await _mainBranch.get(
+      directory: directory,
+      ggLog: <String>[].add,
+    );
+
+    final currentBranch = await _runGitCommand(
+      directory: directory,
+      arguments: const ['rev-parse', '--abbrev-ref', 'HEAD'],
+      actionDescription: 'determine the current branch',
+    );
+    final originalBranch = currentBranch.trim();
+    final switchBranches = originalBranch != mainBranchName;
+
+    if (switchBranches) {
+      await _runGitCommand(
+        directory: directory,
+        arguments: ['checkout', mainBranchName],
+        actionDescription: 'checkout $mainBranchName',
+      );
+    }
+
+    try {
+      await _runGitCommand(
+        directory: directory,
+        arguments: const ['fetch'],
+        actionDescription: 'fetch on $mainBranchName',
+      );
+      await _runGitCommand(
+        directory: directory,
+        arguments: const ['pull'],
+        actionDescription: 'pull on $mainBranchName',
+      );
+    } finally {
+      if (switchBranches) {
+        await _runGitCommand(
+          directory: directory,
+          arguments: ['checkout', originalBranch],
+          actionDescription: 'checkout $originalBranch',
+        );
+      }
+    }
+  }
+
+  /// Runs a git command and throws when it fails. Returns stdout on success.
+  Future<String> _runGitCommand({
+    required Directory directory,
+    required List<String> arguments,
+    required String actionDescription,
+  }) async {
+    final result = await _processWrapper.run(
+      'git',
+      arguments,
+      runInShell: true,
+      workingDirectory: directory.path,
+    );
+
+    if (result.exitCode != 0) {
+      final stderr = result.stderr.toString().trim();
+      final stdout = result.stdout.toString().trim();
+      final details = stderr.isNotEmpty ? stderr : stdout;
+      throw Exception('Failed to $actionDescription: $details');
+    }
+    return result.stdout.toString();
   }
 }
 
