@@ -6,6 +6,8 @@
 
 - Initial implementation
 
+## [3.0.4] - 2026-04-29
+
 ## [3.0.3] - 2026-04-28
 
 ## [3.0.2] - 2026-04-28
@@ -68,6 +70,7 @@
 
 - commit
 
+[3.0.4]: https://github.com/ggsuite/kd/compare/3.0.3...3.0.4
 [3.0.3]: https://github.com/ggsuite/kd/compare/3.0.2...3.0.3
 [3.0.2]: https://github.com/ggsuite/kd/compare/3.0.1...3.0.2
 [3.0.1]: https://github.com/ggsuite/kd/compare/3.0.0...3.0.1
