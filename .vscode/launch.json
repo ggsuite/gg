@@ -6,11 +6,11 @@
 
   "configurations": [
     {
-      "name": "Run Kidney",
+      "name": "Run Gg",
       "type": "dart",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/kidney.dart",
-      "args": ["kidney", "--verbose", "--apply", "gg", "do", "commit"],
+      "program": "${workspaceFolder}/bin/gg.dart",
+      "args": ["gg", "--verbose", "--apply", "gg", "do", "commit"],
       "console": "debugConsole"
     },
     {

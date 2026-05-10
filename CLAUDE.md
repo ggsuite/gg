@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`kd` is a Dart CLI tool (`kd` executable) for managing multi-repository ticket workspaces. It orchestrates cross-repo operations — committing, pushing, reviewing, publishing — across all Dart/Flutter packages in a ticket.
+`gg` is a Dart CLI tool (`gg` executable) for managing multi-repository ticket workspaces. It orchestrates cross-repo operations — committing, pushing, reviewing, publishing — across all Dart/Flutter packages in a ticket.
 
-This repository (`kd`) depends on a sibling package `kidney_core` at `../kidney_core`. Both are typically open together in the `feat-do-claude.code-workspace`.
+This repository (`gg`) depends on a sibling package `gg_multi` at `../gg_multi`. Both are typically open together in the `feat-do-claude.code-workspace`.
 
 ## Commands
 
@@ -33,30 +33,30 @@ gg do push                       # push after checks pass
 ### Running the UI
 
 ```bash
-dart run bin/kd.dart run         # start web server at http://localhost:8084
+dart run bin/gg.dart run         # start web server at http://localhost:8084
 ```
 
 ## Architecture
 
 ### Package Structure
 
-`kd` is a thin CLI shell. All business logic lives in `kidney_core` (`../kidney_core`).
+`gg` is a thin CLI shell. All business logic lives in `gg_multi` (`../gg_multi`).
 
 ```
-bin/kd.dart          → entry point: main() → runKidney()
+bin/gg.dart          → entry point: main() → runGg()
 lib/src/commands/
-  kidney.dart        → root Command; registers KidneyRun, KidneyOne, and all KidneyCore subcommands
-  kidney_one.dart    → `kd one` — re-exposes all `gg` subcommands under the kd namespace
-  kidney_run.dart    → `kd run` — HTTP server (port 8084) serving the pre-built kidney_ui/ Flutter web app
-kidney_ui/           → pre-built Flutter web app (static assets, not a source package)
+  gg.dart        → root Command; registers GgRun, GgOne, and all GgMulti subcommands
+  gg_one.dart    → `gg one` — re-exposes all `gg` subcommands under the gg namespace
+  gg_run.dart    → `gg run` — HTTP server (port 8084) serving the pre-built gg_multi_ui/ Flutter web app
+gg_multi_ui/           → pre-built Flutter web app (static assets, not a source package)
 ```
 
 ### Command Hierarchy
 
 ```
-kd
-├── run          (KidneyRun)    — serves kidney_ui at localhost:8084
-├── one          (KidneyOne)    — all `gg` subcommands
+gg
+├── run          (GgRun)    — serves gg_multi_ui at localhost:8084
+├── one          (GgOne)    — all `gg` subcommands
 ├── ls           (ListCommand)  — list organizations, repos, deps, tickets
 ├── can          (Can)          — can commit / push / publish / review
 ├── did          (Did)          — did commit / push
@@ -65,9 +65,9 @@ kd
                                    add / add-deps / code / create / init / rm
 ```
 
-`KidneyCore` (from `kidney_core`) contributes `ls`, `can`, `did`, and `do` subcommands by iterating over its `.subcommands.values`.
+`GgMulti` (from `gg_multi`) contributes `ls`, `can`, `did`, and `do` subcommands by iterating over its `.subcommands.values`.
 
-### kidney_core
+### gg_multi
 
 The sibling package contains the actual command implementations organized as:
 
@@ -80,7 +80,7 @@ Key backend concepts:
 - **WorkspaceUtils** — detects ticket boundaries by walking the directory tree
 - **SortedProcessingList** — returns repos in dependency order for safe cross-repo operations
 
-### `kd do claude`
+### `gg do claude`
 
 Generates a ticket-level `CLAUDE.md` by reading each repo's own `CLAUDE.md` in dependency order and concatenating them. Requires every repo to already have a `CLAUDE.md` (run `/init` in each repo first).
 

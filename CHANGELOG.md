@@ -2,9 +2,25 @@
 
 ## \[Unreleased\]
 
-### Added
+## [4.0.0] - 2026-05-10
 
-- Initial implementation
+### Changed
+
+- **BREAKING**: Renamed package from `kd` to `gg`. Repository moved to
+  https://github.com/ggsuite/gg. Update `dependencies:` entries and
+  `import 'package:kd/...'` statements to `import 'package:gg/...'`.
+  The executable is now `gg` (previously `kd`).
+- **BREAKING**: Replaced dependency `gg ^7.0.5` with `gg_one ^8.0.0`
+  (the upstream `gg` package was renamed to `gg_one`).
+- **BREAKING**: Replaced dependency `kidney_core ^3.1.0` with
+  `gg_multi ^4.0.0` (the upstream `kidney_core` package was renamed
+  to `gg_multi`).
+- Renamed source files (`bin/kd.dart` → `bin/gg.dart`, `lib/kd.dart`
+  → `lib/gg.dart`, `lib/src/commands/kidney*.dart` →
+  `lib/src/commands/gg*.dart`, tests, example).
+- Renamed Flutter web build directory `kidney_ui/` to `gg_multi_ui/`
+  (alignment with `gg_multi` naming).
+- Renamed status marker file `.kidney_status` to `.gg_multi_status`.
 
 ## [3.1.0] - 2026-05-04
 

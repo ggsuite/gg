@@ -1,29 +1,29 @@
-# kidney
+# gg
 
-Use kidney to apply shell commands to all dart packages in your directory:
+Use gg to apply shell commands to all dart packages in your directory:
 
 ```
-kidney . --apply --verbose ls
+gg . --apply --verbose ls
 ```
 
 ## Install
 
 ```bash
- dart pub global activate kidney
+ dart pub global activate gg
 ```
 
 ## Examples
 
-| Kidney part    | Command part   | Explenation                      |
+| Gg part    | Command part   | Explenation                      |
 | -------------- | -------------- | -------------------------------- |
-| `kidney . -av` | `ls`           | Executes ls in all packages      |
-| `kidney . -a`  | `flutter test` | Run the tests in all directories |
-| `kidney .`     | `ls`           | Start a dry run                  |
+| `gg . -av` | `ls`           | Executes ls in all packages      |
+| `gg . -a`  | `flutter test` | Run the tests in all directories |
+| `gg .`     | `ls`           | Start a dry run                  |
 
 ## Show help
 
 ```bash
-kidney
+gg
 ```
 
 ## Run tests on all packages
@@ -33,7 +33,7 @@ Change into your dev directory containing dart packages.
 Execute the following command:
 
 ```bash
-kidney . -a flutter test
+gg . -a flutter test
 ```
 
 ## Show the directory contents
@@ -41,7 +41,7 @@ kidney . -a flutter test
 To see the folder contents, add the `-v` option and call `ls`:
 
 ```bash
-kidney . -av ls
+gg . -av ls
 ```
 
 ## Do a dry-run
@@ -49,7 +49,7 @@ kidney . -av ls
 Remove the `-a` option, to perform a dry run of the desired command:
 
 ```bash
-kidney . -a ls
+gg . -a ls
 ```
 
 ## All options

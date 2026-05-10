@@ -6,18 +6,18 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg_args/gg_args.dart';
-import 'package:kd/kd.dart';
+import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
-Future<void> runKidney({
+Future<void> runGg({
   required List<String> args,
   required GgLog ggLog,
 }) async {
   try {
     await GgCommandRunner(
       ggLog: ggLog,
-      command: Kidney(ggLog: ggLog),
+      command: Gg(ggLog: ggLog),
     ).run(args: args);
   } catch (e) {
     ggLog(e.toString());
@@ -26,5 +26,5 @@ Future<void> runKidney({
 
 // .............................................................................
 // coverage:ignore-start
-Future<void> main(List<String> args) => runKidney(args: args, ggLog: print);
+Future<void> main(List<String> args) => runGg(args: args, ggLog: print);
 // coverage:ignore-end

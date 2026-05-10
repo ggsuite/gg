@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import '../../bin/kd.dart';
+import '../../bin/gg.dart';
 
 void main() {
   late Directory dRoot;
@@ -29,7 +29,7 @@ void main() {
   setUp(() async {
     messages.clear();
 
-    dRoot = await Directory.systemTemp.createTemp('kidney_test');
+    dRoot = await Directory.systemTemp.createTemp('gg_test');
     d0 = await Directory('${dRoot.path}/dir0').create();
     await initDartPackages();
   });
@@ -39,16 +39,16 @@ void main() {
   });
 
   group('main(args)', () {
-    group('should runKidney', () {
+    group('should runGg', () {
       group('- edge cases', () {
         group('should catch and print errors', () {
           test('- no arguments', () async {
-            await runKidney(args: [], ggLog: ggLog);
+            await runGg(args: [], ggLog: ggLog);
             expect(messages[0], contains('Missing subcommand for'));
           });
 
           test('- unknown argument', () async {
-            await runKidney(args: [dRoot.path, '--unknown'], ggLog: ggLog);
+            await runGg(args: [dRoot.path, '--unknown'], ggLog: ggLog);
             expect(
               messages[0],
               contains('Could not find an option named --unknown'),

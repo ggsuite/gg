@@ -6,21 +6,21 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg_args/gg_args.dart';
-import 'package:kd/kd.dart';
+import 'package:gg/gg.dart';
 import 'package:test/test.dart';
 
 void main() {
   final output = <String>[];
   void ggLog(String msg) => output.add(msg);
 
-  group('KidneyCommand', () {
-    late Kidney kidneyCommand;
+  group('GgCommand', () {
+    late Gg ggCommand;
     late GgCommandRunner runner;
 
     setUp(() {
       output.clear();
-      kidneyCommand = Kidney(ggLog: ggLog);
-      runner = GgCommandRunner(ggLog: ggLog, command: kidneyCommand);
+      ggCommand = Gg(ggLog: ggLog);
+      runner = GgCommandRunner(ggLog: ggLog, command: ggCommand);
     });
 
     test('should display usage help when no subcommand is provided', () async {

@@ -13,8 +13,8 @@ import 'package:gg_log/gg_log.dart';
 import 'package:path/path.dart' as p;
 
 /// Command to run a local web server that serves
-/// static files from the kidney_ui directory.
-class KidneyRun extends Command<void> {
+/// static files from the gg_multi_ui directory.
+class GgRun extends Command<void> {
   /// Constructor with required log function and
   /// optional dependency injection for testing.
   ///
@@ -22,12 +22,12 @@ class KidneyRun extends Command<void> {
   /// [serverBinder] is used to bind the HttpServer.
   /// Defaults to [HttpServer.bind].
   /// [uiDirectory] is the directory serving static files.
-  /// Defaults to './kidney_ui'.
+  /// Defaults to './gg_multi_ui'.
   /// [listenToSigint] determines whether to listen
   /// to SIGINT for graceful shutdown. Defaults to true.
   /// [sigintStream] allows injection of a custom SIGINT stream (for testing).
   /// [exitFn] allows injection of a custom exit function (for testing).
-  KidneyRun({
+  GgRun({
     required this.ggLog,
     Future<HttpServer> Function(InternetAddress, int)? serverBinder,
     Directory? uiDirectory,
@@ -35,7 +35,7 @@ class KidneyRun extends Command<void> {
     Stream<ProcessSignal>? sigintStream,
     void Function(int)? exitFn,
   }) : serverBinder = serverBinder ?? HttpServer.bind,
-       uiDirectory = uiDirectory ?? Directory('./kidney_ui'),
+       uiDirectory = uiDirectory ?? Directory('./gg_multi_ui'),
        _listenToSigint = listenToSigint,
        _sigintStream = sigintStream ?? ProcessSignal.sigint.watch(),
        _exitFn = exitFn ?? exit;
@@ -64,7 +64,7 @@ class KidneyRun extends Command<void> {
   @override
   String get description =>
       'Starts a local web server that '
-      'serves the content of the kidney_ui directory. '
+      'serves the content of the gg_multi_ui directory. '
       'Press Ctrl+C to stop the server.';
 
   @override
@@ -90,7 +90,7 @@ class KidneyRun extends Command<void> {
 
     // Check if the UI directory exists.
     if (!await uiDirectory.exists()) {
-      ggLog(red('Directory kidney_ui not found.'));
+      ggLog(red('Directory gg_multi_ui not found.'));
       await server.close(force: true);
       return;
     }
@@ -109,7 +109,7 @@ class KidneyRun extends Command<void> {
       requestedPath = '/index.html'; // default file
     }
 
-    // Get absolute path of the requested file within kidney_ui.
+    // Get absolute path of the requested file within gg_multi_ui.
     final filePath = uiDirectory.path + requestedPath;
     final file = File(filePath);
 

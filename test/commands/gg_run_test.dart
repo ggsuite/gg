@@ -9,21 +9,21 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:kd/src/commands/kidney_run.dart';
+import 'package:gg/src/commands/gg_run.dart';
 import 'package:path/path.dart' as p;
 
 void main() {
-  group('KidneyRun.handleRequest', () {
+  group('GgRun.handleRequest', () {
     late Directory tempUiDir;
     late List<String> logMessages;
-    late KidneyRun kidneyRun;
+    late GgRun ggRun;
 
     setUp(() async {
-      // Create a temporary directory to act as the kidney_ui directory
-      tempUiDir = await Directory.systemTemp.createTemp('kidney_ui_test');
+      // Create a temporary directory to act as the gg_multi_ui directory
+      tempUiDir = await Directory.systemTemp.createTemp('gg_multi_ui_test');
       logMessages = [];
-      // Create an instance of KidneyRun with injected uiDirectory
-      kidneyRun = KidneyRun(
+      // Create an instance of GgRun with injected uiDirectory
+      ggRun = GgRun(
         ggLog: (msg) => logMessages.add(msg),
         uiDirectory: tempUiDir,
       );
@@ -48,7 +48,7 @@ void main() {
         response: fakeResponse,
       );
 
-      await kidneyRun.handleRequest(fakeRequest);
+      await ggRun.handleRequest(fakeRequest);
 
       // Verify that the response header has correct MIME type
       expect(
@@ -72,7 +72,7 @@ void main() {
         response: fakeResponse,
       );
 
-      await kidneyRun.handleRequest(fakeRequest);
+      await ggRun.handleRequest(fakeRequest);
 
       // Validate MIME type for CSS
       expect(
@@ -100,7 +100,7 @@ void main() {
           response: fakeResponse,
         );
 
-        await kidneyRun.handleRequest(fakeRequest);
+        await ggRun.handleRequest(fakeRequest);
 
         // Check that the MIME type is set to HTML
         expect(
@@ -119,7 +119,7 @@ void main() {
         response: fakeResponse,
       );
 
-      await kidneyRun.handleRequest(fakeRequest);
+      await ggRun.handleRequest(fakeRequest);
 
       // Verify that status code is set
       // to 404 and response contains error message
@@ -141,7 +141,7 @@ void main() {
           response: fakeResponse,
         );
 
-        await kidneyRun.handleRequest(fakeRequest);
+        await ggRun.handleRequest(fakeRequest);
 
         expect(fakeResponse.statusCode, HttpStatus.notFound);
         expect(utf8.decode(fakeResponse.bodyBytes), '404 Not Found');
@@ -150,40 +150,40 @@ void main() {
     );
   });
 
-  group('KidneyRun.lookupMimeType', () {
-    late KidneyRun kidneyRun;
+  group('GgRun.lookupMimeType', () {
+    late GgRun ggRun;
 
     setUp(() {
-      kidneyRun = KidneyRun(ggLog: print);
+      ggRun = GgRun(ggLog: print);
     });
 
     test('returns correct MIME type for .html', () {
-      final mime = kidneyRun.lookupMimeType('dummy/index.html');
+      final mime = ggRun.lookupMimeType('dummy/index.html');
       expect(mime, 'text/html; charset=utf-8');
     });
 
     test('returns correct MIME type for .css', () {
-      final mime = kidneyRun.lookupMimeType('style.css');
+      final mime = ggRun.lookupMimeType('style.css');
       expect(mime, 'text/css; charset=utf-8');
     });
 
     test('returns correct MIME type for .js', () {
-      final mime = kidneyRun.lookupMimeType('script.js');
+      final mime = ggRun.lookupMimeType('script.js');
       expect(mime, 'application/javascript; charset=utf-8');
     });
 
     test('returns correct MIME type for unknown extension', () {
-      final mime = kidneyRun.lookupMimeType('file.unknown');
+      final mime = ggRun.lookupMimeType('file.unknown');
       expect(mime, 'application/octet-stream');
     });
   });
 
   // Additional tests to increase coverage for the run() method
-  group('KidneyRun.run', () {
+  group('GgRun.run', () {
     test('logs error when uiDirectory does not exist', () async {
       // Create a non-existent directory path
       final nonExistentDir = Directory(
-        p.join(Directory.systemTemp.path, 'nonexistent_kidney_ui'),
+        p.join(Directory.systemTemp.path, 'nonexistent_gg_multi_ui'),
       );
       if (await nonExistentDir.exists()) {
         await nonExistentDir.delete(recursive: true);
@@ -200,7 +200,7 @@ void main() {
         return fakeServer;
       }
 
-      final kidneyRun = KidneyRun(
+      final ggRun = GgRun(
         ggLog: (msg) => logMessages.add(msg),
         serverBinder: fakeBinder,
         uiDirectory: nonExistentDir,
@@ -208,21 +208,21 @@ void main() {
 
       // Run the server. It should detect that uiDirectory does not exist,
       // log an error, close the server, and return.
-      await kidneyRun.run();
+      await ggRun.run();
 
       // Check that the log contains the directory not found message
       expect(
         logMessages.any(
-          (msg) => msg.contains('Directory kidney_ui not found.'),
+          (msg) => msg.contains('Directory gg_multi_ui not found.'),
         ),
         isTrue,
       );
     });
 
     test('starts web server when uiDirectory exists', () async {
-      // Create a temporary directory to act as the kidney_ui directory
+      // Create a temporary directory to act as the gg_multi_ui directory
       final tempUiDir = await Directory.systemTemp.createTemp(
-        'kidney_ui_existing',
+        'gg_multi_ui_existing',
       );
 
       // Create a FakeHttpServer with an
@@ -237,7 +237,7 @@ void main() {
         return fakeServer;
       }
 
-      final kidneyRun = KidneyRun(
+      final ggRun = GgRun(
         ggLog: (msg) => logMessages.add(msg),
         serverBinder: fakeBinder,
         uiDirectory: tempUiDir,
@@ -246,7 +246,7 @@ void main() {
       // Run the server. Since the uiDirectory
       // exists and the fake server stream is empty,
       // run() should log the starting messages and then complete.
-      await kidneyRun.run();
+      await ggRun.run();
 
       // Verify that the log contains startup messages
       expect(
@@ -267,8 +267,8 @@ void main() {
     });
 
     test('processes incoming request from fake server', () async {
-      // Create a temporary directory to act as the kidney_ui directory
-      final tempUiDir = await Directory.systemTemp.createTemp('kidney_ui_test');
+      // Create a temporary directory to act as the gg_multi_ui directory
+      final tempUiDir = await Directory.systemTemp.createTemp('gg_multi_ui_test');
       // Create an index.html in tempUiDir with sample content
       final indexFile = File(p.join(tempUiDir.path, 'index.html'));
       const fileContent = '<html>Test Page</html>';
@@ -286,16 +286,16 @@ void main() {
         return fakeServer;
       }
 
-      // Create KidneyRun with SIGINT handling disabled for testing
-      final kidneyRun = KidneyRun(
+      // Create GgRun with SIGINT handling disabled for testing
+      final ggRun = GgRun(
         ggLog: (msg) => logMessages.add(msg),
         serverBinder: fakeBinder,
         uiDirectory: tempUiDir,
         listenToSigint: false,
       );
 
-      // Start kidneyRun.run() in a separate future
-      final runFuture = kidneyRun.run();
+      // Start ggRun.run() in a separate future
+      final runFuture = ggRun.run();
 
       // Create a fake request for '/'
       final fakeResponse = FakeHttpResponse();
@@ -319,9 +319,9 @@ void main() {
     });
 
     test('handles SIGINT signal', () async {
-      // Create a temporary directory to act as the kidney_ui directory
+      // Create a temporary directory to act as the gg_multi_ui directory
       final tempUiDir = await Directory.systemTemp.createTemp(
-        'kidney_ui_sigint',
+        'gg_multi_ui_sigint',
       );
 
       // Create a StreamController to simulate SIGINT signal
@@ -336,7 +336,7 @@ void main() {
 
       final logMessages = <String>[];
 
-      final kidneyRun = KidneyRun(
+      final ggRun = GgRun(
         ggLog: (msg) => logMessages.add(msg),
         serverBinder: (addr, port) async => fakeServer,
         uiDirectory: tempUiDir,
@@ -345,8 +345,8 @@ void main() {
         exitFn: fakeExit,
       );
 
-      // Start kidneyRun.run() in background
-      final runFuture = kidneyRun.run();
+      // Start ggRun.run() in background
+      final runFuture = ggRun.run();
 
       // Emit SIGINT signal
       sigintController.add(ProcessSignal.sigint);
@@ -360,18 +360,18 @@ void main() {
     });
   });
 
-  // tests to cover default constructor values for KidneyRun
-  group('KidneyRun constructor defaults', () {
-    test('defaults uiDirectory to "./kidney_ui"', () {
-      final kidneyRun = KidneyRun(ggLog: print);
-      expect(kidneyRun.uiDirectory.path, './kidney_ui');
+  // tests to cover default constructor values for GgRun
+  group('GgRun constructor defaults', () {
+    test('defaults uiDirectory to "./gg_multi_ui"', () {
+      final ggRun = GgRun(ggLog: print);
+      expect(ggRun.uiDirectory.path, './gg_multi_ui');
     });
 
     test('defaults serverBinder to HttpServer.bind', () async {
-      final kidneyRun = KidneyRun(ggLog: print);
+      final ggRun = GgRun(ggLog: print);
       // Test that serverBinder returns a
       // valid HttpServer when binding to an available port.
-      final server = await kidneyRun.serverBinder(
+      final server = await ggRun.serverBinder(
         InternetAddress.loopbackIPv4,
         0,
       );
@@ -380,15 +380,15 @@ void main() {
     });
   });
 
-  group('KidneyRun properties', () {
+  group('GgRun properties', () {
     test('returns name "run"', () {
-      final kidneyRun = KidneyRun(ggLog: print);
-      expect(kidneyRun.name, equals('run'));
+      final ggRun = GgRun(ggLog: print);
+      expect(ggRun.name, equals('run'));
     });
 
     test('returns correct description', () {
-      final kidneyRun = KidneyRun(ggLog: print);
-      expect(kidneyRun.description, contains('Starts a local web server'));
+      final ggRun = GgRun(ggLog: print);
+      expect(ggRun.description, contains('Starts a local web server'));
     });
   });
 }
