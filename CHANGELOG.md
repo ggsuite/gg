@@ -2,7 +2,15 @@
 
 ## \[Unreleased\]
 
-## [4.0.0] - 2026-05-10
+## [9.0.0] - 2026-05-10
+
+> **Note on version numbering**: Versions 1.x – 7.0.5 of `gg` on pub.dev
+> were a *different* package — a Dart pre-commit / workflow tool, now
+> renamed upstream to `gg_one`. This release (9.0.0) is the first
+> publication of the **new** `gg` package, which is the successor to
+> the `kd` package (formerly at `kd 3.1.0`). The major version was
+> bumped past the old `gg` 7.x range to make the discontinuity clearly
+> visible and to satisfy pub.dev's no-downgrade rule.
 
 ### Changed
 
