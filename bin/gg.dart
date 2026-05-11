@@ -10,10 +10,7 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
-Future<void> runGg({
-  required List<String> args,
-  required GgLog ggLog,
-}) async {
+Future<void> runGg({required List<String> args, required GgLog ggLog}) async {
   try {
     await GgCommandRunner(
       ggLog: ggLog,

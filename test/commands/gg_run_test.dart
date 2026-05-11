@@ -268,7 +268,9 @@ void main() {
 
     test('processes incoming request from fake server', () async {
       // Create a temporary directory to act as the gg_multi_ui directory
-      final tempUiDir = await Directory.systemTemp.createTemp('gg_multi_ui_test');
+      final tempUiDir = await Directory.systemTemp.createTemp(
+        'gg_multi_ui_test',
+      );
       // Create an index.html in tempUiDir with sample content
       final indexFile = File(p.join(tempUiDir.path, 'index.html'));
       const fileContent = '<html>Test Page</html>';
@@ -371,10 +373,7 @@ void main() {
       final ggRun = GgRun(ggLog: print);
       // Test that serverBinder returns a
       // valid HttpServer when binding to an available port.
-      final server = await ggRun.serverBinder(
-        InternetAddress.loopbackIPv4,
-        0,
-      );
+      final server = await ggRun.serverBinder(InternetAddress.loopbackIPv4, 0);
       expect(server, isA<HttpServer>());
       await server.close();
     });

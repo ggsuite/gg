@@ -2,7 +2,7 @@
 
 ## \[Unreleased\]
 
-## [9.0.0] - 2026-05-10
+## \[9.0.0\] - 2026-05-10
 
 > **Note on version numbering**: Versions 1.x – 7.0.5 of `gg` on pub.dev
 > were a *different* package — a Dart pre-commit / workflow tool, now
@@ -15,20 +15,27 @@
 ### Changed
 
 - **BREAKING**: Renamed package from `kd` to `gg`. Repository moved to
-  https://github.com/ggsuite/gg. Update `dependencies:` entries and
-  `import 'package:kd/...'` statements to `import 'package:gg/...'`.
-  The executable is now `gg` (previously `kd`).
+https://github.com/ggsuite/gg. Update `dependencies:` entries and
+`import 'package:kd/...'` statements to `import 'package:gg/...'`.
+The executable is now `gg` (previously `kd`).
 - **BREAKING**: Replaced dependency `gg ^7.0.5` with `gg_one ^8.0.0`
-  (the upstream `gg` package was renamed to `gg_one`).
+(the upstream `gg` package was renamed to `gg_one`).
 - **BREAKING**: Replaced dependency `kidney_core ^3.1.0` with
-  `gg_multi ^4.0.0` (the upstream `kidney_core` package was renamed
-  to `gg_multi`).
+`gg_multi ^4.0.0` (the upstream `kidney_core` package was renamed
+to `gg_multi`).
 - Renamed source files (`bin/kd.dart` → `bin/gg.dart`, `lib/kd.dart`
-  → `lib/gg.dart`, `lib/src/commands/kidney*.dart` →
-  `lib/src/commands/gg*.dart`, tests, example).
+→ `lib/gg.dart`, `lib/src/commands/kidney*.dart` →
+`lib/src/commands/gg*.dart`, tests, example).
 - Renamed Flutter web build directory `kidney_ui/` to `gg_multi_ui/`
-  (alignment with `gg_multi` naming).
+(alignment with `gg_multi` naming).
 - Renamed status marker file `.kidney_status` to `.gg_multi_status`.
+
+## [9.0.1] - 2026-05-11
+
+### Changed
+
+- gg\_multi: changed references to git
+- Gg Multi: changed references to pub.dev
 
 ## [3.1.0] - 2026-05-04
 
@@ -100,6 +107,7 @@
 
 - commit
 
+[9.0.1]: https://github.com/ggsuite/gg/compare/3.1.0...9.0.1
 [3.1.0]: https://github.com/ggsuite/kd/compare/3.0.4...3.1.0
 [3.0.4]: https://github.com/ggsuite/kd/compare/3.0.3...3.0.4
 [3.0.3]: https://github.com/ggsuite/kd/compare/3.0.2...3.0.3
