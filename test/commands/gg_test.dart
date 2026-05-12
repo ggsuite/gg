@@ -27,5 +27,30 @@ void main() {
       await runner.run(args: []);
       expect(output.join('\n'), contains('Usage:'));
     });
+
+    test('registers run, one and multi namespaces', () {
+      expect(ggCommand.subcommands.keys, containsAll(['run', 'one', 'multi']));
+    });
+
+    test('does NOT register shared can/did/do at the root', () {
+      for (final name in sharedTopLevelCommands) {
+        expect(
+          ggCommand.subcommands.containsKey(name),
+          isFalse,
+          reason: '"$name" must not be a root subcommand of gg',
+        );
+      }
+    });
+
+    test('registers gg_multi-only top-level commands at the root', () {
+      // `ls` exists only in gg_multi, not gg_one
+      expect(ggCommand.subcommands.containsKey('ls'), isTrue);
+    });
+
+    test('registers gg_one-only top-level commands at the root', () {
+      // `check` and `info` exist only in gg_one
+      expect(ggCommand.subcommands.containsKey('check'), isTrue);
+      expect(ggCommand.subcommands.containsKey('info'), isTrue);
+    });
   });
 }

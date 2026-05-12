@@ -10,12 +10,20 @@ import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
-Future<void> runGg({required List<String> args, required GgLog ggLog}) async {
+Future<void> runGg({
+  required List<String> args,
+  required GgLog ggLog,
+  ProjectMode Function()? detectMode,
+}) async {
   try {
+    final rewritten = rewriteArgsForProjectMode(
+      args,
+      detectMode ?? ProjectDetector.detect,
+    );
     await GgCommandRunner(
       ggLog: ggLog,
       command: Gg(ggLog: ggLog),
-    ).run(args: args);
+    ).run(args: rewritten);
   } catch (e) {
     ggLog(e.toString());
   }

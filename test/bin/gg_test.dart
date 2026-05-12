@@ -6,6 +6,7 @@
 
 import 'dart:io';
 
+import 'package:gg/gg.dart';
 import 'package:test/test.dart';
 
 import '../../bin/gg.dart';
@@ -18,10 +19,7 @@ void main() {
 
   // ...........................................................................
   Future<void> initDartPackages() async {
-    // Create a pubspec.yaml file in each directory, except dir2
     await File('${d0.path}/pubspec.yaml').writeAsString('name: dir0');
-
-    // Create a textfile in each directory
     await File('${d0.path}/file0.txt').writeAsString('file0');
   }
 
@@ -48,12 +46,27 @@ void main() {
           });
 
           test('- unknown argument', () async {
-            await runGg(args: [dRoot.path, '--unknown'], ggLog: ggLog);
+            await runGg(
+              args: [dRoot.path, '--unknown'],
+              ggLog: ggLog,
+              detectMode: () => ProjectMode.workspace,
+            );
             expect(
               messages[0],
               contains('Could not find an option named --unknown'),
             );
           });
+        });
+      });
+
+      group('- project mode routing', () {
+        test('reports helpful error when mode is unknown', () async {
+          await runGg(
+            args: ['can', 'commit'],
+            ggLog: ggLog,
+            detectMode: () => ProjectMode.unknown,
+          );
+          expect(messages.join('\n'), contains('Cannot run "gg can" here'));
         });
       });
     });

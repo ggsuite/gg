@@ -30,6 +30,12 @@ to `gg_multi`).
 (alignment with `gg_multi` naming).
 - Renamed status marker file `.kidney_status` to `.gg_multi_status`.
 
+## [9.1.0] - 2026-05-12
+
+### Changed
+
+- gg\_multi: changed references to git
+
 ## [9.0.1] - 2026-05-11
 
 ### Changed
@@ -107,6 +113,7 @@ to `gg_multi`).
 
 - commit
 
+[9.1.0]: https://github.com/ggsuite/gg/compare/9.0.1...9.1.0
 [9.0.1]: https://github.com/ggsuite/gg/compare/3.1.0...9.0.1
 [3.1.0]: https://github.com/ggsuite/kd/compare/3.0.4...3.1.0
 [3.0.4]: https://github.com/ggsuite/kd/compare/3.0.3...3.0.4
