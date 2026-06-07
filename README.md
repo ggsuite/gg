@@ -194,6 +194,41 @@ gg do publish
 
 Publish should be triggered manually by a human after review approval.
 
+#### Non-interactive publish via `--config`
+
+Both backends understand `--config <path>` for `do publish`. Pass a
+`.gg-publish.json` file to predeclare merge messages and version
+increments so the release runs prompt-free (handy in CI):
+
+```bash
+gg do publish --config .gg-publish.json
+```
+
+Minimal schema (top-level fields apply to every repo; the optional
+`repos` block lets you override per repo in workspace mode):
+
+```jsonc
+{
+  "version_increment": "patch",          // "patch" | "minor" | "major"
+  "merge_message": "Default merge message",
+  "repos": {
+    "app_core": {                        // optional per-repo override
+      "version_increment": "minor",
+      "merge_message": "app_core: new public API"
+    }
+  }
+}
+```
+
+`gg` looks for `<configArg>` as given (relative to the current
+directory, or absolute), then under the ticket directory in workspace
+mode, or under `<repo>/.gg/` in single-repo mode. A missing required
+field aborts the run — no silent fall-back to a prompt.
+
+See the [`gg_multi`](https://github.com/ggsuite/gg_multi#non-interactive-publish-via---config)
+and [`gg_one`](https://github.com/ggsuite/gg_one#publish-a-single-package-with-gg-one-do-publish)
+READMEs for the full schema and lookup rules.
+
 ### 9. Generate an aggregated CLAUDE.md (optional)
 
 ```bash
