@@ -35,6 +35,7 @@ to `gg_multi`).
 ### Changed
 
 - gg\_multi: changed references to git
+- gg\_multi: changed references to git
 
 ## [9.4.0] - 2026-05-20
 
