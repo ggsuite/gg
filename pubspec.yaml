@@ -1,7 +1,6 @@
 name: gg
 description: gg applies shell commands to multiple dart and flutter packages at once.
 version: 10.0.0
-publish_to: none
 repository: https://github.com/ggsuite/gg.git
 
 environment:
@@ -9,10 +8,7 @@ environment:
 
 dependencies:
   args: ^2.7.0
-  gg_one:
-    git:
-      url: git@github.com:ggsuite/gg_one.git
-      ref: gg_typescript_bugfixes
+  gg_one: ^9.1.0
   gg_args: ^2.0.4
   gg_console_colors: ^2.1.5
   gg_local_package_dependencies: ^1.3.0
@@ -25,10 +21,7 @@ dependencies:
   pub_semver: ^2.2.0
   pubspec_parse: ^1.5.0
   yaml_edit: ^2.2.4
-  gg_multi:
-    git:
-      url: git@github.com:ggsuite/gg_multi.git
-      ref: gg_typescript_bugfixes
+  gg_multi: ^5.1.0
 dev_dependencies:
   fake_async: ^1.3.3
   gg_capture_print: ^1.0.9
