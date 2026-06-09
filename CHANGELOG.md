@@ -35,6 +35,7 @@ to `gg_multi`).
 ### Changed
 
 - gg\_multi: changed references to git
+- style: apply grace-cloud comment + 80-char limits across ticket
 
 ## [10.0.0] - 2026-06-08
 
