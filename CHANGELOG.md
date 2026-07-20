@@ -1,7 +1,5 @@
 # Changelog
 
-## \[Unreleased\]
-
 ## \[9.0.0\] - 2026-05-10
 
 > **Note on version numbering**: Versions 1.x – 7.0.5 of `gg` on pub.dev
@@ -29,6 +27,16 @@ to `gg_multi`).
 - Renamed Flutter web build directory `kidney_ui/` to `gg_multi_ui/`
 (alignment with `gg_multi` naming).
 - Renamed status marker file `.kidney_status` to `.gg_multi_status`.
+
+## [10.4.2] - 2026-07-20
+
+### Changed
+
+- gg\_multi: changed references to git
+
+### Fixed
+
+- Ignore `.gg/*` instead of the whole `.gg` directory, so `.gg/.gg.json` and `.gg/.ticket.json` stay trackable
 
 ## [10.4.1] - 2026-07-20
 
@@ -183,6 +191,7 @@ to `gg_multi`).
 
 - commit
 
+[10.4.2]: https://github.com/ggsuite/gg/compare/10.4.1...10.4.2
 [10.4.1]: https://github.com/ggsuite/gg/compare/10.4.0...10.4.1
 [10.4.0]: https://github.com/ggsuite/gg/compare/10.3.0...10.4.0
 [10.3.0]: https://github.com/ggsuite/gg/compare/10.2.1...10.3.0
