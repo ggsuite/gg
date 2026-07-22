@@ -1,33 +1,5 @@
 # Changelog
 
-## \[9.0.0\] - 2026-05-10
-
-> **Note on version numbering**: Versions 1.x – 7.0.5 of `gg` on pub.dev
-> were a *different* package — a Dart pre-commit / workflow tool, now
-> renamed upstream to `gg_one`. This release (9.0.0) is the first
-> publication of the **new** `gg` package, which is the successor to
-> the `kd` package (formerly at `kd 3.1.0`). The major version was
-> bumped past the old `gg` 7.x range to make the discontinuity clearly
-> visible and to satisfy pub.dev's no-downgrade rule.
-
-### Changed
-
-- **BREAKING**: Renamed package from `kd` to `gg`. Repository moved to
-https://github.com/ggsuite/gg. Update `dependencies:` entries and
-`import 'package:kd/...'` statements to `import 'package:gg/...'`.
-The executable is now `gg` (previously `kd`).
-- **BREAKING**: Replaced dependency `gg ^7.0.5` with `gg_one ^8.0.0`
-(the upstream `gg` package was renamed to `gg_one`).
-- **BREAKING**: Replaced dependency `kidney_core ^3.1.0` with
-`gg_multi ^4.0.0` (the upstream `kidney_core` package was renamed
-to `gg_multi`).
-- Renamed source files (`bin/kd.dart` → `bin/gg.dart`, `lib/kd.dart`
-→ `lib/gg.dart`, `lib/src/commands/kidney*.dart` →
-`lib/src/commands/gg*.dart`, tests, example).
-- Renamed Flutter web build directory `kidney_ui/` to `gg_multi_ui/`
-(alignment with `gg_multi` naming).
-- Renamed status marker file `.kidney_status` to `.gg_multi_status`.
-
 ## [Unreleased]
 
 ### Changed
@@ -126,6 +98,34 @@ to `gg_multi`).
 
 - gg\_multi: changed references to git
 - Gg Multi: changed references to pub.dev
+
+## [9.0.0] - 2026-05-10
+
+> **Note on version numbering**: Versions 1.x – 7.0.5 of `gg` on pub.dev
+> were a *different* package — a Dart pre-commit / workflow tool, now
+> renamed upstream to `gg_one`. This release (9.0.0) is the first
+> publication of the **new** `gg` package, which is the successor to
+> the `kd` package (formerly at `kd 3.1.0`). The major version was
+> bumped past the old `gg` 7.x range to make the discontinuity clearly
+> visible and to satisfy pub.dev's no-downgrade rule.
+
+### Changed
+
+- **BREAKING**: Renamed package from `kd` to `gg`. Repository moved to
+https://github.com/ggsuite/gg. Update `dependencies:` entries and
+`import 'package:kd/...'` statements to `import 'package:gg/...'`.
+The executable is now `gg` (previously `kd`).
+- **BREAKING**: Replaced dependency `gg ^7.0.5` with `gg_one ^8.0.0`
+(the upstream `gg` package was renamed to `gg_one`).
+- **BREAKING**: Replaced dependency `kidney_core ^3.1.0` with
+`gg_multi ^4.0.0` (the upstream `kidney_core` package was renamed
+to `gg_multi`).
+- Renamed source files (`bin/kd.dart` → `bin/gg.dart`, `lib/kd.dart`
+→ `lib/gg.dart`, `lib/src/commands/kidney*.dart` →
+`lib/src/commands/gg*.dart`, tests, example).
+- Renamed Flutter web build directory `kidney_ui/` to `gg_multi_ui/`
+(alignment with `gg_multi` naming).
+- Renamed status marker file `.kidney_status` to `.gg_multi_status`.
 
 ## [3.1.0] - 2026-05-04
 
