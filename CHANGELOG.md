@@ -28,6 +28,12 @@ to `gg_multi`).
 (alignment with `gg_multi` naming).
 - Renamed status marker file `.kidney_status` to `.gg_multi_status`.
 
+## [Unreleased]
+
+### Changed
+
+- Update publish docs: the final merge goes through an auto-merge squash pull request by default
+
 ## [10.4.2] - 2026-07-20
 
 ### Changed
@@ -191,6 +197,7 @@ to `gg_multi`).
 
 - commit
 
+[Unreleased]: https://github.com/ggsuite/gg/compare/10.4.2...HEAD
 [10.4.2]: https://github.com/ggsuite/gg/compare/10.4.1...10.4.2
 [10.4.1]: https://github.com/ggsuite/gg/compare/10.4.0...10.4.1
 [10.4.0]: https://github.com/ggsuite/gg/compare/10.3.0...10.4.0
