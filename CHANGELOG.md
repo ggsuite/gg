@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [11.0.0] - 2026-07-22
 
 ### Changed
 
@@ -185,7 +185,7 @@ to `gg_multi`).
 
 - commit
 
-[Unreleased]: https://github.com/ggsuite/gg/compare/10.4.2...HEAD
+[11.0.0]: https://github.com/ggsuite/gg/compare/10.4.2...11.0.0
 [10.4.2]: https://github.com/ggsuite/gg/compare/10.4.1...10.4.2
 [10.4.1]: https://github.com/ggsuite/gg/compare/10.4.0...10.4.1
 [10.4.0]: https://github.com/ggsuite/gg/compare/10.3.0...10.4.0
