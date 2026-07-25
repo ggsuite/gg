@@ -1,5 +1,11 @@
 # Changelog
 
+## [11.0.1] - 2026-07-25
+
+### Fixed
+
+- IMPORTANT FIX: Previous version removed tag\_patterns on publishing
+
 ## [11.0.0] - 2026-07-22
 
 ### Changed
@@ -185,6 +191,7 @@ to `gg_multi`).
 
 - commit
 
+[11.0.1]: https://github.com/ggsuite/gg/compare/11.0.0...11.0.1
 [11.0.0]: https://github.com/ggsuite/gg/compare/10.4.2...11.0.0
 [10.4.2]: https://github.com/ggsuite/gg/compare/10.4.1...10.4.2
 [10.4.1]: https://github.com/ggsuite/gg/compare/10.4.0...10.4.1
