@@ -1,0 +1,126 @@
+{
+  "issue_id": "CDM-1653-fix-gg-bugs",
+  "description": "Fix gg bugs",
+  "repositories": [
+    {
+      "name": "gg_capture_print",
+      "url": "git@github.com:ggsuite/gg_capture_print.git"
+    },
+    {
+      "name": "gg_console_colors",
+      "url": "git@github.com:ggsuite/gg_console_colors.git"
+    },
+    {
+      "name": "gg_direct_json",
+      "url": "git@github.com:ggsuite/gg_direct_json.git"
+    },
+    {
+      "name": "gg_hash",
+      "url": "git@github.com:ggsuite/gg_hash.git"
+    },
+    {
+      "name": "gg_is_github",
+      "url": "git@github.com:ggsuite/gg_is_github.git"
+    },
+    {
+      "name": "gg_json",
+      "url": "git@github.com:ggsuite/gg_json.git"
+    },
+    {
+      "name": "gg_json_hash",
+      "url": "git@github.com:ggsuite/gg_json_hash.git"
+    },
+    {
+      "name": "gg_list",
+      "url": "git@github.com:ggsuite/gg_list.git"
+    },
+    {
+      "name": "gg_cache",
+      "url": "git@github.com:ggsuite/gg_cache.git"
+    },
+    {
+      "name": "gg_log",
+      "url": "git@github.com:ggsuite/gg_log.git"
+    },
+    {
+      "name": "gg_args",
+      "url": "git@github.com:ggsuite/gg_args.git"
+    },
+    {
+      "name": "gg_create_package",
+      "url": "git@github.com:ggsuite/gg_create_package.git"
+    },
+    {
+      "name": "gg_process",
+      "url": "git@github.com:ggsuite/gg_process.git"
+    },
+    {
+      "name": "gg_lang",
+      "url": "git@github.com:ggsuite/gg_lang.git"
+    },
+    {
+      "name": "gg_local_package_dependencies",
+      "url": "git@github.com:ggsuite/gg_local_package_dependencies.git"
+    },
+    {
+      "name": "gg_parse_stdout",
+      "url": "git@github.com:ggsuite/gg_parse_stdout.git"
+    },
+    {
+      "name": "gg_project_root",
+      "url": "git@github.com:ggsuite/gg_project_root.git"
+    },
+    {
+      "name": "gg_clone_dependencies",
+      "url": "git@github.com:ggsuite/gg_clone_dependencies.git"
+    },
+    {
+      "name": "gg_is_flutter",
+      "url": "git@github.com:ggsuite/gg_is_flutter.git"
+    },
+    {
+      "name": "gg_status_printer",
+      "url": "git@github.com:ggsuite/gg_status_printer.git"
+    },
+    {
+      "name": "gg_changelog",
+      "url": "git@github.com:ggsuite/gg_changelog.git"
+    },
+    {
+      "name": "gg_git",
+      "url": "git@github.com:ggsuite/gg_git.git"
+    },
+    {
+      "name": "gg_merge",
+      "url": "git@github.com:ggsuite/gg_merge.git"
+    },
+    {
+      "name": "gg_test",
+      "url": "git@github.com:ggsuite/gg_test.git"
+    },
+    {
+      "name": "gg_version",
+      "url": "git@github.com:ggsuite/gg_version.git"
+    },
+    {
+      "name": "gg_publish",
+      "url": "git@github.com:ggsuite/gg_publish.git"
+    },
+    {
+      "name": "gg_localize_refs",
+      "url": "git@github.com:ggsuite/gg_localize_refs.git"
+    },
+    {
+      "name": "gg_one",
+      "url": "git@github.com:ggsuite/gg_one.git"
+    },
+    {
+      "name": "gg_multi",
+      "url": "git@github.com:ggsuite/gg_multi.git"
+    },
+    {
+      "name": "gg",
+      "url": "git@github.com:ggsuite/gg.git"
+    }
+  ]
+}
