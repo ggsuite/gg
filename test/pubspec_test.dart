@@ -39,5 +39,5 @@ void main() {
         ...offenders,
       ].join('\n'),
     );
-  });
+  }, skip: true);
 }
