@@ -1,13 +1,13 @@
 # Changelog
 
-## [Unreleased]
+## [12.0.0] - 2026-07-29
 
 ### Changed
 
 - gg now runs gg multi by default inside ticket workspaces: all gg multi
-  commands are available at the root and shown in gg --help alongside gg one;
-  standalone projects, including repos checked out in .master, are no longer
-  auto-routed but get a colored hint to run gg one <command> instead
+commands are available at the root and shown in gg --help alongside gg one;
+standalone projects, including repos checked out in .master, are no longer
+auto-routed but get a colored hint to run gg one <command> instead
 
 ## [11.0.1] - 2026-07-25
 
@@ -20,7 +20,7 @@
 ### Changed
 
 - Update publish docs: the final merge goes through an auto-merge squash pull
-  request by default
+request by default
 - gg\_multi: changed references to git
 
 ## [10.4.2] - 2026-07-20
@@ -32,7 +32,7 @@
 ### Fixed
 
 - Ignore `.gg/*` instead of the whole `.gg` directory, so `.gg/.gg.json` and
-  `.gg/.ticket.json` stay trackable
+`.gg/.ticket.json` stay trackable
 
 ## [10.4.1] - 2026-07-20
 
@@ -45,7 +45,7 @@
 ### Changed
 
 - Deliver gg\_one 10.0.0 (do configure-publish + step-based resumable
-  publishing) and gg\_multi 5.7.0 (two-level --continue resume)
+publishing) and gg\_multi 5.7.0 (two-level --continue resume)
 
 ## [10.3.0] - 2026-07-06
 
@@ -203,7 +203,7 @@ to `gg_multi`).
 
 - commit
 
-[Unreleased]: https://github.com/ggsuite/gg/compare/11.0.1...HEAD
+[12.0.0]: https://github.com/ggsuite/gg/compare/11.0.1...12.0.0
 [11.0.1]: https://github.com/ggsuite/gg/compare/11.0.0...11.0.1
 [11.0.0]: https://github.com/ggsuite/gg/compare/10.4.2...11.0.0
 [10.4.2]: https://github.com/ggsuite/gg/compare/10.4.1...10.4.2
