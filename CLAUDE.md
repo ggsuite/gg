@@ -56,7 +56,8 @@ gg_multi_ui/           → pre-built Flutter web app (static assets, not a sourc
 ```
 gg
 ├── run          (GgRun)    — serves gg_multi_ui at localhost:8084
-├── one          (GgOne)    — all `gg` subcommands
+├── one          (GgOne)    — all `gg_one` subcommands
+├── multi        (GgMultiNamespace, hidden) — explicit gg_multi alias
 ├── ls           (ListCommand)  — list organizations, repos, deps, tickets
 ├── can          (Can)          — can commit / push / publish / review
 ├── did          (Did)          — did commit / push
@@ -65,7 +66,7 @@ gg
                                    add / add-deps / code / create / init / rm
 ```
 
-`GgMulti` (from `gg_multi`) contributes `ls`, `can`, `did`, and `do` subcommands by iterating over its `.subcommands.values`.
+`GgMulti` (from `gg_multi`) contributes `ls`, `can`, `did`, and `do` at the root by iterating over its `.subcommands.values` — inside a gg ticket workspace `gg <cmd>` therefore runs gg_multi by default. `ProjectDetector` (`lib/src/project_detector.dart`) guards this in `bin/gg.dart`: in a standalone project the root commands only print a hint to use `gg one <cmd> …`; outside any recognized project they abort with an error explaining both options.
 
 ### gg_multi
 

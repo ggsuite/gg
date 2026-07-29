@@ -29,6 +29,10 @@ void main() {
       expect(command.description, 'Provides access to gg_multi subcommands.');
     });
 
+    test('is hidden in the help output', () {
+      expect(command.hidden, isTrue);
+    });
+
     test('registers all gg_multi subcommands', () {
       final expected = gg_multi.GgMulti(ggLog: ggLog).subcommands;
 

@@ -12,12 +12,13 @@ It is a thin CLI shell that combines two backend packages:
 | `gg_one`   | a single Dart/TypeScript repo  | pre-commit checks (analyze, format, test, coverage, …)   |
 | `gg_multi` | a multi-repo ticket workspace  | run commands across all repos of a ticket in dep order   |
 
-`gg` automatically chooses the right backend based on where you run it:
+`gg` detects where you run it:
 
-- Inside a **gg workspace** (a directory tree containing `.master/` or
-  `tickets/`) → routed to `gg_multi`.
-- Inside a **single Dart or TypeScript project** (a directory tree with
-  `pubspec.yaml`, `package.json` or `tsconfig.json`) → routed to `gg_one`.
+- Inside a **gg ticket workspace** (a directory tree containing
+  `.master/` or `tickets/`) → `gg <command>` runs `gg_multi` by default.
+- Inside a **standalone Dart or TypeScript project** (a directory tree
+  with `pubspec.yaml`, `package.json` or `tsconfig.json`) → `gg` prints
+  a message asking you to use `gg one <command> …` explicitly.
 
 ## Installation
 
@@ -32,8 +33,7 @@ After installation the `gg` executable is available globally.
 ```
 gg
 ├── run                    Serve the gg_multi web UI at http://localhost:8084
-├── one  <subcommand>      Force single-repo mode (gg_one)
-├── multi <subcommand>     Force workspace mode (gg_multi)
+├── one  <subcommand>      Single-repo mode (gg_one)
 ├── can  <commit|push|publish|review>
 ├── did  <commit|push>
 ├── do   <commit|push|review|cancel-review|publish|claude|code|
@@ -41,17 +41,20 @@ gg
 └── ls   <repos|organizations|deps|tickets>
 ```
 
-`can`, `did` and `do` are **shared**: `gg` rewrites them to
-`gg multi …` or `gg one …` depending on the detected project mode. If
-the current directory is neither, `gg` aborts with a message telling
-you to call `gg one <cmd>` or `gg multi <cmd>` explicitly.
+`can`, `did`, `do` and `ls` are the `gg_multi` commands, registered
+directly at the root: inside a gg ticket workspace `gg do commit`
+runs `gg_multi`'s `do commit`. In a standalone project these commands
+abort with a message asking you to run `gg one <cmd> …` instead, and
+outside of any recognized project `gg` aborts with a hint explaining
+both options. (`gg multi <cmd>` still works as a hidden alias for the
+root commands.)
 
 ## When to use `gg one`
 
-Use `gg one` (or rely on auto-detection inside a single package) when
-you are working in **exactly one** Dart or TypeScript project — for
-example a freshly cloned package, a library you maintain on its own,
-or a repo that is not part of a ticket workspace.
+Use `gg one` when you are working in **exactly one** Dart or
+TypeScript project — for example a freshly cloned package, a library
+you maintain on its own, or a repo that is not part of a ticket
+workspace.
 
 `gg one` is a re-export of the `gg_one` package and offers the
 following subcommands:
@@ -68,33 +71,33 @@ following subcommands:
 | `gg one did commit`        | report what was committed since the last reference state           |
 | `gg one info`              | print project metadata gg_one detected                             |
 
-In a single-package directory you usually do not need to type
-`gg one …` explicitly — `gg can commit` and `gg do push` are
-auto-routed to `gg one`. The explicit form is only needed when
-- you want to run `gg_one` against a single repo that **is** inside a
-  workspace (where `gg can`/`gg do` would otherwise pick `gg multi`),
-- you want to be unambiguous in scripts and CI pipelines, or
-- you are outside any project and need to point gg at one explicitly.
+`gg one …` is always explicit: in a standalone project a plain
+`gg can commit` or `gg do push` does not run anything but prints a
+message asking you to use `gg one` instead.
+This also works inside a ticket workspace when you want to run
+`gg_one` against a single repo (where `gg can`/`gg do` runs
+`gg multi`).
 
-## When to use `gg multi`
+## Workspace commands (`gg_multi`)
 
-`gg multi` (or auto-detected workspace mode) drives operations across
-all repos of a ticket. See the `gg_multi` README and `handbook.md`
-for the full command surface; the most important ones are:
+Inside a gg ticket workspace the `gg_multi` commands drive operations
+across all repos of a ticket — they run by default, directly at the
+root. See the `gg_multi` README and `handbook.md` for the full
+command surface; the most important ones are:
 
-| Command                          | Purpose                                                     |
-| -------------------------------- | ----------------------------------------------------------- |
-| `gg multi do init`               | initialise the master workspace                             |
-| `gg multi do add <target>`       | add a repo or a whole org to the workspace / ticket         |
-| `gg multi do create ticket <id>` | create `tickets/<id>/` with a `.ticket` file                |
-| `gg multi do code`               | open the ticket in VS Code                                  |
-| `gg multi can commit`            | check whether all ticket repos can commit                   |
-| `gg multi do commit -m "…"`      | commit in every ticket repo in dependency order             |
-| `gg multi can push` / `do push`  | check / push every ticket repo                              |
-| `gg multi do review`             | run the full review pipeline across the ticket              |
-| `gg multi do publish`            | publish every publishable package of the ticket             |
-| `gg multi ls repos`              | list repos in the master workspace                          |
-| `gg multi do claude`             | generate an aggregated `CLAUDE.md` for the ticket           |
+| Command                    | Purpose                                             |
+| -------------------------- | --------------------------------------------------- |
+| `gg do init`               | initialise the master workspace                     |
+| `gg do add <target>`       | add a repo or a whole org to the workspace / ticket |
+| `gg do create ticket <id>` | create `tickets/<id>/` with a `.ticket` file        |
+| `gg do code`               | open the ticket in VS Code                          |
+| `gg can commit`            | check whether all ticket repos can commit           |
+| `gg do commit -m "…"`      | commit in every ticket repo in dependency order     |
+| `gg can push` / `do push`  | check / push every ticket repo                      |
+| `gg do review`             | run the full review pipeline across the ticket      |
+| `gg do publish`            | publish every publishable package of the ticket     |
+| `gg ls repos`              | list repos in the master workspace                  |
+| `gg do claude`             | generate an aggregated `CLAUDE.md` for the ticket   |
 
 ## Step-by-step: working on a ticket end-to-end
 
@@ -111,8 +114,8 @@ gg do init                               # initialise master workspace
 gg do add https://github.com/my-org      # add all repos of an org
 ```
 
-`gg do init` and `gg do add` are workspace commands, so they are
-auto-routed to `gg multi`.
+`gg do init` and `gg do add` are `gg_multi` workspace commands and
+run directly at the root.
 
 ### 1. Create a ticket workspace
 
@@ -257,8 +260,10 @@ gg -h
 gg do -h
 gg do commit -h
 gg one -h
-gg multi -h
 ```
+
+`gg` and `gg -h` list all `gg_multi` commands plus `gg one` and
+`gg run`.
 
 ## License
 

@@ -6,6 +6,7 @@
 
 import 'dart:io';
 
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:path/path.dart' as path;
 
 /// The mode of the project that `gg` is invoked in.
@@ -32,7 +33,10 @@ class ProjectDetector {
     workingDir ??= Directory.current.path;
     // coverage:ignore-end
 
-    if (_walkUpFor(workingDir, _workspaceMarkers, isDirectory: true)) {
+    // Repos checked out inside the master workspace (.master/<repo>) are
+    // standalone projects, not part of a ticket workspace.
+    if (!_isInsideDir(workingDir, '.master') &&
+        _walkUpFor(workingDir, _workspaceMarkers, isDirectory: true)) {
       return ProjectMode.workspace;
     }
     if (_walkUpFor(workingDir, _singleProjectMarkers, isDirectory: false)) {
@@ -48,6 +52,20 @@ class ProjectDetector {
     'package.json',
     'tsconfig.json',
   ];
+
+  static bool _isInsideDir(String startPath, String dirName) {
+    var dir = Directory(startPath).absolute;
+    while (true) {
+      if (path.basename(dir.path) == dirName) {
+        return true;
+      }
+      final parent = dir.parent;
+      if (parent.path == dir.path) {
+        return false;
+      }
+      dir = parent;
+    }
+  }
 
   static bool _walkUpFor(
     String startPath,
@@ -74,14 +92,19 @@ class ProjectDetector {
   }
 }
 
-/// Top-level subcommand names that are shared between gg_multi and gg_one
-/// and are dispatched dynamically based on the detected project mode.
-const Set<String> sharedTopLevelCommands = {'can', 'did', 'do'};
+/// Top-level subcommand names that run independently of the detected
+/// project mode and are therefore never guarded.
+const Set<String> modeIndependentCommands = {'one', 'multi', 'run', 'help'};
 
-/// Rewrites [args] by inserting `one` or `multi` before the first non-flag
-/// argument when it is a [sharedTopLevelCommands] entry. Throws a
-/// [StateError] when the mode is [ProjectMode.unknown].
-List<String> rewriteArgsForProjectMode(
+/// Checks whether [args] may run in the detected project mode.
+///
+/// All gg_multi subcommands are registered at the root of `gg`, so inside
+/// a gg ticket workspace the args pass through unchanged and gg multi runs
+/// by default. Inside a standalone project a [StateError] asks the user to
+/// call `gg one ...` explicitly; when no project is detected at all, a
+/// [StateError] explains both options. Empty args, pure flags (`--help`)
+/// and [modeIndependentCommands] always pass through.
+List<String> checkArgsForProjectMode(
   List<String> args,
   ProjectMode Function() detectMode,
 ) {
@@ -89,22 +112,29 @@ List<String> rewriteArgsForProjectMode(
   if (firstNonFlag < 0) return args;
 
   final command = args[firstNonFlag];
-  if (!sharedTopLevelCommands.contains(command)) return args;
+  if (modeIndependentCommands.contains(command)) return args;
 
-  final before = args.sublist(0, firstNonFlag);
-  final after = args.sublist(firstNonFlag);
   switch (detectMode()) {
     case ProjectMode.workspace:
-      return [...before, 'multi', ...after];
+      return args;
     case ProjectMode.single:
-      return [...before, 'one', ...after];
+      final oneCommand = [
+        'gg',
+        ...args.sublist(0, firstNonFlag),
+        'one',
+        ...args.sublist(firstNonFlag),
+      ].join(' ');
+      throw StateError(
+        '${yellow('This is a standalone project. Please use')} '
+        '${blue(oneCommand)} ${yellow('instead.')}',
+      );
     case ProjectMode.unknown:
       throw StateError(
         'Cannot run "gg $command" here: the current directory is neither '
         'inside a gg workspace (no .master/tickets folder found) nor a '
         'Dart/TypeScript project (no pubspec.yaml/package.json/tsconfig.json '
-        'found). Use "gg one $command ..." or "gg multi $command ..." '
-        'explicitly.',
+        'found). Use "gg one $command ..." inside a single project or run '
+        'the command inside a gg ticket workspace.',
       );
   }
 }

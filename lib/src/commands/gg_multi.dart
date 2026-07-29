@@ -24,4 +24,9 @@ class GgMultiNamespace extends Command<void> {
 
   @override
   String get description => 'Provides access to gg_multi subcommands.';
+
+  /// Hidden because all gg_multi subcommands are also registered at the gg
+  /// root; the namespace stays available for explicit invocation.
+  @override
+  bool get hidden => true;
 }

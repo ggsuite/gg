@@ -16,14 +16,16 @@ Future<void> runGg({
   ProjectMode Function()? detectMode,
 }) async {
   try {
-    final rewritten = rewriteArgsForProjectMode(
+    final checked = checkArgsForProjectMode(
       args,
       detectMode ?? ProjectDetector.detect,
     );
     await GgCommandRunner(
       ggLog: ggLog,
       command: Gg(ggLog: ggLog),
-    ).run(args: rewritten);
+    ).run(args: checked);
+  } on StateError catch (e) {
+    ggLog(e.message);
   } catch (e) {
     ggLog(e.toString());
   }

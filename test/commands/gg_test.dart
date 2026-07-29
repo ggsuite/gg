@@ -6,6 +6,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:gg_args/gg_args.dart';
+import 'package:gg_multi/gg_multi.dart' as gg_multi;
 import 'package:gg/gg.dart';
 import 'package:test/test.dart';
 
@@ -32,25 +33,40 @@ void main() {
       expect(ggCommand.subcommands.keys, containsAll(['run', 'one', 'multi']));
     });
 
-    test('does NOT register shared can/did/do at the root', () {
-      for (final name in sharedTopLevelCommands) {
+    test('registers all gg_multi subcommands at the root', () {
+      final expected = gg_multi.GgMulti(ggLog: ggLog).subcommands.keys;
+      expect(ggCommand.subcommands.keys, containsAll(expected));
+    });
+
+    test('does NOT register gg_one-only commands at the root', () {
+      // `check` and `info` exist only in gg_one
+      expect(ggCommand.subcommands.containsKey('check'), isFalse);
+      expect(ggCommand.subcommands.containsKey('info'), isFalse);
+    });
+
+    test('hides the multi namespace in the help output', () async {
+      expect(ggCommand.subcommands['multi']!.hidden, isTrue);
+
+      await runner.run(args: []);
+      final help = output.join('\n');
+      expect(help, isNot(contains('Provides access to gg_multi')));
+      expect(help, contains('Provides access to gg subcommands.'));
+    });
+
+    test('shows gg_multi commands and "one" in the help output', () async {
+      await runner.run(args: []);
+      final help = output.join('\n');
+      final expected = [
+        'one',
+        ...gg_multi.GgMulti(ggLog: ggLog).subcommands.keys,
+      ];
+      for (final name in expected) {
         expect(
-          ggCommand.subcommands.containsKey(name),
-          isFalse,
-          reason: '"$name" must not be a root subcommand of gg',
+          help,
+          matches(RegExp('^\\s+$name\\s', multiLine: true)),
+          reason: '"$name" must be listed in the gg help output',
         );
       }
-    });
-
-    test('registers gg_multi-only top-level commands at the root', () {
-      // `ls` exists only in gg_multi, not gg_one
-      expect(ggCommand.subcommands.containsKey('ls'), isTrue);
-    });
-
-    test('registers gg_one-only top-level commands at the root', () {
-      // `check` and `info` exist only in gg_one
-      expect(ggCommand.subcommands.containsKey('check'), isTrue);
-      expect(ggCommand.subcommands.containsKey('info'), isTrue);
     });
   });
 }
