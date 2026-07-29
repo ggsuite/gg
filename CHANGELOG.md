@@ -1,5 +1,11 @@
 # Changelog
 
+## [12.0.1] - 2026-07-29
+
+### Fixed
+
+- Fix: If an argument was equal command, the command was not executed
+
 ## [12.0.0] - 2026-07-29
 
 ### Changed
@@ -203,6 +209,7 @@ to `gg_multi`).
 
 - commit
 
+[12.0.1]: https://github.com/ggsuite/gg/compare/12.0.0...12.0.1
 [12.0.0]: https://github.com/ggsuite/gg/compare/11.0.1...12.0.0
 [11.0.1]: https://github.com/ggsuite/gg/compare/11.0.0...11.0.1
 [11.0.0]: https://github.com/ggsuite/gg/compare/10.4.2...11.0.0
