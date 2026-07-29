@@ -60,6 +60,26 @@ void main() {
       });
 
       group('- project mode routing', () {
+        test('asks to use "gg one" in a standalone project', () async {
+          await runGg(
+            args: ['can', 'commit'],
+            ggLog: ggLog,
+            detectMode: () => ProjectMode.single,
+          );
+          final output = messages.join('\n');
+          expect(output, contains('This is a standalone project.'));
+          expect(output, contains('gg one can commit'));
+        });
+
+        test('prints unexpected errors', () async {
+          await runGg(
+            args: ['can', 'commit'],
+            ggLog: ggLog,
+            detectMode: () => throw Exception('unexpected'),
+          );
+          expect(messages.join('\n'), contains('Exception: unexpected'));
+        });
+
         test('reports helpful error when mode is unknown', () async {
           await runGg(
             args: ['can', 'commit'],

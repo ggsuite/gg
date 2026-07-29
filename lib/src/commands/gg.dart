@@ -8,9 +8,7 @@
 import 'package:args/command_runner.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_multi/gg_multi.dart' as gg_multi;
-import 'package:gg_one/gg_one.dart' as gg_one;
 
-import '../project_detector.dart';
 import 'gg_multi.dart';
 import 'gg_one.dart';
 import 'gg_run.dart';
@@ -23,23 +21,10 @@ class Gg extends Command<void> {
     addSubcommand(GgOne(ggLog: ggLog));
     addSubcommand(GgMultiNamespace(ggLog: ggLog));
 
-    // Register gg_multi-only and gg_one-only top-level commands directly at
-    // the root. Shared commands (can/did/do) are routed via args rewriting in
-    // `runGg` to either `one` or `multi` based on the detected project mode.
-    final multiSubs = gg_multi.GgMulti(ggLog: ggLog).subcommands;
-    final oneSubs = gg_one.Gg(ggLog: ggLog).subcommands;
-    for (final entry in multiSubs.entries) {
-      if (!sharedTopLevelCommands.contains(entry.key) &&
-          !oneSubs.containsKey(entry.key)) {
-        addSubcommand(entry.value);
-      }
-    }
-    for (final entry in oneSubs.entries) {
-      if (!sharedTopLevelCommands.contains(entry.key) &&
-          !multiSubs.containsKey(entry.key)) {
-        addSubcommand(entry.value);
-      }
-    }
+    // Register all gg_multi subcommands directly at the root: inside a gg
+    // ticket workspace `gg <command>` runs gg multi by default. Standalone
+    // projects are guarded in `runGg` and asked to use `gg one ...`.
+    gg_multi.GgMulti(ggLog: ggLog).subcommands.values.forEach(addSubcommand);
   }
 
   /// The log function.

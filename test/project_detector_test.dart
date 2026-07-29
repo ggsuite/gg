@@ -7,6 +7,7 @@
 import 'dart:io';
 
 import 'package:gg/src/project_detector.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
@@ -81,6 +82,24 @@ void main() {
       );
     });
 
+    test('returns single for a repo checked out inside .master', () {
+      // .master/<repo> lives inside the master workspace, but the repo
+      // itself is a standalone project, not part of a ticket.
+      Directory(path.join(root.path, 'tickets')).createSync();
+      final repo = Directory(path.join(root.path, '.master', 'gg_dna'))
+        ..createSync(recursive: true);
+      File(path.join(repo.path, 'pubspec.yaml')).writeAsStringSync('name: x');
+      expect(ProjectDetector.detect(workingDir: repo.path), ProjectMode.single);
+    });
+
+    test('returns unknown inside .master without project markers', () {
+      final master = Directory(path.join(root.path, '.master'))..createSync();
+      expect(
+        ProjectDetector.detect(workingDir: master.path),
+        ProjectMode.unknown,
+      );
+    });
+
     test('returns unknown when no markers are found', () {
       expect(
         ProjectDetector.detect(workingDir: root.path),
@@ -89,9 +108,9 @@ void main() {
     });
   });
 
-  group('rewriteArgsForProjectMode', () {
+  group('checkArgsForProjectMode', () {
     test('returns args unchanged when empty', () {
-      final result = rewriteArgsForProjectMode(
+      final result = checkArgsForProjectMode(
         const <String>[],
         () => ProjectMode.workspace,
       );
@@ -99,51 +118,73 @@ void main() {
     });
 
     test('returns args unchanged when only flags are present', () {
-      final result = rewriteArgsForProjectMode([
+      final result = checkArgsForProjectMode([
         '--help',
       ], () => ProjectMode.unknown);
       expect(result, ['--help']);
     });
 
-    test('returns args unchanged when first command is not shared', () {
-      final result = rewriteArgsForProjectMode([
-        'run',
-        '--port',
-        '8080',
-      ], () => ProjectMode.unknown);
-      expect(result, ['run', '--port', '8080']);
+    test('returns args unchanged for mode-independent commands', () {
+      for (final command in modeIndependentCommands) {
+        final result = checkArgsForProjectMode([
+          command,
+          'can',
+          'commit',
+        ], () => ProjectMode.unknown);
+        expect(result, [command, 'can', 'commit']);
+      }
     });
 
-    test('prefixes "multi" for shared command in workspace mode', () {
-      final result = rewriteArgsForProjectMode([
+    test('returns args unchanged in workspace mode', () {
+      final result = checkArgsForProjectMode([
         'do',
         'commit',
         '-m',
         'msg',
       ], () => ProjectMode.workspace);
-      expect(result, ['multi', 'do', 'commit', '-m', 'msg']);
+      expect(result, ['do', 'commit', '-m', 'msg']);
     });
 
-    test('prefixes "one" for shared command in single mode', () {
-      final result = rewriteArgsForProjectMode([
-        'can',
-        'commit',
-      ], () => ProjectMode.single);
-      expect(result, ['one', 'can', 'commit']);
+    test('asks to use "gg one" in single mode', () {
+      expect(
+        () => checkArgsForProjectMode([
+          'can',
+          'commit',
+        ], () => ProjectMode.single),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            allOf(
+              contains(yellow('This is a standalone project. Please use')),
+              contains(blue('gg one can commit')),
+              contains(yellow('instead.')),
+            ),
+          ),
+        ),
+      );
     });
 
-    test('preserves leading flags before shared command', () {
-      final result = rewriteArgsForProjectMode([
-        '--verbose',
-        'did',
-        'push',
-      ], () => ProjectMode.workspace);
-      expect(result, ['--verbose', 'multi', 'did', 'push']);
+    test('keeps leading flags in the "gg one" hint', () {
+      expect(
+        () => checkArgsForProjectMode([
+          '--verbose',
+          'did',
+          'push',
+        ], () => ProjectMode.single),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains(blue('gg --verbose one did push')),
+          ),
+        ),
+      );
     });
 
     test('throws StateError with helpful message in unknown mode', () {
       expect(
-        () => rewriteArgsForProjectMode([
+        () => checkArgsForProjectMode([
           'do',
           'commit',
         ], () => ProjectMode.unknown),
@@ -154,7 +195,7 @@ void main() {
             allOf(
               contains('Cannot run "gg do" here'),
               contains('gg one do'),
-              contains('gg multi do'),
+              contains('gg ticket workspace'),
             ),
           ),
         ),

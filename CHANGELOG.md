@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- gg now runs gg multi by default inside ticket workspaces: all gg multi commands are available at the root and shown in gg --help alongside gg one; standalone projects, including repos checked out in .master, are no longer auto-routed but get a colored hint to run gg one <command> instead
+
 ## [11.0.1] - 2026-07-25
 
 ### Fixed
@@ -191,6 +197,7 @@ to `gg_multi`).
 
 - commit
 
+[Unreleased]: https://github.com/ggsuite/gg/compare/11.0.1...HEAD
 [11.0.1]: https://github.com/ggsuite/gg/compare/11.0.0...11.0.1
 [11.0.0]: https://github.com/ggsuite/gg/compare/10.4.2...11.0.0
 [10.4.2]: https://github.com/ggsuite/gg/compare/10.4.1...10.4.2
