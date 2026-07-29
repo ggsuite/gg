@@ -29,8 +29,12 @@ void main() {
       expect(output.join('\n'), contains('Usage:'));
     });
 
-    test('registers run, one and multi namespaces', () {
-      expect(ggCommand.subcommands.keys, containsAll(['run', 'one', 'multi']));
+    test('registers one and multi namespaces', () {
+      expect(ggCommand.subcommands.keys, containsAll(['one', 'multi']));
+    });
+
+    test('does NOT register the removed run command', () {
+      expect(ggCommand.subcommands.containsKey('run'), isFalse);
     });
 
     test('registers all gg_multi subcommands at the root', () {

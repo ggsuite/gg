@@ -11,13 +11,11 @@ import 'package:gg_multi/gg_multi.dart' as gg_multi;
 
 import 'gg_multi.dart';
 import 'gg_one.dart';
-import 'gg_run.dart';
 
 /// The parent command for Gg operations.
 class Gg extends Command<void> {
   /// Create the root gg command and register subcommands.
   Gg({required this.ggLog}) {
-    addSubcommand(GgRun(ggLog: ggLog));
     addSubcommand(GgOne(ggLog: ggLog));
     addSubcommand(GgMultiNamespace(ggLog: ggLog));
 

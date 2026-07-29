@@ -1,16 +1,29 @@
 # Changelog
 
+## Unreleased
+
+### Removed
+
+- Remove dependencies that are no longer needed: gg_local_package_dependencies,
+gg_process, gg_project_root, gg_status_printer, mocktail, pub_semver,
+pubspec_parse, yaml_edit, fake_async and gg_capture_print
+- Remove the orphaned `test/test_helpers/` directory, which was no longer
+referenced by any test
+- Remove the bundled `gg_multi_ui/` web assets, which were only served by
+`gg run`
+- Remove run command because it is not used
+
 ## 12.1.0 - 2026-07-29
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 12.0.2 - 2026-07-29
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ### Removed
 
@@ -35,7 +48,7 @@ auto-routed but get a colored hint to run gg one <command> instead
 
 ### Fixed
 
-- IMPORTANT FIX: Previous version removed tag\_patterns on publishing
+- IMPORTANT FIX: Previous version removed tag_patterns on publishing
 
 ## 11.0.0 - 2026-07-22
 
@@ -43,13 +56,13 @@ auto-routed but get a colored hint to run gg one <command> instead
 
 - Update publish docs: the final merge goes through an auto-merge squash pull
 request by default
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 10.4.2 - 2026-07-20
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ### Fixed
 
@@ -60,84 +73,84 @@ request by default
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 10.4.0 - 2026-07-15
 
 ### Changed
 
-- Deliver gg\_one 10.0.0 (do configure-publish + step-based resumable
-publishing) and gg\_multi 5.7.0 (two-level --continue resume)
+- Deliver gg_one 10.0.0 (do configure-publish + step-based resumable
+publishing) and gg_multi 5.7.0 (two-level --continue resume)
 
 ## 10.3.0 - 2026-07-06
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 10.2.1 - 2026-06-26
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 10.2.0 - 2026-06-19
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 10.1.0 - 2026-06-09
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 - style: apply grace-cloud comment + 80-char limits across ticket
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 10.0.0 - 2026-06-08
 
 ### Changed
 
-- gg\_multi: changed references to git
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 9.4.0 - 2026-05-20
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 9.3.0 - 2026-05-19
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 9.2.1 - 2026-05-19
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 9.2.0 - 2026-05-17
 
 ### Changed
 
 - documentation
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 9.1.0 - 2026-05-12
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 
 ## 9.0.1 - 2026-05-11
 
 ### Changed
 
-- gg\_multi: changed references to git
+- gg_multi: changed references to git
 - Gg Multi: changed references to pub.dev
 - **BREAKING**: Renamed package from `kd` to `gg`. Repository moved to
 https://github.com/ggsuite/gg. Update `dependencies:` entries and
@@ -203,7 +216,7 @@ to `gg_multi`).
 
 ### Removed
 
-- remove publish\_to:none
+- remove publish_to:none
 
 ## 2.0.0 - 2026-03-26
 

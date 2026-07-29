@@ -30,12 +30,6 @@ gg do commit -m <message>        # commit after checks pass
 gg do push                       # push after checks pass
 ```
 
-### Running the UI
-
-```bash
-dart run bin/gg.dart run         # start web server at http://localhost:8084
-```
-
 ## Architecture
 
 ### Package Structure
@@ -45,17 +39,14 @@ dart run bin/gg.dart run         # start web server at http://localhost:8084
 ```
 bin/gg.dart          → entry point: main() → runGg()
 lib/src/commands/
-  gg.dart        → root Command; registers GgRun, GgOne, and all GgMulti subcommands
+  gg.dart        → root Command; registers GgOne and all GgMulti subcommands
   gg_one.dart    → `gg one` — re-exposes all `gg` subcommands under the gg namespace
-  gg_run.dart    → `gg run` — HTTP server (port 8084) serving the pre-built gg_multi_ui/ Flutter web app
-gg_multi_ui/           → pre-built Flutter web app (static assets, not a source package)
 ```
 
 ### Command Hierarchy
 
 ```
 gg
-├── run          (GgRun)    — serves gg_multi_ui at localhost:8084
 ├── one          (GgOne)    — all `gg_one` subcommands
 ├── multi        (GgMultiNamespace, hidden) — explicit gg_multi alias
 ├── ls           (ListCommand)  — list organizations, repos, deps, tickets

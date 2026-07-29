@@ -32,7 +32,6 @@ After installation the `gg` executable is available globally.
 
 ```
 gg
-├── run                    Serve the gg_multi web UI at http://localhost:8084
 ├── one  <subcommand>      Single-repo mode (gg_one)
 ├── can  <commit|push|publish|review>
 ├── did  <commit|push>
@@ -242,15 +241,6 @@ Concatenates each repo's `CLAUDE.md` (in dependency order) into a
 single `CLAUDE.md` at the ticket root so Claude Code has full
 workspace context.
 
-## Running the UI
-
-```bash
-gg run                          # serves http://localhost:8084
-```
-
-`gg run` starts an HTTP server that serves the pre-built `gg_multi`
-Flutter web UI bundled with the package.
-
 ## Getting help
 
 Every command supports `-h` / `--help`:
@@ -262,8 +252,7 @@ gg do commit -h
 gg one -h
 ```
 
-`gg` and `gg -h` list all `gg_multi` commands plus `gg one` and
-`gg run`.
+`gg` and `gg -h` list all `gg_multi` commands plus `gg one`.
 
 ## License
 
