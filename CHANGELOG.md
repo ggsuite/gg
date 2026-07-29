@@ -4,7 +4,6 @@
 
 ### Removed
 
-- Remove the `gg run` command because it is not used
 - Remove dependencies that are no longer needed: gg_local_package_dependencies,
 gg_process, gg_project_root, gg_status_printer, mocktail, pub_semver,
 pubspec_parse, yaml_edit, fake_async and gg_capture_print
