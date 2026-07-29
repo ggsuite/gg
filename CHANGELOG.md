@@ -1,5 +1,11 @@
 # Changelog
 
+## 12.1.0 - 2026-07-29
+
+### Changed
+
+- gg\_multi: changed references to git
+
 ## 12.0.2 - 2026-07-29
 
 ### Changed
