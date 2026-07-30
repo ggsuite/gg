@@ -259,9 +259,9 @@ void main() {
             (e) => e.message,
             'message',
             allOf(
-              contains('Cannot run "gg do" here'),
-              contains('gg one do'),
-              contains('gg ticket workspace'),
+              contains(red('Not a workspace.')),
+              contains(blue('gg do init')),
+              contains(yellow('" to init a workspace.')),
             ),
           ),
         ),

@@ -121,7 +121,7 @@ const Set<String> modeIndependentCommandPaths = {'do init'};
 /// a gg ticket workspace the args pass through unchanged and gg multi runs
 /// by default. Inside a standalone project a [StateError] asks the user to
 /// call `gg one ...` explicitly; when no project is detected at all, a
-/// [StateError] explains both options. Empty args, pure flags (`--help`)
+/// [StateError] points to `gg do init`. Empty args, pure flags (`--help`)
 /// and [modeIndependentCommands] always pass through, and so do the
 /// `<command> <subcommand>` combinations listed in
 /// [modeIndependentCommandPaths].
@@ -158,12 +158,9 @@ List<String> checkArgsForProjectMode(
       );
     case ProjectMode.unknown:
       throw StateError(
-        'Cannot run "gg $command" here: the current directory is neither '
-        'inside a gg workspace (no .master/tickets folder found) nor inside a '
-        'project (no .git folder and no '
-        'pubspec.yaml/package.json/tsconfig.json found). Use '
-        '"gg one $command ..." inside a single project or run the command '
-        'inside a gg ticket workspace.',
+        '${red('Not a workspace.')} '
+        '${yellow('Use "')}${blue('gg do init')}'
+        '${yellow('" to init a workspace.')}',
       );
   }
 }

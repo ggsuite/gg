@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Show a clear message when gg is called in non git or non ticket spaces
+
 ## 12.1.4 - 2026-07-30
 
 ### Fixed

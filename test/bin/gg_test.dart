@@ -86,7 +86,7 @@ void main() {
             ggLog: ggLog,
             detectMode: () => ProjectMode.unknown,
           );
-          expect(messages.join('\n'), contains('Cannot run "gg can" here'));
+          expect(messages.join('\n'), contains('Not a workspace.'));
         });
       });
     });
