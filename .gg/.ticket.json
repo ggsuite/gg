@@ -1,0 +1,26 @@
+{
+  "issue_id": "15_error_when_packages_are_deleted_from_tickets",
+  "description": "Fix publishing error when packages are deleted from ticket",
+  "repositories": [
+    {
+      "name": "gg_publish",
+      "url": "git@github.com:ggsuite/gg_publish.git"
+    },
+    {
+      "name": "gg_localize_refs",
+      "url": "git@github.com:ggsuite/gg_localize_refs.git"
+    },
+    {
+      "name": "gg_one",
+      "url": "git@github.com:ggsuite/gg_one.git"
+    },
+    {
+      "name": "gg_multi",
+      "url": "git@github.com:ggsuite/gg_multi.git"
+    },
+    {
+      "name": "gg",
+      "url": "git@github.com:ggsuite/gg.git"
+    }
+  ]
+}
