@@ -1,10 +1,10 @@
 # Changelog
 
-## Unreleased
+## 12.1.6 - 2026-07-30
 
 ### Changed
 
-- Improve &quot;gg do init&quot; message
+- Improve "gg do init" message
 
 ## 12.1.5 - 2026-07-30
 
