@@ -1,0 +1,10 @@
+{
+  "issue_id": "19_gg_do_init_does_not_work",
+  "description": "Fix: 'gg do init' does not work",
+  "repositories": [
+    {
+      "name": "gg",
+      "url": "git@github.com:ggsuite/gg.git"
+    }
+  ]
+}
