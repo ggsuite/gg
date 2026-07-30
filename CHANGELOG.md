@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Improve &quot;gg do init&quot; message
+
 ## 12.1.5 - 2026-07-30
 
 ### Changed
