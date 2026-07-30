@@ -1,5 +1,11 @@
 # Changelog
 
+## 12.1.3 - 2026-07-30
+
+### Fixed
+
+- Fix "gg do init" was not forwarded to "gg multi do init"
+
 ## 12.1.2 - 2026-07-30
 
 ### Fixed
