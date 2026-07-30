@@ -14,8 +14,9 @@ enum ProjectMode {
   /// A gg multi-repo workspace (contains `.master` or `tickets`).
   workspace,
 
-  /// A single Dart or TypeScript project (`pubspec.yaml`, `package.json`,
-  /// or `tsconfig.json` found while walking up the directory tree).
+  /// A single project: a Dart or TypeScript project (`pubspec.yaml`,
+  /// `package.json`, or `tsconfig.json`) or any git repository (`.git`)
+  /// found while walking up the directory tree.
   single,
 
   /// Neither a workspace nor a recognized single project.
@@ -23,7 +24,7 @@ enum ProjectMode {
 }
 
 /// Detects whether the current directory belongs to a gg workspace or a
-/// single Dart/TypeScript project.
+/// single project (a Dart/TypeScript project or a plain git repository).
 class ProjectDetector {
   /// Walks up from [workingDir] (defaults to [Directory.current]) and returns
   /// the detected [ProjectMode]. Workspace markers take precedence over
@@ -42,6 +43,11 @@ class ProjectDetector {
     if (_walkUpFor(workingDir, _singleProjectMarkers, isDirectory: false)) {
       return ProjectMode.single;
     }
+    // A plain git repository - possibly still empty, without any pubspec.yaml
+    // or package.json - is a standalone project too.
+    if (_walkUpFor(workingDir, _repoMarkers, isDirectory: null)) {
+      return ProjectMode.single;
+    }
     return ProjectMode.unknown;
   }
 
@@ -52,6 +58,10 @@ class ProjectDetector {
     'package.json',
     'tsconfig.json',
   ];
+
+  /// `.git` is a directory in a normal clone and a file in a git worktree or
+  /// submodule, so both entity types count.
+  static const _repoMarkers = <String>['.git'];
 
   static bool _isInsideDir(String startPath, String dirName) {
     var dir = Directory(startPath).absolute;
@@ -67,18 +77,23 @@ class ProjectDetector {
     }
   }
 
+  /// Walks up from [startPath] looking for any of [markers]. [isDirectory]
+  /// selects the expected entity type; `null` accepts a file or a directory.
   static bool _walkUpFor(
     String startPath,
     List<String> markers, {
-    required bool isDirectory,
+    required bool? isDirectory,
   }) {
     var dir = Directory(startPath).absolute;
     while (true) {
       for (final marker in markers) {
         final markerPath = path.join(dir.path, marker);
-        final exists = isDirectory
-            ? Directory(markerPath).existsSync()
-            : File(markerPath).existsSync();
+        final exists = switch (isDirectory) {
+          true => Directory(markerPath).existsSync(),
+          false => File(markerPath).existsSync(),
+          null =>
+            Directory(markerPath).existsSync() || File(markerPath).existsSync(),
+        };
         if (exists) {
           return true;
         }
@@ -131,10 +146,11 @@ List<String> checkArgsForProjectMode(
     case ProjectMode.unknown:
       throw StateError(
         'Cannot run "gg $command" here: the current directory is neither '
-        'inside a gg workspace (no .master/tickets folder found) nor a '
-        'Dart/TypeScript project (no pubspec.yaml/package.json/tsconfig.json '
-        'found). Use "gg one $command ..." inside a single project or run '
-        'the command inside a gg ticket workspace.',
+        'inside a gg workspace (no .master/tickets folder found) nor inside a '
+        'project (no .git folder and no '
+        'pubspec.yaml/package.json/tsconfig.json found). Use '
+        '"gg one $command ..." inside a single project or run the command '
+        'inside a gg ticket workspace.',
       );
   }
 }
