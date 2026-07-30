@@ -1,0 +1,10 @@
+{
+  "issue_id": "20_simple_error_message_when_no_git",
+  "description": "Show a clear message when gg is called in non git or non ticket spaces",
+  "repositories": [
+    {
+      "name": "gg",
+      "url": "git@github.com:ggsuite/gg.git"
+    }
+  ]
+}
