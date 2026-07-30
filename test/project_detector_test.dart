@@ -92,6 +92,36 @@ void main() {
       expect(ProjectDetector.detect(workingDir: repo.path), ProjectMode.single);
     });
 
+    test('returns single for a git repo without any project markers', () {
+      // An empty repo has no pubspec.yaml/package.json yet, but it is still a
+      // standalone project - so gg must point the user to "gg one".
+      Directory(path.join(root.path, '.git')).createSync();
+      expect(ProjectDetector.detect(workingDir: root.path), ProjectMode.single);
+    });
+
+    test('returns single when .git is a file (worktree/submodule)', () {
+      File(
+        path.join(root.path, '.git'),
+      ).writeAsStringSync('gitdir: /elsewhere');
+      expect(ProjectDetector.detect(workingDir: root.path), ProjectMode.single);
+    });
+
+    test('returns single when .git is in an ancestor', () {
+      Directory(path.join(root.path, '.git')).createSync();
+      final sub = Directory(path.join(root.path, 'a', 'b'))
+        ..createSync(recursive: true);
+      expect(ProjectDetector.detect(workingDir: sub.path), ProjectMode.single);
+    });
+
+    test('workspace takes precedence over a .git folder', () {
+      Directory(path.join(root.path, 'tickets')).createSync();
+      Directory(path.join(root.path, '.git')).createSync();
+      expect(
+        ProjectDetector.detect(workingDir: root.path),
+        ProjectMode.workspace,
+      );
+    });
+
     test('returns unknown inside .master without project markers', () {
       final master = Directory(path.join(root.path, '.master'))..createSync();
       expect(

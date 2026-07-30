@@ -1,5 +1,11 @@
 # Changelog
 
+## 12.1.2 - 2026-07-30
+
+### Fixed
+
+- Fix: Empty repos were not treated as stand alone projects
+
 ## 12.1.1 - 2026-07-29
 
 ### Removed
