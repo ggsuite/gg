@@ -111,6 +111,10 @@ class ProjectDetector {
 /// project mode and are therefore never guarded.
 const Set<String> modeIndependentCommands = {'one', 'multi', 'run', 'help'};
 
+/// Command paths (`<command> <subcommand>`) that create or bootstrap a
+/// workspace and therefore must run outside of one as well.
+const Set<String> modeIndependentCommandPaths = {'do init'};
+
 /// Checks whether [args] may run in the detected project mode.
 ///
 /// All gg_multi subcommands are registered at the root of `gg`, so inside
@@ -118,7 +122,9 @@ const Set<String> modeIndependentCommands = {'one', 'multi', 'run', 'help'};
 /// by default. Inside a standalone project a [StateError] asks the user to
 /// call `gg one ...` explicitly; when no project is detected at all, a
 /// [StateError] explains both options. Empty args, pure flags (`--help`)
-/// and [modeIndependentCommands] always pass through.
+/// and [modeIndependentCommands] always pass through, and so do the
+/// `<command> <subcommand>` combinations listed in
+/// [modeIndependentCommandPaths].
 List<String> checkArgsForProjectMode(
   List<String> args,
   ProjectMode Function() detectMode,
@@ -128,6 +134,13 @@ List<String> checkArgsForProjectMode(
 
   final command = args[firstNonFlag];
   if (modeIndependentCommands.contains(command)) return args;
+
+  final rest = args.sublist(firstNonFlag + 1);
+  final secondNonFlag = rest.indexWhere((a) => !a.startsWith('-'));
+  if (secondNonFlag >= 0 &&
+      modeIndependentCommandPaths.contains('$command ${rest[secondNonFlag]}')) {
+    return args;
+  }
 
   switch (detectMode()) {
     case ProjectMode.workspace:
