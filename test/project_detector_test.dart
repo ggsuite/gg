@@ -261,7 +261,7 @@ void main() {
             allOf(
               contains(red('Not a workspace.')),
               contains(blue('gg do init')),
-              contains(yellow('" to init a workspace.')),
+              contains(yellow(' to init a workspace.')),
             ),
           ),
         ),

@@ -159,8 +159,8 @@ List<String> checkArgsForProjectMode(
     case ProjectMode.unknown:
       throw StateError(
         '${red('Not a workspace.')} '
-        '${yellow('Use "')}${blue('gg do init')}'
-        '${yellow('" to init a workspace.')}',
+        '${yellow('Use ')}${blue('gg do init')}'
+        '${yellow(' to init a workspace.')}',
       );
   }
 }
