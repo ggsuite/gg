@@ -165,6 +165,42 @@ void main() {
       }
     });
 
+    test('returns args unchanged for mode-independent command paths', () {
+      for (final mode in ProjectMode.values) {
+        expect(checkArgsForProjectMode(['do', 'init'], () => mode), [
+          'do',
+          'init',
+        ]);
+      }
+    });
+
+    test('ignores flags when matching mode-independent command paths', () {
+      expect(
+        checkArgsForProjectMode([
+          '--verbose',
+          'do',
+          '--force',
+          'init',
+        ], () => ProjectMode.unknown),
+        ['--verbose', 'do', '--force', 'init'],
+      );
+    });
+
+    test('does not exempt other subcommands of an exempted command', () {
+      expect(
+        () =>
+            checkArgsForProjectMode(['do', 'commit'], () => ProjectMode.single),
+        throwsA(isA<StateError>()),
+      );
+    });
+
+    test('does not exempt a command without a subcommand', () {
+      expect(
+        () => checkArgsForProjectMode(['do'], () => ProjectMode.unknown),
+        throwsA(isA<StateError>()),
+      );
+    });
+
     test('returns args unchanged in workspace mode', () {
       final result = checkArgsForProjectMode([
         'do',

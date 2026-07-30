@@ -1,5 +1,11 @@
 # Changelog
 
+## 12.1.4 - 2026-07-30
+
+### Fixed
+
+- Fix: 'gg do init' does not work
+
 ## 12.1.3 - 2026-07-30
 
 ### Fixed
