@@ -53,7 +53,7 @@ gg
 ├── can          (Can)          — can commit / push / publish / review
 ├── did          (Did)          — did commit / push
 └── do           (Do)           — do commit / push / publish / review / cancel-review
-                                   execute / claude
+                                   maintain exec / claude
                                    add / add-deps / code / create / init / rm
 ```
 
