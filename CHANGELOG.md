@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Do not publish unchanged packages
+
 ## 13.0.1 - 2026-07-31
 
 ### Changed
