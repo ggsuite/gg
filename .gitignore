@@ -21,3 +21,4 @@ build
 !.gg/gg.json
 !.gg/.ticket.json
 .gg/.gg-publish.json
+.gg/gg-publish.json
