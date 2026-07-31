@@ -36,7 +36,7 @@ gg
 ├── can  <commit|push|publish|review>
 ├── did  <commit|push>
 ├── do   <commit|push|review|cancel-review|publish|claude|code|
-│         create|init|add|add-deps|rm|execute|…>
+│         create|init|add|add-deps|rm|maintain|…>
 └── ls   <repos|organizations|deps|tickets>
 ```
 
