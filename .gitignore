@@ -11,6 +11,7 @@ coverage
 build
 *.vm.json
 .DS_Store
+.idea/*
 
 .aicode
 # Ignore .gg contents, but keep the check-state and ticket files trackable.
