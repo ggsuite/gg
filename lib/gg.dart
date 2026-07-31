@@ -8,4 +8,5 @@
 library;
 
 export 'src/commands/gg.dart';
+export 'src/gg_version.dart';
 export 'src/project_detector.dart';

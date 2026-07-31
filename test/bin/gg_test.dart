@@ -7,6 +7,7 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
+import 'package:gg_multi/gg_multi.dart' as gg_multi;
 import 'package:test/test.dart';
 
 import '../../bin/gg.dart';
@@ -38,6 +39,19 @@ void main() {
 
   group('main(args)', () {
     group('should runGg', () {
+      group('- version', () {
+        test('--version prints the gg version', () async {
+          await runGg(args: ['--version'], ggLog: ggLog);
+          expect(messages, [ggVersion]);
+        });
+
+        test('propagates the gg version to gg_multi', () async {
+          gg_multi.ggCliVersion = 'outdated';
+          await runGg(args: ['--version'], ggLog: ggLog);
+          expect(gg_multi.ggCliVersion, ggVersion);
+        });
+      });
+
       group('- edge cases', () {
         group('should catch and print errors', () {
           test('- no arguments', () async {
