@@ -8,6 +8,7 @@
 import 'package:gg_args/gg_args.dart';
 import 'package:gg/gg.dart';
 import 'package:gg_log/gg_log.dart';
+import 'package:gg_multi/gg_multi.dart' as gg_multi;
 
 // .............................................................................
 Future<void> runGg({
@@ -15,6 +16,14 @@ Future<void> runGg({
   required GgLog ggLog,
   ProjectMode Function()? detectMode,
 }) async {
+  // gg_multi stamps and checks this version in .gg/.ticket.json markers.
+  gg_multi.ggCliVersion = ggVersion;
+
+  if (args.contains('--version')) {
+    ggLog(ggVersion);
+    return;
+  }
+
   try {
     final checked = checkArgsForProjectMode(
       args,
