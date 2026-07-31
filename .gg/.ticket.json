@@ -3,6 +3,10 @@
   "description": "Require minimum gg version",
   "repositories": [
     {
+      "name": "gg_multi",
+      "url": "git@github.com:ggsuite/gg_multi.git"
+    },
+    {
       "name": "gg",
       "url": "git@github.com:ggsuite/gg.git"
     }
