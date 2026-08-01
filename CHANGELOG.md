@@ -6,6 +6,10 @@
 
 - Add »gg do create graph« to output mermaid graphs
 
+### Changed
+
+- \#gg: changed references to git
+
 ## 14.0.1 - 2026-07-31
 
 ### Changed
