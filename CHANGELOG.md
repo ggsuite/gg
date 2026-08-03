@@ -6,12 +6,13 @@
 
 - replace do cancel-review with do review --abort
 - move ls under do
-- refactor(gg): rename gg one description to "Work in standalone repos"
+- rename gg one description to "Work in standalone repos"
 - Rework CLI texts
 
 ### Removed
 
 - remove do add-deps command
+- Remove unused CLI commands
 
 ## 14.0.2 - 2026-08-02
 
