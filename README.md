@@ -35,9 +35,9 @@ gg
 ├── one  <subcommand>      Single-repo mode (gg_one)
 ├── can  <commit|push|publish|review>
 ├── did  <commit|push>
-├── do   <commit|push|review [--abort]|publish|claude|code|
-│         create|init|add|rm|maintain|…>
-└── ls   <repos|organizations|deps|tickets>
+└── do   <commit|push|review [--abort]|publish|claude|code|
+          create|init|add|rm|maintain|
+          ls <repos|organizations|deps|tickets>|…>
 ```
 
 `can`, `did`, `do` and `ls` are the `gg_multi` commands, registered
@@ -95,7 +95,7 @@ command surface; the most important ones are:
 | `gg can push` / `do push`  | check / push every ticket repo                      |
 | `gg do review`             | run the full review pipeline across the ticket      |
 | `gg do publish`            | publish every publishable package of the ticket     |
-| `gg ls repos`              | list repos in the master workspace                  |
+| `gg do ls repos`           | list repos in the master workspace                  |
 | `gg do claude`             | generate an aggregated `CLAUDE.md` for the ticket   |
 
 ## Step-by-step: working on a ticket end-to-end
