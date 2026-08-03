@@ -5,14 +5,8 @@
 # remove it again.
 dependency_overrides:
   gg_one:
-    git:
-      url: git@github.com:ggsuite/gg_one.git
-      ref: CDM-1668-C
+    path: ../gg_one
   gg_multi:
-    git:
-      url: git@github.com:ggsuite/gg_multi.git
-      ref: CDM-1668-C
+    path: ../gg_multi
   gg_test:
-    git:
-      url: git@github.com:ggsuite/gg_test.git
-      ref: CDM-1668-C
+    path: ../gg_test
