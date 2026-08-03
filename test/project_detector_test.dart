@@ -219,12 +219,12 @@ void main() {
         ], () => ProjectMode.single),
         throwsA(
           isA<StateError>().having(
-            (e) => e.message,
+            (e) => rmC(e.message),
             'message',
             allOf(
-              contains(yellow('This is a standalone project. Please use')),
-              contains(blue('gg one can commit')),
-              contains(yellow('instead.')),
+              contains('This is a standalone project. Please use'),
+              contains('gg one can commit'),
+              contains('instead.'),
             ),
           ),
         ),
@@ -240,9 +240,9 @@ void main() {
         ], () => ProjectMode.single),
         throwsA(
           isA<StateError>().having(
-            (e) => e.message,
+            (e) => rmC(e.message),
             'message',
-            contains(blue('gg --verbose one did push')),
+            contains('gg --verbose one did push'),
           ),
         ),
       );
@@ -256,12 +256,12 @@ void main() {
         ], () => ProjectMode.unknown),
         throwsA(
           isA<StateError>().having(
-            (e) => e.message,
+            (e) => rmC(e.message),
             'message',
             allOf(
-              contains(red('Not a workspace.')),
-              contains(blue('gg do init')),
-              contains(yellow(' to init a workspace.')),
+              contains('Not a workspace.'),
+              contains('gg do init'),
+              contains(' to init a workspace.'),
             ),
           ),
         ),

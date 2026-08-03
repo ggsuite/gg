@@ -1,13 +1,21 @@
 # Changelog
 
-## Unreleased
+## 14.0.3 - 2026-08-03
 
 ### Changed
 
+- dart pub upgrade --major-versions --tighten
+- use the semantic colors of gg_console_colors: cAction for instructions,
+cWarn for warnings, cDetail for progress, cCmd/cPath inside a message
+- wrap every exception text in cError
+- assert the plain text in the tests, not the escape codes (rmC)
+- reword the gg root description to "Work on tickets across many repos"
 - replace do cancel-review with do review --abort
 - move ls under do
 - rename gg one description to "Work in standalone repos"
 - Rework CLI texts
+- Rework console colors
+- Improve cli log and colors
 
 ### Removed
 
