@@ -54,7 +54,7 @@ void main() {
       await runner.run(args: []);
       final help = output.join('\n');
       expect(help, isNot(contains('Provides access to gg_multi')));
-      expect(help, contains('Provides access to gg subcommands.'));
+      expect(help, contains('Work in standalone repos'));
     });
 
     test('shows gg_multi commands and "one" in the help output', () async {

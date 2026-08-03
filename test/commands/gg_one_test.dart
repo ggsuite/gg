@@ -26,7 +26,7 @@ void main() {
     });
 
     test('returns the expected description', () {
-      expect(command.description, 'Provides access to gg subcommands.');
+      expect(command.description, 'Work in standalone repos');
     });
 
     test('registers all gg subcommands', () {

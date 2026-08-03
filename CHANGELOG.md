@@ -6,6 +6,7 @@
 
 - refactor(gg_multi): replace do cancel-review with do review --abort
 - refactor(gg_multi): move ls under do
+- refactor(gg): rename gg one description to &quot;Work in standalone repos&quot;
 
 ### Removed
 
