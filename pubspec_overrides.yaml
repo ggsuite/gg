@@ -14,3 +14,5 @@ dependency_overrides:
     path: ../gg_publish
   gg_localize_refs:
     path: ../gg_localize_refs
+  gg_changelog:
+    path: ../gg_changelog
