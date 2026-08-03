@@ -12,3 +12,5 @@ dependency_overrides:
     path: ../gg_multi
   gg_localize_refs:
     path: ../gg_localize_refs
+  gg_version:
+    path: ../gg_version
