@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Fix test error paths
+
 ## 14.0.4 - 2026-08-03
 
 ### Changed
