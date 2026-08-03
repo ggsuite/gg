@@ -4,6 +4,7 @@
 
 ### Changed
 
+- dart pub upgrade --major-versions --tighten
 - replace do cancel-review with do review --abort
 - move ls under do
 - rename gg one description to "Work in standalone repos"
