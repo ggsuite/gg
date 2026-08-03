@@ -15,6 +15,7 @@ cWarn for warnings, cDetail for progress, cCmd/cPath inside a message
 - rename gg one description to "Work in standalone repos"
 - Rework CLI texts
 - Rework console colors
+- Improve cli log and colors
 
 ### Removed
 
