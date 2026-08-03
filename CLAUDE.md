@@ -54,7 +54,7 @@ gg
 ├── did          (Did)          — did commit / push
 └── do           (Do)           — do commit / push / publish / review [--abort]
                                    maintain exec / claude
-                                   add / add-deps / code / create / init / rm
+                                   add / code / create / init / rm
 ```
 
 `GgMulti` (from `gg_multi`) contributes `ls`, `can`, `did`, and `do` at the root by iterating over its `.subcommands.values` — inside a gg ticket workspace `gg <cmd>` therefore runs gg_multi by default. `ProjectDetector` (`lib/src/project_detector.dart`) guards this in `bin/gg.dart`: in a standalone project the root commands only print a hint to use `gg one <cmd> …`; outside any recognized project they abort with an error explaining both options. `gg do init` is exempt from this guard (see `modeIndependentCommandPaths`), because it bootstraps a new master workspace and must therefore run outside of one.
