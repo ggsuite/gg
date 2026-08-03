@@ -35,7 +35,7 @@ gg
 ├── one  <subcommand>      Single-repo mode (gg_one)
 ├── can  <commit|push|publish|review>
 ├── did  <commit|push>
-├── do   <commit|push|review|cancel-review|publish|claude|code|
+├── do   <commit|push|review [--abort]|publish|claude|code|
 │         create|init|add|add-deps|rm|maintain|…>
 └── ls   <repos|organizations|deps|tickets>
 ```
@@ -184,7 +184,7 @@ consistent state ready for merge.
 If you need to keep working after starting a review:
 
 ```bash
-gg do cancel-review
+gg do review --abort
 ```
 
 ### 8. Publish (when approved)

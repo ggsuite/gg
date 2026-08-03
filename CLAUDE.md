@@ -52,7 +52,7 @@ gg
 ├── ls           (ListCommand)  — list organizations, repos, deps, tickets
 ├── can          (Can)          — can commit / push / publish / review
 ├── did          (Did)          — did commit / push
-└── do           (Do)           — do commit / push / publish / review / cancel-review
+└── do           (Do)           — do commit / push / publish / review [--abort]
                                    maintain exec / claude
                                    add / add-deps / code / create / init / rm
 ```
