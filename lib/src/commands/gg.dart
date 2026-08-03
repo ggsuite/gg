@@ -32,5 +32,5 @@ class Gg extends Command<void> {
   String get name => 'gg';
 
   @override
-  String get description => 'Various maintenance tasks for our repositories.';
+  String get description => 'Work on tickets across many repos';
 }

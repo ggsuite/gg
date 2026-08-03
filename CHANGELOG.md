@@ -5,6 +5,7 @@
 ### Changed
 
 - dart pub upgrade --major-versions --tighten
+- reword the gg root description to "Work on tickets across many repos"
 - replace do cancel-review with do review --abort
 - move ls under do
 - rename gg one description to "Work in standalone repos"
