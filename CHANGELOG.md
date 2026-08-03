@@ -1,5 +1,11 @@
 # Changelog
 
+## 14.0.4 - 2026-08-03
+
+### Changed
+
+- Improve review workflow
+
 ## 14.0.3 - 2026-08-03
 
 ### Changed

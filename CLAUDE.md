@@ -51,7 +51,7 @@ gg
 ├── multi        (GgMultiNamespace, hidden) — explicit gg_multi alias
 ├── can          (Can)          — can commit / push / publish / review
 ├── did          (Did)          — did commit / push
-└── do           (Do)           — do commit / push / publish / review [--abort]
+└── do           (Do)           — do commit / push / publish / review
                                    maintain exec / claude
                                    add / code / create / init / rm
                                    ls repos|organizations|deps|tickets
