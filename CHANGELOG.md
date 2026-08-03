@@ -4,13 +4,14 @@
 
 ### Changed
 
-- refactor(gg_multi): replace do cancel-review with do review --abort
-- refactor(gg_multi): move ls under do
-- refactor(gg): rename gg one description to &quot;Work in standalone repos&quot;
+- replace do cancel-review with do review --abort
+- move ls under do
+- refactor(gg): rename gg one description to "Work in standalone repos"
+- Rework CLI texts
 
 ### Removed
 
-- refactor(gg_multi): remove do add-deps command
+- remove do add-deps command
 
 ## 14.0.2 - 2026-08-02
 
