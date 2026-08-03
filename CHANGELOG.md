@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- replace do cancel-review with do review --abort
+- move ls under do
+- refactor(gg): rename gg one description to "Work in standalone repos"
+- Rework CLI texts
+
+### Removed
+
+- remove do add-deps command
+
 ## 14.0.2 - 2026-08-02
 
 ## 14.0.1 - 2026-07-31

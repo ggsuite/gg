@@ -23,5 +23,5 @@ class GgOne extends Command<void> {
   String get name => 'one';
 
   @override
-  String get description => 'Provides access to gg subcommands.';
+  String get description => 'Work in standalone repos';
 }
