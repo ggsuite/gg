@@ -153,14 +153,19 @@ List<String> checkArgsForProjectMode(
         ...args.sublist(firstNonFlag),
       ].join(' ');
       throw StateError(
-        '${cAction('This is a standalone project. Please use')} '
-        '${cCmd(oneCommand)} ${cAction('instead.')}',
+        cError(
+          'This is a standalone project. Please use '
+          '${cCmd(oneCommand)}'
+          ' instead.',
+        ),
       );
     case ProjectMode.unknown:
       throw StateError(
-        '${red('Not a workspace.')} '
-        '${cAction('Use ')}${cCmd('gg do init')}'
-        '${cAction(' to init a workspace.')}',
+        cError(
+          'Not a workspace. Use '
+          '${cCmd('gg do init')}'
+          ' to init a workspace.',
+        ),
       );
   }
 }
