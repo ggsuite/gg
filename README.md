@@ -7,10 +7,10 @@ repositories of a ticket.
 
 It is a thin CLI shell that combines two backend packages:
 
-| Package    | Scope                          | Purpose                                                  |
-| ---------- | ------------------------------ | -------------------------------------------------------- |
-| `gg_one`   | a single Dart/TypeScript repo  | pre-commit checks (analyze, format, test, coverage, …)   |
-| `gg_multi` | a multi-repo ticket workspace  | run commands across all repos of a ticket in dep order   |
+| Package    | Scope                         | Purpose                                                |
+| ---------- | ----------------------------- | ------------------------------------------------------ |
+| `gg_one`   | a single Dart/TypeScript repo | pre-commit checks (analyze, format, test, coverage, …) |
+| `gg_multi` | a multi-repo ticket workspace | run commands across all repos of a ticket in dep order |
 
 `gg` detects where you run it:
 
@@ -34,8 +34,8 @@ After installation the `gg` executable is available globally.
 gg
 ├── one  <subcommand>      Single-repo mode (gg_one)
 ├── can  <commit|push|publish|review>
-├── did  <commit|push>
-└── do   <commit|push|review [--abort]|publish|claude|code|
+├── did  <commit|push|review>
+└── do   <commit|push|review|publish|claude|code|
           create|init|add|rm|maintain|
           ls <repos|organizations|deps|tickets>|…>
 ```
@@ -58,17 +58,17 @@ workspace.
 `gg one` is a re-export of the `gg_one` package and offers the
 following subcommands:
 
-| Command                    | Purpose                                                            |
-| -------------------------- | ------------------------------------------------------------------ |
-| `gg one check analyze`     | static analysis                                                    |
-| `gg one check format`      | formatting check                                                   |
-| `gg one check`             | run the full local check pipeline (analyze + format + tests + …)   |
-| `gg one can commit`        | verify the repo is ready to commit                                 |
-| `gg one do commit -m "…"`  | commit after checks pass                                           |
-| `gg one can push`          | verify the repo is ready to push                                   |
-| `gg one do push`           | push after checks pass                                             |
-| `gg one did commit`        | report what was committed since the last reference state           |
-| `gg one info`              | print project metadata gg_one detected                             |
+| Command                   | Purpose                                                          |
+| ------------------------- | ---------------------------------------------------------------- |
+| `gg one check analyze`    | static analysis                                                  |
+| `gg one check format`     | formatting check                                                 |
+| `gg one check`            | run the full local check pipeline (analyze + format + tests + …) |
+| `gg one can commit`       | verify the repo is ready to commit                               |
+| `gg one do commit -m "…"` | commit after checks pass                                         |
+| `gg one can push`         | verify the repo is ready to push                                 |
+| `gg one do push`          | push after checks pass                                           |
+| `gg one did commit`       | report what was committed since the last reference state         |
+| `gg one info`             | print project metadata gg_one detected                           |
 
 `gg one …` is always explicit: in a standalone project a plain
 `gg can commit` or `gg do push` does not run anything but prints a
@@ -92,8 +92,9 @@ command surface; the most important ones are:
 | `gg do code`               | open the ticket in VS Code                          |
 | `gg can commit`            | check whether all ticket repos can commit           |
 | `gg do commit -m "…"`      | commit in every ticket repo in dependency order     |
-| `gg can push` / `do push`  | check / push every ticket repo                      |
-| `gg do review`             | run the full review pipeline across the ticket      |
+| `gg can push` / `do push`  | check / merge main into and push every ticket repo  |
+| `gg do review`             | push, open pull requests and record the review      |
+| `gg did review`            | report whether the current state was reviewed       |
 | `gg do publish`            | publish every publishable package of the ticket     |
 | `gg do ls repos`           | list repos in the master workspace                  |
 | `gg do claude`             | generate an aggregated `CLAUDE.md` for the ticket   |
@@ -109,7 +110,7 @@ globally.
 ```bash
 mkdir my_project
 cd my_project
-gg do init                               # initialise master workspace
+gg do init workspace                     # initialise master workspace
 gg do add https://github.com/my-org      # add all repos of an org
 ```
 
@@ -164,28 +165,27 @@ gg do commit -m 'Simplify login flow'
 `gg can commit` runs the full check pipeline (analyze, format, tests)
 in every repo in dependency order and aborts on the first failure.
 
-### 6. Push
-
-```bash
-gg can push
-gg do push
-```
-
-### 7. Review
+### 6. Review
 
 ```bash
 gg do review
 ```
 
-`do review` unlocalises references, re-localises them as Git refs,
-runs `pub upgrade`, commits and pushes — bringing every repo into a
-consistent state ready for merge.
+`do review` merges the main branches into the feature branches, pushes
+every repo, opens a pull request per repo (printing the urls) and
+records the review — the repos keep their local path references; a
+reviewer recreates the setup via `gg do import ticket`.
 
-If you need to keep working after starting a review:
+### 7. Iterate on review feedback
 
 ```bash
-gg do review --abort
+gg do commit -m 'Address review comments'
+gg do push
 ```
+
+`do push` merges the main branches into the feature branches and
+pushes every repo, updating the open pull requests. It also works on
+its own at any time — `gg do review` simply runs it automatically.
 
 ### 8. Publish (when approved)
 
@@ -195,6 +195,9 @@ gg do publish
 ```
 
 Publish should be triggered manually by a human after review approval.
+It refuses to run when the current ticket state was not reviewed
+(`gg did review`) — commits made after the last review require another
+`gg do review` first.
 
 #### Non-interactive publish via `--config`
 
@@ -211,14 +214,15 @@ Minimal schema (top-level fields apply to every repo; the optional
 
 ```jsonc
 {
-  "version_increment": "patch",          // "patch" | "minor" | "major"
+  "version_increment": "patch", // "patch" | "minor" | "major"
   "merge_message": "Default merge message",
   "repos": {
-    "app_core": {                        // optional per-repo override
+    "app_core": {
+      // optional per-repo override
       "version_increment": "minor",
-      "merge_message": "app_core: new public API"
-    }
-  }
+      "merge_message": "app_core: new public API",
+    },
+  },
 }
 ```
 
