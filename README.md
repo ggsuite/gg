@@ -86,7 +86,7 @@ command surface; the most important ones are:
 
 | Command                    | Purpose                                             |
 | -------------------------- | --------------------------------------------------- |
-| `gg do init`               | initialise the ocean workspace                     |
+| `gg do init workspace`     | initialise the workspace                            |
 | `gg do add <target>`       | add a repo or a whole org to the workspace / ticket |
 | `gg do create ticket <id>` | create `tickets/<id>/` with a `.ticket` file        |
 | `gg do code`               | open the ticket in VS Code                          |
@@ -96,7 +96,7 @@ command surface; the most important ones are:
 | `gg do review`             | push, open pull requests and record the review      |
 | `gg did review`            | report whether the current state was reviewed       |
 | `gg do publish`            | publish every publishable package of the ticket     |
-| `gg do ls repos`           | list repos in the ocean workspace                  |
+| `gg do ls repos`           | list repos in the ocean                             |
 | `gg do claude`             | generate an aggregated `CLAUDE.md` for the ticket   |
 
 ## Step-by-step: working on a ticket end-to-end
@@ -110,11 +110,11 @@ globally.
 ```bash
 mkdir my_project
 cd my_project
-gg do init workspace                     # initialise ocean workspace
+gg do init workspace                     # initialise workspace
 gg do add https://github.com/my-org      # add all repos of an org
 ```
 
-`gg do init` and `gg do add` are `gg_multi` workspace commands and
+`gg do init workspace` and `gg do add` are `gg_multi` workspace commands and
 run directly at the root.
 
 ### 1. Create a ticket workspace

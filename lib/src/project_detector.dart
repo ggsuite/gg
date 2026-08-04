@@ -36,7 +36,7 @@ class ProjectDetector {
     workingDir ??= Directory.current.path;
     // coverage:ignore-end
 
-    // Repos checked out inside the ocean workspace (.ocean/<repo>) are
+    // Repos checked out inside the ocean (.ocean/<repo>) are
     // standalone projects, not part of a ticket workspace. The legacy
     // `.master` name counts too: the detector runs before gg_multi's
     // auto-rename gets a chance to fire.
@@ -56,7 +56,7 @@ class ProjectDetector {
     return ProjectMode.unknown;
   }
 
-  /// The ocean workspace folder holding the pristine clones of all repos.
+  /// The ocean folder holding the pristine clones of all repos.
   static const _oceanFolder = '.ocean';
 
   /// The former name of [_oceanFolder]. Still recognized so an unmigrated

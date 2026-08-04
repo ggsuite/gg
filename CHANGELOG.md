@@ -5,6 +5,7 @@
 ### Changed
 
 - Rename .master to .ocean with automatic migration at next start
+- Rename ocean workspace -&gt; ocean
 
 ## 14.0.5 - 2026-08-04
 

@@ -93,7 +93,7 @@ void main() {
     });
 
     test('returns single for a repo checked out inside .ocean', () {
-      // .ocean/<repo> lives inside the ocean workspace, but the repo
+      // .ocean/<repo> lives inside the ocean, but the repo
       // itself is a standalone project, not part of a ticket.
       Directory(path.join(root.path, 'tickets')).createSync();
       final repo = Directory(path.join(root.path, '.ocean', 'gg_dna'))
