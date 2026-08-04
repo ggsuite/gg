@@ -160,8 +160,10 @@ List<String> checkArgsForProjectMode(
         ),
       );
     case ProjectMode.unknown:
+      // Nothing is broken — the user is simply standing in a folder that is
+      // not a workspace yet. That is an instruction to follow, not an error.
       throw StateError(
-        cError(
+        cAction(
           'Not a workspace. Use '
           '${cCmd('gg do init')}'
           ' to init a workspace.',

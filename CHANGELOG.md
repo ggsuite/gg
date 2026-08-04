@@ -1,5 +1,12 @@
 # Changelog
 
+## 14.0.5 - 2026-08-04
+
+### Changed
+
+- Finetune command line output
+- Update dependencies
+
 ## 14.0.4 - 2026-08-03
 
 ### Changed
