@@ -9,4 +9,4 @@
 // coverage:ignore-file
 
 /// The version of the `gg` package.
-const String ggVersion = '14.0.4';
+const String ggVersion = '14.1.0';
