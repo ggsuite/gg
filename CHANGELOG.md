@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased
+## 14.1.1 - 2026-08-04
 
 ### Changed
 
 - Improve push and publish workflow
+
 ## 14.1.0 - 2026-08-04
 
 ### Changed
