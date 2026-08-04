@@ -178,12 +178,11 @@ packages:
     source: hosted
     version: "1.0.9"
   gg_changelog:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_changelog
-      sha256: "998fd7ccc003998451b2a7143539fbc4b319eb9f80ebfc5079a5f3a2bc6fa7a4"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_changelog"
+      relative: true
+    source: path
     version: "1.1.4"
   gg_console_colors:
     dependency: "direct main"
@@ -250,12 +249,11 @@ packages:
     source: hosted
     version: "2.1.0"
   gg_localize_refs:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_localize_refs
-      sha256: a8b668f2496652adda788645e6d4cccdfdcf0d5b8087db971046726537168f12
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_localize_refs"
+      relative: true
+    source: path
     version: "3.4.0"
   gg_log:
     dependency: "direct main"
@@ -276,18 +274,16 @@ packages:
   gg_multi:
     dependency: "direct main"
     description:
-      name: gg_multi
-      sha256: d79481d1ccf7766f1f9bac6e406c71fd6cc6e7100f6e3ae4399318f05ee42b62
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi"
+      relative: true
+    source: path
     version: "7.11.0"
   gg_one:
     dependency: "direct main"
     description:
-      name: gg_one
-      sha256: c70d3847e990ca63fd102dd72678ce4b09c8075097c5d59ac102613c783f02c5
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_one"
+      relative: true
+    source: path
     version: "12.7.0"
   gg_process:
     dependency: transitive
@@ -306,12 +302,11 @@ packages:
     source: hosted
     version: "1.0.4"
   gg_publish:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_publish
-      sha256: "88df2d2f2b5450409b056bc09bbcbb176bb2875ee954926bb0731dbc2b12e2ba"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_publish"
+      relative: true
+    source: path
     version: "3.10.1"
   gg_status_printer:
     dependency: transitive
