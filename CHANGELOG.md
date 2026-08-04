@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Use overrides in package.json
+
 ## 14.1.1 - 2026-08-04
 
 ### Changed
