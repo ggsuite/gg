@@ -25,7 +25,17 @@ void main() {
   });
 
   group('ProjectDetector.detect', () {
-    test('returns workspace when .master folder is found at root', () {
+    test('returns workspace when .ocean folder is found at root', () {
+      Directory(path.join(root.path, '.ocean')).createSync();
+      expect(
+        ProjectDetector.detect(workingDir: root.path),
+        ProjectMode.workspace,
+      );
+    });
+
+    test('returns workspace when the legacy .master folder is found', () {
+      // A workspace gg_multi has not auto-renamed yet must still be
+      // recognized — otherwise gg would suggest »gg do init« inside it.
       Directory(path.join(root.path, '.master')).createSync();
       expect(
         ProjectDetector.detect(workingDir: root.path),
@@ -41,8 +51,8 @@ void main() {
       );
     });
 
-    test('returns workspace when an ancestor contains .master', () {
-      Directory(path.join(root.path, '.master')).createSync();
+    test('returns workspace when an ancestor contains .ocean', () {
+      Directory(path.join(root.path, '.ocean')).createSync();
       final sub = Directory(path.join(root.path, 'sub', 'deep'))
         ..createSync(recursive: true);
       expect(
@@ -74,7 +84,7 @@ void main() {
     });
 
     test('workspace takes precedence over single-project markers', () {
-      Directory(path.join(root.path, '.master')).createSync();
+      Directory(path.join(root.path, '.ocean')).createSync();
       File(path.join(root.path, 'pubspec.yaml')).writeAsStringSync('name: x');
       expect(
         ProjectDetector.detect(workingDir: root.path),
@@ -82,9 +92,17 @@ void main() {
       );
     });
 
-    test('returns single for a repo checked out inside .master', () {
-      // .master/<repo> lives inside the master workspace, but the repo
+    test('returns single for a repo checked out inside .ocean', () {
+      // .ocean/<repo> lives inside the ocean, but the repo
       // itself is a standalone project, not part of a ticket.
+      Directory(path.join(root.path, 'tickets')).createSync();
+      final repo = Directory(path.join(root.path, '.ocean', 'gg_dna'))
+        ..createSync(recursive: true);
+      File(path.join(repo.path, 'pubspec.yaml')).writeAsStringSync('name: x');
+      expect(ProjectDetector.detect(workingDir: repo.path), ProjectMode.single);
+    });
+
+    test('returns single for a repo inside the legacy .master too', () {
       Directory(path.join(root.path, 'tickets')).createSync();
       final repo = Directory(path.join(root.path, '.master', 'gg_dna'))
         ..createSync(recursive: true);
@@ -122,10 +140,10 @@ void main() {
       );
     });
 
-    test('returns unknown inside .master without project markers', () {
-      final master = Directory(path.join(root.path, '.master'))..createSync();
+    test('returns unknown inside .ocean without project markers', () {
+      final ocean = Directory(path.join(root.path, '.ocean'))..createSync();
       expect(
-        ProjectDetector.detect(workingDir: master.path),
+        ProjectDetector.detect(workingDir: ocean.path),
         ProjectMode.unknown,
       );
     });

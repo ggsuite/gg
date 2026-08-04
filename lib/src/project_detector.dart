@@ -11,7 +11,9 @@ import 'package:path/path.dart' as path;
 
 /// The mode of the project that `gg` is invoked in.
 enum ProjectMode {
-  /// A gg multi-repo workspace (contains `.master` or `tickets`).
+  /// A gg multi-repo workspace (contains `.ocean` — or the legacy
+  /// `.master`, still recognized until gg_multi auto-renames it — or
+  /// `tickets`).
   workspace,
 
   /// A single project: a Dart or TypeScript project (`pubspec.yaml`,
@@ -34,9 +36,12 @@ class ProjectDetector {
     workingDir ??= Directory.current.path;
     // coverage:ignore-end
 
-    // Repos checked out inside the master workspace (.master/<repo>) are
-    // standalone projects, not part of a ticket workspace.
-    if (!_isInsideDir(workingDir, '.master') &&
+    // Repos checked out inside the ocean (.ocean/<repo>) are
+    // standalone projects, not part of a ticket workspace. The legacy
+    // `.master` name counts too: the detector runs before gg_multi's
+    // auto-rename gets a chance to fire.
+    if (!_isInsideDir(workingDir, _oceanFolder) &&
+        !_isInsideDir(workingDir, _legacyMasterFolder) &&
         _walkUpFor(workingDir, _workspaceMarkers, isDirectory: true)) {
       return ProjectMode.workspace;
     }
@@ -51,7 +56,18 @@ class ProjectDetector {
     return ProjectMode.unknown;
   }
 
-  static const _workspaceMarkers = <String>['.master', 'tickets'];
+  /// The ocean folder holding the pristine clones of all repos.
+  static const _oceanFolder = '.ocean';
+
+  /// The former name of [_oceanFolder]. Still recognized so an unmigrated
+  /// workspace is not mistaken for »no workspace at all«.
+  static const _legacyMasterFolder = '.master';
+
+  static const _workspaceMarkers = <String>[
+    _oceanFolder,
+    _legacyMasterFolder,
+    'tickets',
+  ];
 
   static const _singleProjectMarkers = <String>[
     'pubspec.yaml',
