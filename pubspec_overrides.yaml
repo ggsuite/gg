@@ -8,3 +8,5 @@ dependency_overrides:
     path: ../gg_one
   gg_multi:
     path: ../gg_multi
+  gg_localize_refs:
+    path: ../gg_localize_refs
