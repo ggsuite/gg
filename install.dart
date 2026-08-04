@@ -20,6 +20,17 @@ void main() {
 
   print('Installing $exe globally.');
 
+  try {
+    Process.runSync(
+      'dart',
+      ['pub', 'global', 'deactivate', '--source', 'path', '.'],
+      stderrEncoding: utf8,
+      stdoutEncoding: utf8,
+    );
+  } catch (e) {
+    // do nothing
+  }
+
   final result = Process.runSync(
     'dart',
     ['pub', 'global', 'activate', '--source', 'path', '.'],
