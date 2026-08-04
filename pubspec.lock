@@ -239,7 +239,7 @@ packages:
       path: "../gg_lang"
       relative: true
     source: path
-    version: "0.3.4"
+    version: "0.4.0"
   gg_local_package_dependencies:
     dependency: transitive
     description:
@@ -254,7 +254,7 @@ packages:
       path: "../gg_localize_refs"
       relative: true
     source: path
-    version: "3.4.0"
+    version: "3.5.0"
   gg_log:
     dependency: "direct main"
     description:
@@ -269,7 +269,7 @@ packages:
       path: "../gg_merge"
       relative: true
     source: path
-    version: "2.0.3"
+    version: "2.1.0"
   gg_multi:
     dependency: "direct main"
     description:
@@ -306,7 +306,7 @@ packages:
       path: "../gg_publish"
       relative: true
     source: path
-    version: "3.9.5"
+    version: "3.10.0"
   gg_status_printer:
     dependency: transitive
     description:
@@ -321,14 +321,14 @@ packages:
       path: "../gg_test"
       relative: true
     source: path
-    version: "2.3.3"
+    version: "2.4.0"
   gg_version:
     dependency: "direct overridden"
     description:
       path: "../gg_version"
       relative: true
     source: path
-    version: "4.5.2"
+    version: "4.6.0"
   glob:
     dependency: transitive
     description:
