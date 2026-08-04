@@ -279,14 +279,14 @@ packages:
       path: "../gg_multi"
       relative: true
     source: path
-    version: "7.11.1"
+    version: "7.11.2"
   gg_one:
     dependency: "direct main"
     description:
       path: "../gg_one"
       relative: true
     source: path
-    version: "12.7.1"
+    version: "12.7.2"
   gg_process:
     dependency: transitive
     description:
