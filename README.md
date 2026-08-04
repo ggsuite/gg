@@ -15,7 +15,7 @@ It is a thin CLI shell that combines two backend packages:
 `gg` detects where you run it:
 
 - Inside a **gg ticket workspace** (a directory tree containing
-  `.master/` or `tickets/`) → `gg <command>` runs `gg_multi` by default.
+  `.ocean/` — or the legacy `.master/`, renamed automatically — or `tickets/`) → `gg <command>` runs `gg_multi` by default.
 - Inside a **standalone Dart or TypeScript project** (a directory tree
   with `pubspec.yaml`, `package.json` or `tsconfig.json`) → `gg` prints
   a message asking you to use `gg one <command> …` explicitly.
@@ -86,7 +86,7 @@ command surface; the most important ones are:
 
 | Command                    | Purpose                                             |
 | -------------------------- | --------------------------------------------------- |
-| `gg do init`               | initialise the master workspace                     |
+| `gg do init`               | initialise the ocean workspace                     |
 | `gg do add <target>`       | add a repo or a whole org to the workspace / ticket |
 | `gg do create ticket <id>` | create `tickets/<id>/` with a `.ticket` file        |
 | `gg do code`               | open the ticket in VS Code                          |
@@ -96,7 +96,7 @@ command surface; the most important ones are:
 | `gg do review`             | push, open pull requests and record the review      |
 | `gg did review`            | report whether the current state was reviewed       |
 | `gg do publish`            | publish every publishable package of the ticket     |
-| `gg do ls repos`           | list repos in the master workspace                  |
+| `gg do ls repos`           | list repos in the ocean workspace                  |
 | `gg do claude`             | generate an aggregated `CLAUDE.md` for the ticket   |
 
 ## Step-by-step: working on a ticket end-to-end
@@ -110,7 +110,7 @@ globally.
 ```bash
 mkdir my_project
 cd my_project
-gg do init workspace                     # initialise master workspace
+gg do init workspace                     # initialise ocean workspace
 gg do add https://github.com/my-org      # add all repos of an org
 ```
 

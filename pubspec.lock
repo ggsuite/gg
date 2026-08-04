@@ -239,7 +239,7 @@ packages:
       path: "../gg_lang"
       relative: true
     source: path
-    version: "0.3.3"
+    version: "0.3.4"
   gg_local_package_dependencies:
     dependency: transitive
     description:
@@ -254,7 +254,7 @@ packages:
       path: "../gg_localize_refs"
       relative: true
     source: path
-    version: "3.3.3"
+    version: "3.4.0"
   gg_log:
     dependency: "direct main"
     description:
@@ -276,14 +276,14 @@ packages:
       path: "../gg_multi"
       relative: true
     source: path
-    version: "7.9.5"
+    version: "8.0.0"
   gg_one:
     dependency: "direct main"
     description:
       path: "../gg_one"
       relative: true
     source: path
-    version: "12.5.5"
+    version: "13.0.0"
   gg_process:
     dependency: transitive
     description:
