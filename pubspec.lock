@@ -276,18 +276,16 @@ packages:
   gg_multi:
     dependency: "direct main"
     description:
-      name: gg_multi
-      sha256: d79481d1ccf7766f1f9bac6e406c71fd6cc6e7100f6e3ae4399318f05ee42b62
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi"
+      relative: true
+    source: path
     version: "7.11.0"
   gg_one:
     dependency: "direct main"
     description:
-      name: gg_one
-      sha256: c70d3847e990ca63fd102dd72678ce4b09c8075097c5d59ac102613c783f02c5
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_one"
+      relative: true
+    source: path
     version: "12.7.0"
   gg_process:
     dependency: transitive
