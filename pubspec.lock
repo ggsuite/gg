@@ -276,10 +276,9 @@ packages:
   gg_multi:
     dependency: "direct main"
     description:
-      name: gg_multi
-      sha256: e2608a0fd771e7eee8bda56b4f00be1f84edbc0a552f142157082ef0cf175738
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi"
+      relative: true
+    source: path
     version: "7.13.1"
   gg_multi_commit:
     dependency: transitive
