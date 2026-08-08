@@ -276,19 +276,76 @@ packages:
   gg_multi:
     dependency: "direct main"
     description:
-      name: gg_multi
-      sha256: aab7e6bdcb71846aa36134eed0175694d9444a546f88aa31c348a303862a0027
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.13.0"
+      path: "../gg_multi"
+      relative: true
+    source: path
+    version: "7.13.1"
+  gg_multi_commit:
+    dependency: "direct overridden"
+    description:
+      path: "../gg_multi_commit"
+      relative: true
+    source: path
+    version: "1.0.2"
+  gg_multi_core:
+    dependency: "direct overridden"
+    description:
+      path: "../gg_multi_core"
+      relative: true
+    source: path
+    version: "1.0.3"
+  gg_multi_do_publish:
+    dependency: "direct overridden"
+    description:
+      path: "../gg_multi_do_publish"
+      relative: true
+    source: path
+    version: "1.0.1"
+  gg_multi_workspace:
+    dependency: "direct overridden"
+    description:
+      path: "../gg_multi_workspace"
+      relative: true
+    source: path
+    version: "1.0.1"
   gg_one:
     dependency: "direct main"
     description:
-      name: gg_one
-      sha256: c52fa1caae92d80dc9c042b9e549c7e7d0ad0580b38d94a03dd658bbd5094d0c
+      path: "../gg_one"
+      relative: true
+    source: path
+    version: "12.9.3"
+  gg_one_commit:
+    dependency: transitive
+    description:
+      name: gg_one_commit
+      sha256: e4bd9d65774cd387c569d677a684c71084f1696833f0cc6805d3c2b485e19298
       url: "https://pub.dev"
     source: hosted
-    version: "12.9.0"
+    version: "1.0.1"
+  gg_one_core:
+    dependency: transitive
+    description:
+      name: gg_one_core
+      sha256: e0ecca5f387b1803330fa83bdc2485d4dd1f600b0d6368bd0c655198edc9df84
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
+  gg_one_do_publish:
+    dependency: "direct overridden"
+    description:
+      path: "../gg_one_do_publish"
+      relative: true
+    source: path
+    version: "1.0.2"
+  gg_one_merge:
+    dependency: transitive
+    description:
+      name: gg_one_merge
+      sha256: aeb58c5ebb5eaa3ba70cf4ed0d91dd6e919cf9574b9b952b0da0b84e3f24e977
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   gg_process:
     dependency: transitive
     description:
@@ -325,10 +382,10 @@ packages:
     dependency: transitive
     description:
       name: gg_test
-      sha256: "47548ab67a8d8c00a92eb2be0b2cf34959ff6db9f289e59aa4dfd6994b28c75e"
+      sha256: "20f15200ddf610fb2c7cae26686b3ec98b1e63a6a76c1c370d3c7e36791c86c2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "2.4.1"
   gg_version:
     dependency: transitive
     description:
