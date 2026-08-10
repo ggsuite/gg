@@ -1,6 +1,6 @@
 name: gg
 description: gg applies shell commands to multiple dart and flutter packages at once.
-version: 15.3.0
+version: 15.3.1
 repository: https://github.com/ggsuite/gg.git
 
 environment:
