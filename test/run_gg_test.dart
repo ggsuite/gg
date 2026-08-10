@@ -10,8 +10,6 @@ import 'package:gg/gg.dart';
 import 'package:gg_multi/gg_multi.dart' as gg_multi;
 import 'package:test/test.dart';
 
-import '../../bin/gg.dart';
-
 void main() {
   late Directory dRoot;
   late Directory d0;

@@ -218,7 +218,7 @@ packages:
     source: path
     version: "1.0.8"
   gg_is_github:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../gg_is_github"
       relative: true
@@ -330,7 +330,7 @@ packages:
     source: path
     version: "1.0.1"
   gg_process:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../gg_process"
       relative: true

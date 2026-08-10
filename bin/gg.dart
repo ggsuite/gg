@@ -5,42 +5,16 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:gg_args/gg_args.dart';
+import 'dart:io';
+
 import 'package:gg/gg.dart';
-import 'package:gg_log/gg_log.dart';
-import 'package:gg_multi/gg_multi.dart' as gg_multi;
 
-// .............................................................................
-Future<void> runGg({
-  required List<String> args,
-  required GgLog ggLog,
-  ProjectMode Function()? detectMode,
-}) async {
-  // gg_multi stamps and checks this version in .gg/.ticket.json markers.
-  gg_multi.ggCliVersion = ggVersion;
-
-  if (args.contains('--version')) {
-    ggLog(ggVersion);
-    return;
-  }
-
-  try {
-    final checked = checkArgsForProjectMode(
-      args,
-      detectMode ?? ProjectDetector.detect,
-    );
-    await GgCommandRunner(
-      ggLog: ggLog,
-      command: Gg(ggLog: ggLog),
-    ).run(args: checked);
-  } on StateError catch (e) {
-    ggLog(e.message);
-  } catch (e) {
-    ggLog(e.toString());
-  }
-}
+export 'package:gg/gg.dart' show runGg;
 
 // .............................................................................
 // coverage:ignore-start
-Future<void> main(List<String> args) => runGg(args: args, ggLog: print);
+Future<void> main(List<String> args) async {
+  exitCode = await runGg(args: args, ggLog: print);
+}
+
 // coverage:ignore-end

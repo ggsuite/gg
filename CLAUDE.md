@@ -59,6 +59,29 @@ gg
 
 `GgMulti` (from `gg_multi`) contributes `can`, `did`, and `do` at the root (`ls` lives under `do`) by iterating over its `.subcommands.values` — inside a gg ticket workspace `gg <cmd>` therefore runs gg_multi by default. `ProjectDetector` (`lib/src/project_detector.dart`) guards this in `bin/gg.dart`: in a standalone project the root commands only print a hint to use `gg one <cmd> …`; outside any recognized project they abort with an error explaining both options. `gg do init` is exempt from this guard (see `modeIndependentCommandPaths`), because it bootstraps a new ocean and must therefore run outside of one.
 
+### Running without `dart:io`
+
+`lib/src/host/` lets an embedder hand gg a file system, a process runner, a
+platform and a console. `GgHost.install(...)` wires them into
+`IOOverrides.global` plus the delegates in `gg_process`, so every package of
+the suite is redirected at once without touching its call sites. This is
+what makes the WebAssembly build in
+[`gg-js`](https://github.com/tssuite/gg-js) possible.
+
+`doc/wasm-host-delegates.md` documents which `dart:io` APIs a Wasm build
+cannot use and where each one is delegated. Two rules follow from it:
+
+- **Never call `Process.run`, `Platform.*` or set `exitCode` directly.** Use
+  `ggRunProcess` / `ggStartProcess`, `ggPlatform` and `ggExitCode` from
+  `package:gg_process`.
+- **Never import a package that needs `dart:ffi`** (`package:interact` is
+  the one that did) without hiding it behind a conditional import — it
+  fails the Wasm compile rather than throwing at runtime. Interactive
+  prompts go through `GgPrompts.current`.
+
+`GgHostIo` is a `GgHost` built on `dart:io`; installing it must leave gg
+behaving exactly as it does with no host at all, and the tests check that.
+
 ### gg_multi
 
 The sibling package contains the actual command implementations organized as:
