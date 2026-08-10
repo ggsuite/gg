@@ -13,7 +13,7 @@ dependencies:
   gg_console_colors: ^2.3.0
   gg_log: ^1.0.6
   path: ^1.9.1
-  gg_multi: ^8.3.2
+  gg_multi: ^9.0.0
 dev_dependencies:
   lints: ^6.1.0
   test: ^1.31.2
