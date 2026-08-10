@@ -178,12 +178,13 @@ List<String> checkArgsForProjectMode(
     case ProjectMode.unknown:
       // Nothing is broken — the user is simply standing in a folder that is
       // not a workspace yet. That is an instruction to follow, not an error.
+      // The three colors are concatenated rather than nested: a cCmd inside
+      // a cAction resets the yellow and the rest of the sentence loses it.
       throw StateError(
-        cAction(
-          'Not a workspace. Use '
-          '${cCmd('gg do init')}'
-          ' to init a workspace.',
-        ),
+        '${cError('Not a workspace. ')}'
+        '${cAction('Use ')}'
+        '${cCmd('gg do init')}'
+        '${cAction(' to init a workspace.')}',
       );
   }
 }
