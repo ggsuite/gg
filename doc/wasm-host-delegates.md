@@ -26,6 +26,7 @@ Probed against `dart compile wasm` on Dart 3.12, running under Node 24:
 | `exitCode =`, `exit()`, `pid`, `sleep()`                        | **throws** | `Unsupported operation: ProcessUtils._…`   |
 | `Process.run`, `Process.runSync`, `Process.start`               | **throws** | `Unsupported operation: Process.runSync`   |
 | `HttpClient`                                                    | **throws** | needs `Platform._version`                  |
+| `package:http`                                                  | works | picks its `fetch` based client, which Node 22+ has |
 | `dart:ffi`                                                      | **absent** | does not even compile                      |
 
 Two consequences shaped the design:
@@ -67,7 +68,7 @@ host process.
 
 | Capability                       | Delegate                       | Call sites changed |
 | -------------------------------- | ------------------------------ | ------------------ |
-| `Process.run` / `Process.start`  | `GgProcessDelegate.current`    | 9 in `lib/`, plus `gg_git`'s test helpers |
+| `Process.run` / `Process.start`  | `GgProcessDelegate.current`    | 10 in `lib/`, plus `gg_git`'s test helpers |
 | `Platform.*`                     | `GgPlatformDelegate.current`   | 6                  |
 | `exitCode =`                     | `ggExitCode`                   | 2                  |
 
@@ -144,12 +145,14 @@ runs `runGg` on it. If gg works there, it works on Node.
 ## 7. Known gaps
 
 - **`Process.start` does not stream.** The callback runs the program to
-  completion and the returned `Process` replays its output. Commands that
-  write to a started process' stdin (the interactive part of
-  `gg one do publish`) do not work through an embedder.
-- **`package:http`** still constructs its own client. The publish and
-  import flows that call pub.dev, npm and GitHub are therefore untested
-  under Wasm.
+  completion and the returned `Process` replays its output. This is not a
+  cosmetic limitation: `gg_test` parses `dart test`'s output **per chunk**
+  (`tests.dart`, `await for` over `process.stdout`), and a single chunk
+  carrying the whole run makes it report the test file as a failure. So
+  `can commit` — and everything built on it — currently fails through an
+  embedder even when the tests pass. `gg_publish` additionally writes the
+  publish confirmation to the started process' stdin, which a
+  run-to-completion model cannot do at all.
 - **Windows.** `package:path` decides posix-vs-windows from `Uri.base`,
   which a Wasm build reads from `globalThis.location`. `gg-js` points that
   at a `file:` URL, which yields posix. A Windows embedder needs more than
