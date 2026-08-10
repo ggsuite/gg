@@ -4,6 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -209,7 +210,27 @@ class InMemoryHost {
           return _processStubs[command] ??
               const GgProcessOutcome(exitCode: 0, stdout: '', stderr: '');
         },
+    start:
+        (
+          executable,
+          arguments, {
+          workingDirectory,
+          environment,
+          includeParentEnvironment = true,
+          runInShell = false,
+          detached = false,
+        }) async {
+          final command = '$executable ${arguments.join(' ')}'.trim();
+          processCalls.add(command);
+          final outcome =
+              _processStubs[command] ??
+              const GgProcessOutcome(exitCode: 0, stdout: '', stderr: '');
+          return startedProcess = FakeStartedProcess(outcome);
+        },
   );
+
+  /// The process most recently handed out by the `start` callback.
+  FakeStartedProcess? startedProcess;
 
   // ...........................................................................
   /// The platform callbacks.
@@ -252,4 +273,68 @@ class InMemoryHost {
     }
     return path;
   }
+}
+
+// #############################################################################
+/// A [GgStartedProcess] that emits a recorded outcome one line at a time.
+///
+/// Line by line on purpose: gg parses `dart test`'s output per chunk, and a
+/// host that hands over the whole run at once is exactly the bug this
+/// exists to catch.
+class FakeStartedProcess implements GgStartedProcess {
+  /// Default constructor
+  FakeStartedProcess(this._outcome);
+
+  final GgProcessOutcome _outcome;
+
+  /// Everything that was written to the process' stdin.
+  final StringBuffer stdinBuffer = StringBuffer();
+
+  /// Whether stdin was closed.
+  bool stdinClosed = false;
+
+  /// The signal the process was killed with, if any.
+  String? killedWith;
+
+  @override
+  int get pid => _outcome.pid;
+
+  @override
+  void onStdout(void Function(Uint8List chunk) listener) => _stdout = listener;
+
+  @override
+  void onStderr(void Function(Uint8List chunk) listener) => _stderr = listener;
+
+  @override
+  void onExit(void Function(int code) listener) {
+    _exit = listener;
+    // Deliver once every listener is attached, the way a real host does.
+    scheduleMicrotask(_deliver);
+  }
+
+  @override
+  void writeStdin(String text) => stdinBuffer.write(text);
+
+  @override
+  void closeStdin() => stdinClosed = true;
+
+  @override
+  bool kill(String signal) {
+    killedWith = signal;
+    return true;
+  }
+
+  void _deliver() {
+    for (final line in const LineSplitter().convert(_outcome.stdout)) {
+      _stdout?.call(Uint8List.fromList(utf8.encode('$line\n')));
+    }
+    for (final line in const LineSplitter().convert(_outcome.stderr)) {
+      _stderr?.call(Uint8List.fromList(utf8.encode('$line\n')));
+    }
+    _exit?.call(_outcome.exitCode);
+  }
+
+  void Function(Uint8List)? _stdout;
+  void Function(Uint8List)? _stderr;
+  void Function(int)? _exit;
 }

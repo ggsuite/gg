@@ -145,7 +145,7 @@ class GgHostFile implements File {
   File get absolute => GgHostFile(_fs, _abs);
 
   @override
-  Directory get parent => GgHostDirectory(_fs, p.dirname(_abs));
+  Directory get parent => GgHostDirectory(_fs, p.dirname(path));
 
   @override
   Uri get uri => Uri.file(path);
@@ -311,7 +311,7 @@ class GgHostDirectory implements Directory {
   Directory get absolute => GgHostDirectory(_fs, _abs);
 
   @override
-  Directory get parent => GgHostDirectory(_fs, p.dirname(_abs));
+  Directory get parent => GgHostDirectory(_fs, p.dirname(path));
 
   @override
   Uri get uri => Uri.directory(path);
@@ -354,7 +354,25 @@ class GgHostDirectory implements Directory {
   List<FileSystemEntity> listSync({
     bool recursive = false,
     bool followLinks = true,
-  }) => _fs.listDirectory(_abs, recursive).map(_toEntity).toList();
+  }) {
+    // `dart:io` prefixes every entry with the directory as the caller
+    // spelled it: list `../x` and you get `../x/y`, never `/abs/x/y`. The
+    // callbacks answer with absolute paths, so they are spelled back the
+    // way they came in. gg compares listed paths against ones it built
+    // itself — `gg one can commit` matches coverage files against
+    // `join(dir.path, …)` — and an absolute path where a relative one is
+    // expected silently matches nothing.
+    final base = _abs;
+    return _fs
+        .listDirectory(base, recursive)
+        .map((entry) => _toEntity(entry.type, _asSpelled(entry.path, base)))
+        .toList();
+  }
+
+  /// Rewrites an absolute [entryPath] the way the caller spelled [path].
+  String _asSpelled(String entryPath, String base) => p.isAbsolute(path)
+      ? entryPath
+      : p.join(path, p.relative(entryPath, from: base));
 
   @override
   Stream<FileSystemEntity> list({
@@ -385,11 +403,12 @@ class GgHostDirectory implements Directory {
   @override
   Future<String> resolveSymbolicLinks() async => resolveSymbolicLinksSync();
 
-  FileSystemEntity _toEntity(GgDirectoryEntry entry) => switch (entry.type) {
-    GgEntityType.directory => GgHostDirectory(_fs, entry.path),
-    GgEntityType.link => GgHostLink(_fs, entry.path),
-    _ => GgHostFile(_fs, entry.path),
-  };
+  FileSystemEntity _toEntity(GgEntityType type, String entryPath) =>
+      switch (type) {
+        GgEntityType.directory => GgHostDirectory(_fs, entryPath),
+        GgEntityType.link => GgHostLink(_fs, entryPath),
+        _ => GgHostFile(_fs, entryPath),
+      };
 
   @override
   String toString() => "Directory: '$path'";
@@ -417,7 +436,7 @@ class GgHostLink implements Link {
   Link get absolute => GgHostLink(_fs, _abs);
 
   @override
-  Directory get parent => GgHostDirectory(_fs, p.dirname(_abs));
+  Directory get parent => GgHostDirectory(_fs, p.dirname(path));
 
   @override
   Uri get uri => Uri.file(path);
@@ -637,10 +656,18 @@ class GgHostStdin implements Stdin {
 /// An [IOSink] forwarding everything written to it to a callback.
 class GgHostIoSink implements IOSink {
   /// Default constructor
-  GgHostIoSink({required this.encoding, required void Function(String) onWrite})
-    : _onWrite = onWrite;
+  ///
+  /// [onClose] is called by [close] — a started process' stdin has to be
+  /// closable, or a program waiting for end of input never finishes.
+  GgHostIoSink({
+    required this.encoding,
+    required void Function(String) onWrite,
+    void Function()? onClose,
+  }) : _onWrite = onWrite,
+       _onClose = onClose;
 
   final void Function(String text) _onWrite;
+  final void Function()? _onClose;
 
   @override
   Encoding encoding;
@@ -671,7 +698,7 @@ class GgHostIoSink implements IOSink {
   Future<void> flush() async {}
 
   @override
-  Future<void> close() async {}
+  Future<void> close() async => _onClose?.call();
 
   @override
   Future<void> get done async {}

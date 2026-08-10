@@ -4,6 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -38,7 +39,80 @@ void main() {
         expect(Directory.current.path, '/work');
         expect(File('rel.txt').readAsStringSync(), 'relative');
         expect(File('rel.txt').absolute.path, '/work/rel.txt');
-        expect(File('rel.txt').parent.path, '/work');
+        // `.`, like dart:io — `parent` keeps the caller's spelling.
+        expect(File('rel.txt').parent.path, '.');
+        expect(File('rel.txt').absolute.parent.path, '/work');
+      });
+
+      test('streams a started process through the host', () async {
+        final host = InMemoryHost()
+          ..stubProcess(
+            'dart test',
+            exitCode: 0,
+            stdout: 'first\nsecond\nthird',
+          );
+        GgHost.install(host.ggHost);
+
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('dart', ['test']);
+
+        // One event per line, not one event for the whole run — gg's test
+        // output parser depends on it.
+        final chunks = <String>[];
+        await for (final chunk in process.stdout.transform(utf8.decoder)) {
+          chunks.add(chunk);
+        }
+
+        expect(chunks, ['first\n', 'second\n', 'third\n']);
+        expect(await process.exitCode, 0);
+      });
+
+      test('carries what gg types into a started process\' stdin', () async {
+        final host = InMemoryHost()..stubProcess('dart pub publish');
+        GgHost.install(host.ggHost);
+
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('dart', ['pub', 'publish']);
+        process.stdin.writeln('y');
+        await process.stdin.close();
+        await process.exitCode;
+
+        expect(host.startedProcess!.stdinBuffer.toString(), 'y\n');
+        expect(host.startedProcess!.stdinClosed, isTrue);
+      });
+
+      test('forwards kill to the host', () async {
+        final host = InMemoryHost()..stubProcess('sleep 10');
+        GgHost.install(host.ggHost);
+
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('sleep', ['10']);
+
+        expect(process.kill(), isTrue);
+        expect(host.startedProcess!.killedWith, contains('SIGTERM'));
+        expect(process.pid, isA<int>());
+      });
+
+      test('replays the output when the host cannot stream', () async {
+        // A host without a `start` callback: gg runs the program to
+        // completion and hands the output over afterwards.
+        final host = InMemoryHost()..stubProcess('git log', stdout: 'one\ntwo');
+        GgHost.install(
+          GgHost(
+            fileSystem: host.ggHost.fileSystem,
+            process: GgProcessCallbacks(run: host.process.run),
+            platform: host.ggHost.platform,
+            console: host.ggHost.console,
+          ),
+        );
+
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('git', ['log']);
+
+        expect(await process.stdout.transform(utf8.decoder).join(), 'one\ntwo');
+        expect(await process.exitCode, 0);
+        expect(process.kill(), isFalse);
+        expect(() => process.stdin.writeln('ignored'), returnsNormally);
       });
 
       test('routes process execution through the process callbacks', () async {

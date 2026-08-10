@@ -4,6 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -189,29 +190,86 @@ class _HostProcessDelegate extends GgProcessDelegate {
     ProcessStartMode mode = ProcessStartMode.normal,
   }) async {
     final start = _callbacks.start;
-    final outcome = start != null
-        ? await start(
-            executable,
-            arguments,
-            workingDirectory: workingDirectory,
-            environment: environment,
-            includeParentEnvironment: includeParentEnvironment,
-            runInShell: runInShell,
-            detached:
-                mode == ProcessStartMode.detached ||
-                mode == ProcessStartMode.detachedWithStdio,
-          )
-        : await _callbacks.run(
-            executable,
-            arguments,
-            workingDirectory: workingDirectory,
-            environment: environment,
-            includeParentEnvironment: includeParentEnvironment,
-            runInShell: runInShell,
-          );
+    if (start == null) {
+      // No streaming host: run the program to completion and replay what it
+      // wrote. Enough for a caller that reads the output at the end.
+      return _CompletedProcess(
+        await _callbacks.run(
+          executable,
+          arguments,
+          workingDirectory: workingDirectory,
+          environment: environment,
+          includeParentEnvironment: includeParentEnvironment,
+          runInShell: runInShell,
+        ),
+      );
+    }
 
-    return _CompletedProcess(outcome);
+    return _StreamingProcess(
+      await start(
+        executable,
+        arguments,
+        workingDirectory: workingDirectory,
+        environment: environment,
+        includeParentEnvironment: includeParentEnvironment,
+        runInShell: runInShell,
+        detached:
+            mode == ProcessStartMode.detached ||
+            mode == ProcessStartMode.detachedWithStdio,
+      ),
+    );
   }
+}
+
+// #############################################################################
+/// A [Process] fed by a [GgStartedProcess] while the program runs.
+///
+/// The two stream controllers are single-subscription, so anything the
+/// program writes before gg gets around to listening is buffered rather
+/// than dropped — `gg one can commit` subscribes one microtask after the
+/// start and must not miss the first line.
+class _StreamingProcess implements Process {
+  _StreamingProcess(this._started) {
+    _started.onStdout(_stdout.add);
+    _started.onStderr(_stderr.add);
+    _started.onExit((code) {
+      if (!_stdout.isClosed) _stdout.close();
+      if (!_stderr.isClosed) _stderr.close();
+      if (!_exit.isCompleted) _exit.complete(code);
+    });
+  }
+
+  final GgStartedProcess _started;
+  final _stdout = StreamController<List<int>>();
+  final _stderr = StreamController<List<int>>();
+  final _exit = Completer<int>();
+
+  @override
+  Future<int> get exitCode => _exit.future;
+
+  @override
+  Stream<List<int>> get stdout => _stdout.stream;
+
+  @override
+  Stream<List<int>> get stderr => _stderr.stream;
+
+  @override
+  late final IOSink stdin = GgHostIoSink(
+    encoding: utf8,
+    onWrite: _started.writeStdin,
+    onClose: _started.closeStdin,
+  );
+
+  @override
+  int get pid => _started.pid;
+
+  @override
+  bool kill([ProcessSignal signal = ProcessSignal.sigterm]) =>
+      _started.kill(signal.toString());
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw GgHostUnsupportedError('Process.${invocation.memberName}');
 }
 
 // #############################################################################

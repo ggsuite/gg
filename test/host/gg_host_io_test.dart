@@ -220,6 +220,44 @@ void main() {
         expect(dir.toString(), contains('d2'));
       });
 
+      test('spells listed entries the way the directory was spelled', () {
+        // `dart:io` prefixes every entry with the path the caller passed
+        // in, and gg compares those against paths it built itself: the
+        // coverage check of `gg one can commit` matches listed files
+        // against `join(dir.path, …)`. Answering with absolute paths where
+        // relative ones are expected makes that comparison match nothing —
+        // and a passing test run look like an untested file.
+        Directory('$tmpPath/rel/sub').createSync(recursive: true);
+        File('$tmpPath/rel/sub/deep.txt').writeAsStringSync('x');
+        File('$tmpPath/rel/top.txt').writeAsStringSync('x');
+
+        final before = Directory.current;
+        Directory.current = tmpPath;
+        addTearDown(() => Directory.current = before);
+
+        final listed = Directory(
+          'rel',
+        ).listSync(recursive: true).map((e) => e.path).toList()..sort();
+
+        expect(listed, ['rel/sub', 'rel/sub/deep.txt', 'rel/top.txt']);
+
+        // …and an absolute directory still lists absolute entries.
+        final absolute = Directory(
+          '$tmpPath/rel',
+        ).listSync().map((e) => e.path);
+        expect(absolute, everyElement(startsWith('$tmpPath/rel/')));
+      });
+
+      test('keeps the spelling in parent as well', () {
+        final before = Directory.current;
+        Directory.current = tmpPath;
+        addTearDown(() => Directory.current = before);
+
+        expect(File('a/b/c.txt').parent.path, 'a/b');
+        expect(Directory('a/b').parent.path, 'a');
+        expect(File('c.txt').parent.path, '.');
+      });
+
       test('throws a helpful error for unsupported members', () {
         expect(
           () => Directory(tmpPath).watch(),
@@ -389,19 +427,59 @@ void main() {
         expect(result.stdout, contains('from-host'));
       });
 
-      test('serves start() by running to completion', () async {
+      test('streams a started process while it runs', () async {
         const wrapper = GgProcessWrapper();
         final process = await wrapper.start('echo', ['started']);
 
-        expect(await process.exitCode, 0);
         expect(
           await process.stdout.transform(utf8.decoder).join(),
           contains('started'),
         );
         expect(await process.stderr.transform(utf8.decoder).join(), isEmpty);
-        expect(process.pid, isA<int>());
-        expect(process.kill(), isFalse);
-        expect(() => process.stdin.writeln('ignored'), returnsNormally);
+        expect(await process.exitCode, 0);
+        expect(process.pid, greaterThan(0));
+      });
+
+      test('carries stdin into the started process', () async {
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('cat', <String>[]);
+
+        process.stdin.write('through stdin');
+        await process.stdin.close();
+
+        expect(
+          await process.stdout.transform(utf8.decoder).join(),
+          'through stdin',
+        );
+        expect(await process.exitCode, 0);
+      });
+
+      test('delivers output in chunks, not in one lump', () async {
+        // The regression this whole layer exists for: gg parses `dart test`
+        // output per chunk, so a host that hands over the whole run at once
+        // makes it read a passing run as a failure.
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('sh', [
+          '-c',
+          'echo one; sleep 0.2; echo two',
+        ]);
+
+        final chunks = <String>[];
+        await for (final chunk in process.stdout.transform(utf8.decoder)) {
+          chunks.add(chunk);
+        }
+        await process.exitCode;
+
+        expect(chunks.length, greaterThan(1));
+        expect(chunks.join(), 'one\ntwo\n');
+      });
+
+      test('kills a running process', () async {
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('sleep', ['30']);
+
+        expect(process.kill(), isTrue);
+        expect(await process.exitCode, isNot(0));
       });
     });
 

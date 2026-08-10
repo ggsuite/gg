@@ -4,7 +4,9 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'gg_host.dart';
 import 'gg_host_callbacks.dart';
@@ -122,6 +124,28 @@ abstract final class GgHostIo {
             pid: result.pid,
           );
         },
+    start:
+        (
+          executable,
+          arguments, {
+          workingDirectory,
+          environment,
+          includeParentEnvironment = true,
+          runInShell = false,
+          detached = false,
+        }) async => _IoStartedProcess(
+          await Process.start(
+            executable,
+            arguments,
+            workingDirectory: workingDirectory,
+            environment: environment,
+            includeParentEnvironment: includeParentEnvironment,
+            runInShell: runInShell,
+            mode: detached
+                ? ProcessStartMode.detached
+                : ProcessStartMode.normal,
+          ),
+        ),
   );
 
   // ...........................................................................
@@ -167,4 +191,115 @@ T _raw<T>(T Function() body) {
   } finally {
     IOOverrides.global = saved;
   }
+}
+
+// #############################################################################
+/// A [GgStartedProcess] wrapping a `dart:io` [Process].
+///
+/// Subscribes to the process' output immediately and buffers it: a program
+/// can be done before the caller registers its listeners, and gg reading
+/// an empty run is exactly the failure this layer exists to avoid.
+class _IoStartedProcess implements GgStartedProcess {
+  _IoStartedProcess(this._process) {
+    _process.stdout.listen(
+      (data) => _push(_outBuffer, () => _outListener, data),
+      onDone: () {
+        _outDone = true;
+        _finishWhenReady();
+      },
+    );
+    _process.stderr.listen(
+      (data) => _push(_errBuffer, () => _errListener, data),
+      onDone: () {
+        _errDone = true;
+        _finishWhenReady();
+      },
+    );
+    unawaited(
+      _process.exitCode.then((code) {
+        _code = code;
+        _finishWhenReady();
+      }),
+    );
+  }
+
+  final Process _process;
+  final _outBuffer = <Uint8List>[];
+  final _errBuffer = <Uint8List>[];
+  void Function(Uint8List)? _outListener;
+  void Function(Uint8List)? _errListener;
+  void Function(int)? _exitListener;
+  bool _outDone = false;
+  bool _errDone = false;
+  bool _finished = false;
+  int? _code;
+
+  @override
+  int get pid => _process.pid;
+
+  @override
+  void onStdout(void Function(Uint8List chunk) listener) {
+    _outListener = listener;
+    _drain(_outBuffer, listener);
+  }
+
+  @override
+  void onStderr(void Function(Uint8List chunk) listener) {
+    _errListener = listener;
+    _drain(_errBuffer, listener);
+  }
+
+  @override
+  void onExit(void Function(int code) listener) {
+    _exitListener = listener;
+    if (_finished) listener(_code!);
+    _finishWhenReady();
+  }
+
+  @override
+  void writeStdin(String text) => _process.stdin.write(text);
+
+  @override
+  void closeStdin() => unawaited(_process.stdin.close());
+
+  @override
+  bool kill(String signal) => _process.kill(_signalFrom(signal));
+
+  void _push(
+    List<Uint8List> buffer,
+    void Function(Uint8List)? Function() listener,
+    List<int> data,
+  ) {
+    final bytes = data is Uint8List ? data : Uint8List.fromList(data);
+    final sink = listener();
+    if (sink != null) {
+      sink(bytes);
+    } else {
+      buffer.add(bytes);
+    }
+  }
+
+  void _drain(List<Uint8List> buffer, void Function(Uint8List) listener) {
+    while (buffer.isNotEmpty) {
+      listener(buffer.removeAt(0));
+    }
+  }
+
+  /// Reports the exit only once both output streams have run dry.
+  ///
+  /// `Process.exitCode` completes as soon as the program is gone, which can
+  /// be before the last bytes have been delivered.
+  void _finishWhenReady() {
+    if (_finished || _code == null || !_outDone || !_errDone) return;
+    _finished = true;
+    _exitListener?.call(_code!);
+  }
+
+  static ProcessSignal _signalFrom(String name) =>
+      switch (name.toUpperCase().replaceFirst('PROCESSSIGNAL.', '')) {
+        'SIGKILL' => ProcessSignal.sigkill,
+        'SIGINT' => ProcessSignal.sigint,
+        'SIGHUP' => ProcessSignal.sighup,
+        _ => ProcessSignal.sigterm,
+      };
 }

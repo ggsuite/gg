@@ -165,13 +165,15 @@ class GgProcessCallbacks {
   })
   run;
 
-  /// Starts [executable] with [arguments] without waiting for it.
+  /// Starts [executable] with [arguments] and returns it while it runs.
   ///
   /// Optional. When omitted, [run] serves `Process.start` as well: the
-  /// process is run to completion and its output is replayed on the
-  /// returned streams. Commands that write to the started process' stdin
-  /// do not work in that mode.
-  final Future<GgProcessOutcome> Function(
+  /// program is run to completion and its output replayed afterwards. That
+  /// is enough for a caller that only reads the output at the end, but not
+  /// for gg — `gg one can commit` parses `dart test`'s output line by line
+  /// as it arrives, and `gg one do publish` types the confirmation into the
+  /// started program's stdin. Supply this to make those work.
+  final Future<GgStartedProcess> Function(
     String executable,
     List<String> arguments, {
     String? workingDirectory,
@@ -181,6 +183,45 @@ class GgProcessCallbacks {
     bool detached,
   })?
   start;
+}
+
+// .............................................................................
+/// A program that was started and is still running.
+///
+/// The listener methods are called once, right after the process was
+/// started, and before any output is read. An implementation that produces
+/// output earlier must hold on to it until its listener arrives — nothing
+/// gg reads may be dropped.
+abstract interface class GgStartedProcess {
+  /// The process id, or `0` when the host does not report one.
+  int get pid;
+
+  /// Registers the sink for everything the program writes to stdout.
+  void onStdout(void Function(Uint8List chunk) listener);
+
+  /// Registers the sink for everything the program writes to stderr.
+  void onStderr(void Function(Uint8List chunk) listener);
+
+  /// Registers the callback for when the program terminates.
+  ///
+  /// Called exactly once, and **after the last stdout and stderr chunk**.
+  /// gg closes its output streams when this fires; a host that reports the
+  /// exit first would truncate whatever was still in flight.
+  ///
+  /// [code] is the exit code, or a non-zero value when the program was
+  /// killed by a signal.
+  void onExit(void Function(int code) listener);
+
+  /// Writes [text] to the program's stdin. No newline is appended.
+  void writeStdin(String text);
+
+  /// Closes the program's stdin.
+  void closeStdin();
+
+  /// Sends [signal] to the program, e.g. `SIGTERM`.
+  ///
+  /// Returns whether the signal was delivered.
+  bool kill(String signal);
 }
 
 // .............................................................................

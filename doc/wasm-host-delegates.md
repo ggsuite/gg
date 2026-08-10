@@ -142,17 +142,38 @@ surface gg uses through it, against a real temp directory.
 backed by maps, with no `dart:io` anywhere. `test/host/gg_host_test.dart`
 runs `runGg` on it. If gg works there, it works on Node.
 
-## 7. Known gaps
+## 7. Two things the reference implementation caught
 
-- **`Process.start` does not stream.** The callback runs the program to
-  completion and the returned `Process` replays its output. This is not a
-  cosmetic limitation: `gg_test` parses `dart test`'s output **per chunk**
-  (`tests.dart`, `await for` over `process.stdout`), and a single chunk
-  carrying the whole run makes it report the test file as a failure. So
-  `can commit` — and everything built on it — currently fails through an
-  embedder even when the tests pass. `gg_publish` additionally writes the
-  publish confirmation to the started process' stdin, which a
-  run-to-completion model cannot do at all.
+`GgHostIo` is not decoration. Both of these were found by running gg
+through it natively, with a real stack trace, rather than by staring at a
+Wasm trap.
+
+**Output has to arrive in pieces.** `gg_test` parses `dart test`'s output
+per chunk (`await for` over `process.stdout`). A host that runs the
+program to completion and replays everything as one chunk makes it read a
+passing suite as a failure — `gg one can commit` reported the test file
+itself as an error. `GgProcessCallbacks.start` therefore hands over a
+[GgStartedProcess] while the program runs, and gg builds a real streaming
+`Process` from it. gg_publish needs the same thing in the other direction:
+it types the publish confirmation into the started program's stdin.
+
+**Listed paths have to keep their spelling.** `dart:io` prefixes every
+entry of `Directory.listSync` with the path the caller passed in — list
+`../x` and you get `../x/y`, never `/abs/x/y`. The callbacks answer with
+absolute paths, and `GgHostDirectory.listSync` used to hand those straight
+back. gg compares listed paths against paths it builds itself — the
+coverage check matches coverage files against `join(dir.path, …)` — so
+absolute answers matched nothing, and a fully covered package was reported
+as untested. The entries are now spelled back the way they came in.
+
+The lesson generalises: an embedder is not just »somewhere the bytes come
+from«. It has to reproduce `dart:io`'s *shape*, and only running the real
+gg through it finds the places where it does not.
+
+## 8. Known gaps
+- **Interactive prompts.** An embedder can supply them through
+  `GgHost.prompts`; `gg-js` does not yet, so the commands that ask
+  questions refuse with an actionable message.
 - **Windows.** `package:path` decides posix-vs-windows from `Uri.base`,
   which a Wasm build reads from `globalThis.location`. `gg-js` points that
   at a `file:` URL, which yields posix. A Windows embedder needs more than
