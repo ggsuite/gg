@@ -22,10 +22,13 @@ class InMemoryHost {
     this.operatingSystem = 'linux',
     this.supportsAnsiEscapes = false,
     this.hasTerminal = false,
-    this.workingDirectory = '/work',
-  }) : environment = environment ?? const {} {
-    _directories.add('/');
-    _makeDirectories(workingDirectory);
+    String? workingDirectory,
+  }) : environment = environment ?? const {},
+       // Rooted the way the platform spells it, so the tests read the
+       // same on posix and on Windows.
+       workingDirectory = workingDirectory ?? p.join(p.separator, 'work') {
+    _directories.add(p.separator);
+    _makeDirectories(this.workingDirectory);
   }
 
   /// The environment the host reports.

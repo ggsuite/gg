@@ -12,36 +12,46 @@ import 'package:gg/gg.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_is_github/gg_is_github.dart';
 import 'package:gg_process/gg_process.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import 'in_memory_host.dart';
 
 void main() {
+  // The in-memory host roots itself the way the platform spells it, so the
+  // expectations below have to as well.
+  final work = p.join(p.separator, 'work');
+
   tearDown(GgHost.uninstall);
 
   group('GgHost', () {
     // #########################################################################
     group('install(host)', () {
       test('routes dart:io through the file system callbacks', () {
-        final host = InMemoryHost()..writeFile('/work/hello.txt', 'Hello Host');
+        final host = InMemoryHost()
+          ..writeFile(p.join(work, 'hello.txt'), 'Hello Host');
         GgHost.install(host.ggHost);
 
-        expect(File('/work/hello.txt').existsSync(), isTrue);
-        expect(File('/work/hello.txt').readAsStringSync(), 'Hello Host');
-        expect(File('/work/missing.txt').existsSync(), isFalse);
-        expect(Directory('/work').existsSync(), isTrue);
+        expect(File(p.join(work, 'hello.txt')).existsSync(), isTrue);
+        expect(
+          File(p.join(work, 'hello.txt')).readAsStringSync(),
+          'Hello Host',
+        );
+        expect(File(p.join(work, 'missing.txt')).existsSync(), isFalse);
+        expect(Directory(work).existsSync(), isTrue);
       });
 
       test('routes relative paths through the callbacks working dir', () {
-        final host = InMemoryHost()..writeFile('/work/rel.txt', 'relative');
+        final host = InMemoryHost()
+          ..writeFile(p.join(work, 'rel.txt'), 'relative');
         GgHost.install(host.ggHost);
 
-        expect(Directory.current.path, '/work');
+        expect(Directory.current.path, work);
         expect(File('rel.txt').readAsStringSync(), 'relative');
-        expect(File('rel.txt').absolute.path, '/work/rel.txt');
+        expect(File('rel.txt').absolute.path, p.join(work, 'rel.txt'));
         // `.`, like dart:io — `parent` keeps the caller's spelling.
         expect(File('rel.txt').parent.path, '.');
-        expect(File('rel.txt').absolute.parent.path, '/work');
+        expect(File('rel.txt').absolute.parent.path, work);
       });
 
       test('streams a started process through the host', () async {
@@ -294,11 +304,11 @@ void main() {
     group('uninstall()', () {
       test('gives dart:io back', () {
         GgHost.install(InMemoryHost().ggHost);
-        expect(Directory.current.path, '/work');
+        expect(Directory.current.path, work);
 
         GgHost.uninstall();
         expect(GgHost.installed, isNull);
-        expect(Directory.current.path, isNot('/work'));
+        expect(Directory.current.path, isNot(work));
         expect(GgProcessDelegate.current, GgProcessDelegate.defaultDelegate);
         expect(GgPlatformDelegate.current, GgPlatformDelegate.defaultDelegate);
       });
@@ -333,7 +343,8 @@ void main() {
       });
 
       test('detects the project mode from the host file system', () async {
-        final host = InMemoryHost()..writeFile('/work/pubspec.yaml', 'name: x');
+        final host = InMemoryHost()
+          ..writeFile(p.join(work, 'pubspec.yaml'), 'name: x');
         GgHost.install(host.ggHost);
 
         final messages = <String>[];

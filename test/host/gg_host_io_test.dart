@@ -9,6 +9,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:gg/gg.dart';
+import 'package:path/path.dart' as p;
 import 'package:gg_process/gg_process.dart';
 import 'package:test/test.dart';
 
@@ -19,10 +20,24 @@ import 'package:test/test.dart';
 void main() {
   late Directory tmp;
   late String tmpPath;
+  late String helper;
+
+  /// The Dart executable running these tests.
+  ///
+  /// The process tests need a program to start, and `echo`, `cat`, `sh`
+  /// and `sleep` are not it: none of them is an executable on Windows.
+  /// The Dart binary is, on every platform the suite runs on.
+  final dart = Platform.resolvedExecutable;
 
   setUp(() {
     tmp = Directory.systemTemp.createTempSync('gg_host_io');
     tmpPath = tmp.resolveSymbolicLinksSync();
+
+    // Written before the host is installed, so it is a plain file on disk
+    // no matter what the tests do to `dart:io` afterwards.
+    helper = '$tmpPath/helper.dart';
+    File(helper).writeAsStringSync(_helperSource);
+
     GgHost.install(GgHostIo.create());
   });
 
@@ -239,7 +254,11 @@ void main() {
           'rel',
         ).listSync(recursive: true).map((e) => e.path).toList()..sort();
 
-        expect(listed, ['rel/sub', 'rel/sub/deep.txt', 'rel/top.txt']);
+        expect(listed, [
+          p.join('rel', 'sub'),
+          p.join('rel', 'sub', 'deep.txt'),
+          p.join('rel', 'top.txt'),
+        ]);
 
         // …and an absolute directory still lists absolute entries.
         final absolute = Directory(
@@ -253,8 +272,8 @@ void main() {
         Directory.current = tmpPath;
         addTearDown(() => Directory.current = before);
 
-        expect(File('a/b/c.txt').parent.path, 'a/b');
-        expect(Directory('a/b').parent.path, 'a');
+        expect(File(p.join('a', 'b', 'c.txt')).parent.path, p.join('a', 'b'));
+        expect(Directory(p.join('a', 'b')).parent.path, 'a');
         expect(File('c.txt').parent.path, '.');
       });
 
@@ -421,7 +440,7 @@ void main() {
     group('processes', () {
       test('runs a real process through the callbacks', () async {
         const wrapper = GgProcessWrapper();
-        final result = await wrapper.run('echo', ['from-host']);
+        final result = await wrapper.run(dart, [helper, 'emit', 'from-host']);
 
         expect(result.exitCode, 0);
         expect(result.stdout, contains('from-host'));
@@ -429,7 +448,7 @@ void main() {
 
       test('streams a started process while it runs', () async {
         const wrapper = GgProcessWrapper();
-        final process = await wrapper.start('echo', ['started']);
+        final process = await wrapper.start(dart, [helper, 'emit', 'started']);
 
         expect(
           await process.stdout.transform(utf8.decoder).join(),
@@ -442,7 +461,7 @@ void main() {
 
       test('carries stdin into the started process', () async {
         const wrapper = GgProcessWrapper();
-        final process = await wrapper.start('cat', <String>[]);
+        final process = await wrapper.start(dart, [helper, 'copy']);
 
         process.stdin.write('through stdin');
         await process.stdin.close();
@@ -459,10 +478,7 @@ void main() {
         // output per chunk, so a host that hands over the whole run at once
         // makes it read a passing run as a failure.
         const wrapper = GgProcessWrapper();
-        final process = await wrapper.start('sh', [
-          '-c',
-          'echo one; sleep 0.2; echo two',
-        ]);
+        final process = await wrapper.start(dart, [helper, 'chunks']);
 
         final chunks = <String>[];
         await for (final chunk in process.stdout.transform(utf8.decoder)) {
@@ -476,7 +492,7 @@ void main() {
 
       test('kills a running process', () async {
         const wrapper = GgProcessWrapper();
-        final process = await wrapper.start('sleep', ['30']);
+        final process = await wrapper.start(dart, [helper, 'sleep']);
 
         expect(process.kill(), isTrue);
         expect(await process.exitCode, isNot(0));
@@ -502,3 +518,30 @@ void main() {
     });
   });
 }
+
+// .............................................................................
+/// A stand-in for the POSIX tools the process tests used to reach for.
+///
+/// `emit` prints its argument, `copy` pipes stdin to stdout, `chunks`
+/// prints two lines with a pause between them, and `sleep` stays alive
+/// long enough to be killed.
+const String _helperSource = '''
+import 'dart:io';
+
+Future<void> main(List<String> args) async {
+  switch (args.first) {
+    case 'emit':
+      stdout.write(args[1]);
+    case 'copy':
+      await stdout.addStream(stdin);
+    case 'chunks':
+      stdout.writeln('one');
+      await stdout.flush();
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      stdout.writeln('two');
+      await stdout.flush();
+    case 'sleep':
+      await Future<void>.delayed(const Duration(seconds: 30));
+  }
+}
+''';
