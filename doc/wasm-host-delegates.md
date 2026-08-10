@@ -99,7 +99,12 @@ import 'prompts_interact.dart'
 A native build gets the `package:interact` prompts. A Wasm build gets one
 that throws `GgPromptsUnsupportedError`, telling the user which flag to
 pass instead — unless the embedder supplies prompts of its own through
-`GgHost.prompts`.
+`GgHost.prompts`. `gg-js` does, drawn from Node.
+
+Every prompt in the suite sits behind `throwWhenNotATerminal`, so a piped
+or headless run fails fast with the flag to pass instead of blocking on an
+answer nobody is there to give. That guard is what makes it safe for the
+prompt callbacks to read stdin synchronously.
 
 ## 5. The public surface
 
@@ -171,9 +176,6 @@ from«. It has to reproduce `dart:io`'s *shape*, and only running the real
 gg through it finds the places where it does not.
 
 ## 8. Known gaps
-- **Interactive prompts.** An embedder can supply them through
-  `GgHost.prompts`; `gg-js` does not yet, so the commands that ask
-  questions refuse with an actionable message.
 - **Windows.** `package:path` decides posix-vs-windows from `Uri.base`,
   which a Wasm build reads from `globalThis.location`. `gg-js` points that
   at a `file:` URL, which yields posix. A Windows embedder needs more than

@@ -237,6 +237,51 @@ void main() {
         expect(isGitHub, isFalse);
       });
 
+      test('asks the host prompts when gg needs an answer', () {
+        final asked = <String>[];
+        final host = InMemoryHost();
+
+        GgHost.install(
+          GgHost(
+            fileSystem: host.ggHost.fileSystem,
+            process: host.ggHost.process,
+            platform: host.ggHost.platform,
+            console: host.ggHost.console,
+            prompts: GgPromptCallbacks(
+              select: (prompt, options, initialIndex) {
+                asked.add('select:$prompt');
+                return options.length - 1;
+              },
+              input: (prompt, defaultValue, initialText, asMessageEditor) {
+                asked.add('input:$prompt:$initialText:$asMessageEditor');
+                return 'answered';
+              },
+            ),
+          ),
+        );
+
+        expect(
+          GgPrompts.current.select(prompt: 'Which one?', options: ['a', 'b']),
+          1,
+        );
+        expect(
+          GgPrompts.current.input(
+            prompt: 'Message',
+            initialText: 'seed',
+            asMessageEditor: true,
+          ),
+          'answered',
+        );
+        expect(asked, ['select:Which one?', 'input:Message:seed:true']);
+      });
+
+      test('leaves the platform prompts alone without host prompts', () {
+        // Without them a Wasm build refuses interactive commands with an
+        // actionable message; a native build keeps its own prompts.
+        GgHost.install(InMemoryHost().ggHost);
+        expect(GgPrompts.current, GgPrompts.defaultPrompts);
+      });
+
       test('is remembered in GgHost.installed', () {
         expect(GgHost.installed, isNull);
         final host = InMemoryHost().ggHost;
