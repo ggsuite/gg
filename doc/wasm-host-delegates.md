@@ -176,9 +176,14 @@ from«. It has to reproduce `dart:io`'s *shape*, and only running the real
 gg through it finds the places where it does not.
 
 ## 8. Known gaps
-- **Windows.** `package:path` decides posix-vs-windows from `Uri.base`,
-  which a Wasm build reads from `globalThis.location`. `gg-js` points that
-  at a `file:` URL, which yields posix. A Windows embedder needs more than
-  that.
+- **Windows is unverified, not unsupported.** The path layer works:
+  `package:path` decides posix-vs-windows from `Uri.base` *and* from
+  `Uri._isWindows`, which dart2wasm answers by asking
+  `process.platform == 'win32'`. With a `file:` URL ending in a slash —
+  what an embedder must supply anyway — a Windows Node therefore gets
+  `Style.platform == windows`, a `\` separator, and correct `dirname`,
+  `split` and `relative`. Measured, not assumed. What is untested is the
+  rest of an embedder on Windows: a blocking read from a console handle,
+  `cmd.exe` quoting, and the fact that no CI has ever run there.
 - **`dart:ffi`** stays unavailable. Anything that needs it must go behind
   a conditional import, the way `prompts.dart` does.
