@@ -183,7 +183,7 @@ List<String> checkArgsForProjectMode(
       throw StateError(
         '${cError('Not a workspace. ')}'
         '${cAction('Use ')}'
-        '${cCmd('gg do init')}'
+        '${cCmd('gg do init workspace')}'
         '${cAction(' to init a workspace.')}',
       );
   }
