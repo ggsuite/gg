@@ -303,11 +303,21 @@ class GgPromptCallbacks {
   const GgPromptCallbacks({required this.select, required this.input});
 
   /// Lets the user pick one of [options] and returns the index picked.
-  final int Function(String prompt, List<String> options, int initialIndex)
+  ///
+  /// Asynchronous, unlike the file system callbacks: those have to be
+  /// synchronous because `dart:io`'s `…Sync` APIs cannot await, and a
+  /// prompt has no such constraint. Blocking on input is not something
+  /// every platform lets an embedder do — Node cannot read a Windows
+  /// console handle synchronously — so gg does not ask it to.
+  final Future<int> Function(
+    String prompt,
+    List<String> options,
+    int initialIndex,
+  )
   select;
 
   /// Lets the user edit a line of text and returns what they left behind.
-  final String Function(
+  final Future<String> Function(
     String prompt,
     String defaultValue,
     String initialText,

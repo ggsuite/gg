@@ -247,7 +247,7 @@ void main() {
         expect(isGitHub, isFalse);
       });
 
-      test('asks the host prompts when gg needs an answer', () {
+      test('asks the host prompts when gg needs an answer', () async {
         final asked = <String>[];
         final host = InMemoryHost();
 
@@ -258,24 +258,28 @@ void main() {
             platform: host.ggHost.platform,
             console: host.ggHost.console,
             prompts: GgPromptCallbacks(
-              select: (prompt, options, initialIndex) {
+              select: (prompt, options, initialIndex) async {
                 asked.add('select:$prompt');
                 return options.length - 1;
               },
-              input: (prompt, defaultValue, initialText, asMessageEditor) {
-                asked.add('input:$prompt:$initialText:$asMessageEditor');
-                return 'answered';
-              },
+              input:
+                  (prompt, defaultValue, initialText, asMessageEditor) async {
+                    asked.add('input:$prompt:$initialText:$asMessageEditor');
+                    return 'answered';
+                  },
             ),
           ),
         );
 
         expect(
-          GgPrompts.current.select(prompt: 'Which one?', options: ['a', 'b']),
+          await GgPrompts.current.select(
+            prompt: 'Which one?',
+            options: ['a', 'b'],
+          ),
           1,
         );
         expect(
-          GgPrompts.current.input(
+          await GgPrompts.current.input(
             prompt: 'Message',
             initialText: 'seed',
             asMessageEditor: true,

@@ -103,8 +103,15 @@ pass instead — unless the embedder supplies prompts of its own through
 
 Every prompt in the suite sits behind `throwWhenNotATerminal`, so a piped
 or headless run fails fast with the flag to pass instead of blocking on an
-answer nobody is there to give. That guard is what makes it safe for the
-prompt callbacks to read stdin synchronously.
+answer nobody is there to give.
+
+The prompt callbacks are **asynchronous**, unlike the file system ones.
+That asymmetry is deliberate and worth stating: the file callbacks have to
+be synchronous because `dart:io`'s `…Sync` APIs cannot await, and a prompt
+has no such constraint — every caller in the suite already awaits it. A
+synchronous prompt would force an embedder to block on its input, which
+not every platform allows: Node cannot read a Windows console handle that
+way. Asking for a `Future` costs gg nothing and keeps that door open.
 
 ## 5. The public surface
 

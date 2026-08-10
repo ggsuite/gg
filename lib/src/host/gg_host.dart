@@ -335,14 +335,14 @@ class _HostPrompts extends GgPrompts {
   final GgPromptCallbacks _callbacks;
 
   @override
-  int select({
+  Future<int> select({
     required String prompt,
     required List<String> options,
     int initialIndex = 0,
   }) => _callbacks.select(prompt, options, initialIndex);
 
   @override
-  String input({
+  Future<String> input({
     required String prompt,
     String? defaultValue,
     String? initialText,
