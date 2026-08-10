@@ -276,42 +276,37 @@ packages:
   gg_multi:
     dependency: "direct main"
     description:
-      name: gg_multi
-      sha256: "8572b6437a162d3e969d1c66ba7226f648e5e40164ee4f4025279cff0af1bca4"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi"
+      relative: true
+    source: path
     version: "8.3.2"
   gg_multi_commit:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_multi_commit
-      sha256: aa311704a8201b55abfbddc0feb399ebbeae98254ed245ea02325a6f14a8a307
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi_commit"
+      relative: true
+    source: path
     version: "2.3.1"
   gg_multi_core:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_multi_core
-      sha256: "29b8d49a85e667c6587a3bfb28712305910048537af2c45869486cdff09151e7"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi_core"
+      relative: true
+    source: path
     version: "2.3.1"
   gg_multi_do_publish:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_multi_do_publish
-      sha256: "6d5a8717ca86271f15cc09bce4424d7657635945c09b93c1004cee417d5ca995"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi_do_publish"
+      relative: true
+    source: path
     version: "2.4.2"
   gg_multi_workspace:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_multi_workspace
-      sha256: "36402145945d7e5624a4bc64c62dd2e362a3d8e36cd560d362d6a1cad74dd7de"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi_workspace"
+      relative: true
+    source: path
     version: "2.3.3"
   gg_one:
     dependency: "direct main"
