@@ -1,5 +1,11 @@
 # Changelog
 
+## 16.1.0 - 2026-08-10
+
+### Changed
+
+- Refactor commit messages, version increment
+
 ## 16.0.0 - 2026-08-10
 
 ## 15.3.1 - 2026-08-10
