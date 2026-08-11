@@ -10,8 +10,6 @@ import 'package:gg/gg.dart';
 import 'package:gg_multi/gg_multi.dart' as gg_multi;
 import 'package:test/test.dart';
 
-import '../../bin/gg.dart';
-
 void main() {
   late Directory dRoot;
   late Directory d0;
@@ -49,6 +47,21 @@ void main() {
           gg_multi.ggCliVersion = 'outdated';
           await runGg(args: ['--version'], ggLog: ggLog);
           expect(gg_multi.ggCliVersion, ggVersion);
+        });
+      });
+
+      group('- an embedder exiting', () {
+        test('returns the code of a GgExitException', () async {
+          // `exit(code)` inside an installed host throws instead of
+          // terminating the process, so the embedder stays in control of
+          // when its own process ends.
+          final code = await runGg(
+            args: ['do', 'commit'],
+            ggLog: ggLog,
+            detectMode: () => throw const GgExitException(42),
+          );
+
+          expect(code, 42);
         });
       });
 

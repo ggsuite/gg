@@ -1,5 +1,23 @@
 # Changelog
 
+## 16.1.1 - 2026-08-11
+
+### Added
+
+- `GgHost` — the one place gg's access to the outside world is configured.
+An embedder supplies file system, process, platform, console and prompt
+callbacks, and gg routes everything through them. See
+`doc/wasm-host-delegates.md`.
+- `GgHostIo`, a `GgHost` answering every callback with `dart:io`, as the
+reference implementation an embedder is measured against.
+- `runGg` moved from `bin/gg.dart` into `lib/src/run_gg.dart` so embedders
+can call it, and now returns the exit code instead of setting it.
+
+### Changed
+
+- "First javascript implementation"
+- Fix shell changes
+
 ## 16.1.0 - 2026-08-10
 
 ### Changed
