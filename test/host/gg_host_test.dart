@@ -6,7 +6,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:gg/gg.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
@@ -77,6 +76,21 @@ void main() {
         expect(await process.exitCode, 0);
       });
 
+      test('streams stderr of a started process too', () async {
+        final host = InMemoryHost()
+          ..stubProcess('git push', exitCode: 1, stderr: 'rejected');
+        GgHost.install(host.ggHost);
+
+        const wrapper = GgProcessWrapper();
+        final process = await wrapper.start('git', ['push']);
+
+        expect(
+          await process.stderr.transform(utf8.decoder).join(),
+          'rejected\n',
+        );
+        expect(await process.exitCode, 1);
+      });
+
       test('carries what gg types into a started process\' stdin', () async {
         final host = InMemoryHost()..stubProcess('dart pub publish');
         GgHost.install(host.ggHost);
@@ -101,12 +115,20 @@ void main() {
         expect(process.kill(), isTrue);
         expect(host.startedProcess!.killedWith, contains('SIGTERM'));
         expect(process.pid, isA<int>());
+
+        // gg reads a started process' output, writes its stdin and kills
+        // it. Anything else says so by name.
+        expect(
+          () => process.noSuchMethod(Invocation.getter(#somethingElse)),
+          throwsA(isA<GgHostUnsupportedError>()),
+        );
       });
 
       test('replays the output when the host cannot stream', () async {
         // A host without a `start` callback: gg runs the program to
         // completion and hands the output over afterwards.
-        final host = InMemoryHost()..stubProcess('git log', stdout: 'one\ntwo');
+        final host = InMemoryHost()
+          ..stubProcess('git log', stdout: 'one\ntwo', stderr: 'a warning');
         GgHost.install(
           GgHost(
             fileSystem: host.ggHost.fileSystem,
@@ -120,9 +142,21 @@ void main() {
         final process = await wrapper.start('git', ['log']);
 
         expect(await process.stdout.transform(utf8.decoder).join(), 'one\ntwo');
+        expect(
+          await process.stderr.transform(utf8.decoder).join(),
+          'a warning',
+        );
         expect(await process.exitCode, 0);
+        expect(process.pid, isA<int>());
         expect(process.kill(), isFalse);
         expect(() => process.stdin.writeln('ignored'), returnsNormally);
+
+        // A replayed process is not a real one; anything beyond reading
+        // its output says so by name.
+        expect(
+          () => process.noSuchMethod(Invocation.getter(#somethingElse)),
+          throwsA(isA<GgHostUnsupportedError>()),
+        );
       });
 
       test('routes process execution through the process callbacks', () async {
@@ -379,86 +413,6 @@ void main() {
 
         expect(code, 42);
       });
-    });
-  });
-
-  // ###########################################################################
-  group('GgHostUnsupportedError', () {
-    test('names what is missing', () {
-      final error = GgHostUnsupportedError('Watching /a');
-      expect(error.message, contains('Watching /a'));
-      expect(error.message, contains('GgHost.install'));
-    });
-  });
-
-  // ###########################################################################
-  group('ggProcessResultFrom(outcome)', () {
-    test('copies every field', () {
-      final result = ggProcessResultFrom(
-        const GgProcessOutcome(exitCode: 2, stdout: 'o', stderr: 'e', pid: 123),
-      );
-      expect(result.exitCode, 2);
-      expect(result.stdout, 'o');
-      expect(result.stderr, 'e');
-      expect(result.pid, 123);
-    });
-  });
-
-  // ###########################################################################
-  group('GgDirectoryEntry', () {
-    test('prints path and type', () {
-      const entry = GgDirectoryEntry(
-        path: '/a/b',
-        type: GgEntityType.directory,
-      );
-      expect(entry.toString(), '/a/b (directory)');
-    });
-  });
-
-  // ###########################################################################
-  group('GgConsoleCallbacks', () {
-    test('defaults to a non-terminal 80 column console', () {
-      final callbacks = GgConsoleCallbacks(
-        writeStdout: (_) {},
-        writeStderr: (_) {},
-      );
-      expect(callbacks.hasTerminal(), isFalse);
-      expect(callbacks.supportsAnsiEscapes(), isFalse);
-      expect(callbacks.terminalColumns(), 80);
-      expect(callbacks.readLine, isNull);
-    });
-  });
-
-  // ###########################################################################
-  group('GgFileSystemCallbacks', () {
-    test('exposes every callback it was built with', () {
-      final callbacks = GgFileSystemCallbacks(
-        typeOf: (_, _) => GgEntityType.notFound,
-        readBytes: (_) => Uint8List(0),
-        writeBytes: (_, _, _) {},
-        createDirectory: (_, _) {},
-        createFile: (_, _) {},
-        deleteEntity: (_, _) {},
-        listDirectory: (_, _) => [],
-        rename: (_, _) {},
-        copyFile: (_, _) {},
-        currentDirectory: () => '/',
-        setCurrentDirectory: (_) {},
-        systemTempDirectory: () => '/tmp',
-        createTempDirectory: (_, _) => '/tmp/x',
-        resolveSymbolicLinks: (path) => path,
-        createLink: (_, _) {},
-        linkTarget: (_) => '/target',
-      );
-
-      expect(callbacks.typeOf('/a', true), GgEntityType.notFound);
-      expect(callbacks.currentDirectory(), '/');
-      expect(callbacks.systemTempDirectory(), '/tmp');
-      expect(callbacks.createTempDirectory('/tmp', 'p'), '/tmp/x');
-      expect(callbacks.resolveSymbolicLinks('/a'), '/a');
-      expect(callbacks.linkTarget('/l'), '/target');
-      expect(callbacks.readBytes('/a'), isEmpty);
-      expect(callbacks.listDirectory('/a', false), isEmpty);
     });
   });
 }

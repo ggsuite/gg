@@ -163,7 +163,11 @@ abstract final class GgHostIo {
   static final GgConsoleCallbacks console = GgConsoleCallbacks(
     writeStdout: (text) => _raw(() => stdout.write(text)),
     writeStderr: (text) => _raw(() => stderr.write(text)),
+    // Reading the test runner's own stdin would block until somebody
+    // types, so this one line stays uncovered on purpose.
+    // coverage:ignore-start
     readLine: () => _raw(() => stdin.readLineSync()),
+    // coverage:ignore-end
     hasTerminal: () => _raw(() => stdout.hasTerminal),
     supportsAnsiEscapes: () => _raw(() => stdout.supportsAnsiEscapes),
     terminalColumns: () =>

@@ -50,6 +50,21 @@ void main() {
         });
       });
 
+      group('- an embedder exiting', () {
+        test('returns the code of a GgExitException', () async {
+          // `exit(code)` inside an installed host throws instead of
+          // terminating the process, so the embedder stays in control of
+          // when its own process ends.
+          final code = await runGg(
+            args: ['do', 'commit'],
+            ggLog: ggLog,
+            detectMode: () => throw const GgExitException(42),
+          );
+
+          expect(code, 42);
+        });
+      });
+
       group('- edge cases', () {
         group('should catch and print errors', () {
           test('- no arguments', () async {
