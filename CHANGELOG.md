@@ -15,7 +15,8 @@ can call it, and now returns the exit code instead of setting it.
 
 ### Changed
 
-- &quot;First javascript implementation&quot;
+- "First javascript implementation"
+- Fix shell changes
 
 ## 16.1.0 - 2026-08-10
 
