@@ -79,9 +79,8 @@ void dartIoConformanceTests() {
         final file = await File('$tmpPath/async-create.txt').create();
         expect(file.existsSync(), isTrue);
 
-        final nested = await File(
-          '$tmpPath/async-nested/deep.txt',
-        ).create(recursive: true);
+        final nested = await File('$tmpPath/async-nested/deep.txt')
+            .create(recursive: true);
         expect(nested.existsSync(), isTrue);
       });
 
@@ -93,9 +92,8 @@ void dartIoConformanceTests() {
         expect(File('$tmpPath/nested/deep.txt').existsSync(), isTrue);
 
         File('$tmpPath/new.txt').writeAsStringSync('payload');
-        final renamed = File(
-          '$tmpPath/new.txt',
-        ).renameSync('$tmpPath/moved.txt');
+        final renamed = File('$tmpPath/new.txt')
+            .renameSync('$tmpPath/moved.txt');
         expect(renamed.readAsStringSync(), 'payload');
         expect(File('$tmpPath/new.txt').existsSync(), isFalse);
 
@@ -105,9 +103,8 @@ void dartIoConformanceTests() {
 
       test('renames and copies asynchronously', () async {
         await File('$tmpPath/src.txt').writeAsString('x');
-        final renamed = await File(
-          '$tmpPath/src.txt',
-        ).rename('$tmpPath/dst.txt');
+        final renamed = await File('$tmpPath/src.txt')
+            .rename('$tmpPath/dst.txt');
         expect(renamed.readAsStringSync(), 'x');
 
         final copied = await renamed.copy('$tmpPath/dst2.txt');
@@ -271,9 +268,9 @@ void dartIoConformanceTests() {
         ]);
 
         // …and an absolute directory still lists absolute entries.
-        final absolute = Directory(
-          '$tmpPath/rel',
-        ).listSync().map((e) => e.path);
+        final absolute = Directory('$tmpPath/rel')
+            .listSync()
+            .map((e) => e.path);
         expect(absolute, everyElement(startsWith('$tmpPath/rel/')));
       });
 
@@ -320,9 +317,8 @@ void dartIoConformanceTests() {
 
       test('creates a link recursively and asynchronously', () async {
         File('$tmpPath/t2.txt').writeAsStringSync('x');
-        final link = await Link(
-          '$tmpPath/deep/l.txt',
-        ).create('$tmpPath/t2.txt', recursive: true);
+        final link = await Link('$tmpPath/deep/l.txt')
+            .create('$tmpPath/t2.txt', recursive: true);
         expect(link.existsSync(), isTrue);
         await link.delete();
       });

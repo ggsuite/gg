@@ -258,9 +258,9 @@ void main() {
 
     test('refuses anything else by name', () {
       expect(
-        () => GgHostFileStat(
-          GgEntityType.file,
-        ).noSuchMethod(Invocation.getter(#somethingElse)),
+        () =>
+            GgHostFileStat(GgEntityType.file)
+                .noSuchMethod(Invocation.getter(#somethingElse)),
         throwsA(isA<GgHostUnsupportedError>()),
       );
     });

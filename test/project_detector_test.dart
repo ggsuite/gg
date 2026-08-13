@@ -118,9 +118,8 @@ void main() {
     });
 
     test('returns single when .git is a file (worktree/submodule)', () {
-      File(
-        path.join(root.path, '.git'),
-      ).writeAsStringSync('gitdir: /elsewhere');
+      File(path.join(root.path, '.git'))
+          .writeAsStringSync('gitdir: /elsewhere');
       expect(ProjectDetector.detect(workingDir: root.path), ProjectMode.single);
     });
 

@@ -6,6 +6,10 @@
 
 - Rework copyright headers
 
+### Fixed
+
+- Cleanup copy right headers. Update to dart 3.13. Auto fixes.
+
 ## 17.0.0 - 2026-08-13
 
 ## 16.1.1 - 2026-08-11
