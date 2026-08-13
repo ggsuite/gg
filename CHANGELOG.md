@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Rework copyright headers
+
 ## 17.0.0 - 2026-08-13
 
 ## 16.1.1 - 2026-08-11
