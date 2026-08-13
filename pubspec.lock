@@ -394,12 +394,11 @@ packages:
     source: hosted
     version: "1.4.3"
   gg_test:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_test
-      sha256: "3a04f47ab980b7292c34d29179f999222984aa76e972e3992f2859045a465204"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_test"
+      relative: true
+    source: path
     version: "3.1.1"
   gg_version:
     dependency: transitive
