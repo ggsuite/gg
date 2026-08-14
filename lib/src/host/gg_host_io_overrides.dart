@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2026 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) ggsuite
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -657,14 +657,9 @@ class GgHostStdin implements Stdin {
 class GgHostIoSink implements IOSink {
   /// Default constructor
   ///
-  /// [onClose] is called by [close] — a started process' stdin has to be
+  /// [_onClose] is called by [close] — a started process' stdin has to be
   /// closable, or a program waiting for end of input never finishes.
-  GgHostIoSink({
-    required this.encoding,
-    required void Function(String) onWrite,
-    void Function()? onClose,
-  }) : _onWrite = onWrite,
-       _onClose = onClose;
+  GgHostIoSink({required this.encoding, required this._onWrite, this._onClose});
 
   final void Function(String text) _onWrite;
   final void Function()? _onClose;

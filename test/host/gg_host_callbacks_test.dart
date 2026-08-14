@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2026 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) ggsuite
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -136,16 +136,14 @@ void main() {
       // enough for a caller that reads the output at the end, but not for
       // `can commit`, which parses `dart test` line by line.
       final callbacks = GgProcessCallbacks(
-        run:
-            (
-              executable,
-              arguments, {
-              workingDirectory,
-              environment,
-              includeParentEnvironment = true,
-              runInShell = false,
-            }) async =>
-                const GgProcessOutcome(exitCode: 0, stdout: '', stderr: ''),
+        run: (
+          executable,
+          arguments, {
+          workingDirectory,
+          environment,
+          includeParentEnvironment = true,
+          runInShell = false,
+        }) async => const GgProcessOutcome(exitCode: 0, stdout: '', stderr: ''),
       );
 
       expect(callbacks.start, isNull);

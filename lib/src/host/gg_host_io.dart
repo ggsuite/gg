@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2026 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) ggsuite
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -63,19 +63,20 @@ abstract final class GgHostIo {
       }
     }),
     listDirectory: (path, recursive) => _raw(
-      () => Directory(path)
-          .listSync(recursive: recursive, followLinks: false)
-          .map(
-            (e) => GgDirectoryEntry(
-              path: e.path,
-              type: switch (e) {
-                Directory() => GgEntityType.directory,
-                Link() => GgEntityType.link,
-                _ => GgEntityType.file,
-              },
-            ),
-          )
-          .toList(),
+      () =>
+          Directory(path)
+              .listSync(recursive: recursive, followLinks: false)
+              .map(
+                (e) => GgDirectoryEntry(
+                  path: e.path,
+                  type: switch (e) {
+                    Directory() => GgEntityType.directory,
+                    Link() => GgEntityType.link,
+                    _ => GgEntityType.file,
+                  },
+                ),
+              )
+              .toList(),
     ),
     rename: (from, to) => _raw(() {
       final type = FileSystemEntity.typeSync(from, followLinks: false);

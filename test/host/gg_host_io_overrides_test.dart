@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2026 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) ggsuite
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -258,9 +258,9 @@ void main() {
 
     test('refuses anything else by name', () {
       expect(
-        () => GgHostFileStat(
-          GgEntityType.file,
-        ).noSuchMethod(Invocation.getter(#somethingElse)),
+        () =>
+            GgHostFileStat(GgEntityType.file)
+                .noSuchMethod(Invocation.getter(#somethingElse)),
         throwsA(isA<GgHostUnsupportedError>()),
       );
     });
