@@ -15,7 +15,7 @@ dependencies:
   gg_process: ^1.2.0
   gg_is_github: ^1.1.0
   path: ^1.9.1
-  gg_multi: ^10.1.0
+  gg_multi: ^10.1.1
 dev_dependencies:
   lints: ^6.1.0
   test: ^1.31.2
