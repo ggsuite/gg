@@ -87,7 +87,7 @@ command surface; the most important ones are:
 | Command                    | Purpose                                             |
 | -------------------------- | --------------------------------------------------- |
 | `gg do init workspace`     | initialise the workspace                            |
-| `gg do add <target>`       | add a repo or a whole org to the workspace / ticket |
+| `gg do add <target>`       | add a repo, a regexp match or a whole org to the workspace / ticket |
 | `gg do create ticket <id>` | create `tickets/<id>/` with a `.ticket` file        |
 | `gg do code`               | open the ticket in VS Code                          |
 | `gg can commit`            | check whether all ticket repos can commit           |
@@ -132,7 +132,13 @@ ticket id and description.
 
 ```bash
 gg do add app_core ui_core
+gg do add "ui_.+"                        # every ocean repo named ui_…
 ```
+
+A target may be a regular expression selecting repositories the ocean
+already holds. It is anchored, so `gg do add gg` adds the repository
+named `gg` and not every name containing it, and a target matching no
+ocean repo is treated as a name or url exactly as before.
 
 Local dependencies are added automatically, and packages are
 localised inside the ticket so that intra-workspace edits resolve to
