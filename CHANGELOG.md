@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Use ggwsm in pipelines
+## 17.2.0 - 2026-08-18
+
+### Added
+
+- Add helix as »gg dna«
+
+### Changed
+
+- Improve help of gg dna
+
 ## 17.1.1 - 2026-08-15
 
 ### Changed
