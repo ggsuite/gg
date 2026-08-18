@@ -5,6 +5,11 @@
 ### Changed
 
 - Use ggwsm in pipelines
+
+### Fixed
+
+- Fix issues in gg
+
 ## 17.2.0 - 2026-08-18
 
 ### Added
