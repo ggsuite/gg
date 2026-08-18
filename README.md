@@ -88,7 +88,7 @@ their content — configs, docs, scripts and agent skills — into the repo:
 
 | Command         | Purpose                                                        |
 | --------------- | -------------------------------------------------------------- |
-| `gg dna init`   | place the DNA test into the project; the test instantiates the DNA on every test run |
+| `gg dna init`   | place the DNA test that instantiates the project DNA on every test run |
 
 Like `gg one`, `gg dna` works on a single repo, and it therefore runs in
 both modes: inside a ticket workspace and in a standalone project.

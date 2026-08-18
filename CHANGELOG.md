@@ -6,6 +6,10 @@
 
 - Add helix as »gg dna«
 
+### Changed
+
+- Improve help of gg dna
+
 ## 17.1.1 - 2026-08-15
 
 ### Changed

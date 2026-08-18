@@ -420,10 +420,9 @@ packages:
   helix:
     dependency: "direct main"
     description:
-      name: helix
-      sha256: "6464101a65e835c937cbf5dbfb3c89fd822e178d0414c81a826bb07e53b954bd"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../helix"
+      relative: true
+    source: path
     version: "0.1.0"
   http:
     dependency: transitive
