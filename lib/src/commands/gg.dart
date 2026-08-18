@@ -10,6 +10,7 @@ import 'package:args/command_runner.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_multi/gg_multi.dart' as gg_multi;
 
+import 'gg_dna.dart';
 import 'gg_multi.dart';
 import 'gg_one.dart';
 
@@ -19,6 +20,7 @@ class Gg extends Command<void> {
   Gg({required this.ggLog}) {
     addSubcommand(GgOne(ggLog: ggLog));
     addSubcommand(GgMultiNamespace(ggLog: ggLog));
+    addSubcommand(GgDna(ggLog: ggLog));
 
     // Register all gg_multi subcommands directly at the root: inside a gg
     // ticket workspace `gg <command>` runs gg multi by default. Standalone
