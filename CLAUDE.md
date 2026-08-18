@@ -39,8 +39,9 @@ gg do push                       # push after checks pass
 ```
 bin/gg.dart          → entry point: main() → runGg()
 lib/src/commands/
-  gg.dart        → root Command; registers GgOne and all GgMulti subcommands
+  gg.dart        → root Command; registers GgOne, GgDna and all GgMulti subcommands
   gg_one.dart    → `gg one` — re-exposes all `gg` subcommands under the gg namespace
+  gg_dna.dart    → `gg dna` — re-exposes all `helix` subcommands under the dna namespace
 ```
 
 ### Command Hierarchy
@@ -49,6 +50,7 @@ lib/src/commands/
 gg
 ├── one          (GgOne)    — all `gg_one` subcommands
 ├── multi        (GgMultiNamespace, hidden) — explicit gg_multi alias
+├── dna          (GgDna)        — all `helix` subcommands (init, …)
 ├── can          (Can)          — can commit / push / publish / review
 ├── did          (Did)          — did commit / push
 └── do           (Do)           — do commit / push / publish / review
@@ -58,6 +60,16 @@ gg
 ```
 
 `GgMulti` (from `gg_multi`) contributes `can`, `did`, and `do` at the root (`ls` lives under `do`) by iterating over its `.subcommands.values` — inside a gg ticket workspace `gg <cmd>` therefore runs gg_multi by default. `ProjectDetector` (`lib/src/project_detector.dart`) guards this in `bin/gg.dart`: in a standalone project the root commands only print a hint to use `gg one <cmd> …`; outside any recognized project they abort with an error explaining both options. `gg do init` is exempt from this guard (see `modeIndependentCommandPaths`), because it bootstraps a new ocean and must therefore run outside of one.
+
+### helix (`gg dna`)
+
+`GgDna` (`lib/src/commands/gg_dna.dart`) registers the subcommands of
+`helix`'s root `Helix` command under `gg dna`, the same way `GgOne` does for
+`gg_one`. `helix` is the DNA engine: it resolves the DNA packages a repo
+declares as dev-dependencies and instantiates their configs, docs, scripts
+and agent skills into that repo. Because it operates on a single repo, `dna`
+is listed in `modeIndependentCommands` and therefore runs in a workspace and
+in a standalone project alike.
 
 ### Running without `dart:io`
 
