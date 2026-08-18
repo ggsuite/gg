@@ -125,7 +125,13 @@ class ProjectDetector {
 
 /// Top-level subcommand names that run independently of the detected
 /// project mode and are therefore never guarded.
-const Set<String> modeIndependentCommands = {'one', 'multi', 'run', 'help'};
+const Set<String> modeIndependentCommands = {
+  'one',
+  'multi',
+  'dna',
+  'run',
+  'help',
+};
 
 /// Command paths (`<command> <subcommand>`) that create or bootstrap a
 /// workspace and therefore must run outside of one as well.

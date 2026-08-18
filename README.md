@@ -5,12 +5,13 @@ scale — from running pre-commit checks in a single package to
 orchestrating commits, pushes, reviews and publishes across all
 repositories of a ticket.
 
-It is a thin CLI shell that combines two backend packages:
+It is a thin CLI shell that combines three backend packages:
 
 | Package    | Scope                         | Purpose                                                |
 | ---------- | ----------------------------- | ------------------------------------------------------ |
 | `gg_one`   | a single Dart/TypeScript repo | pre-commit checks (analyze, format, test, coverage, …) |
 | `gg_multi` | a multi-repo ticket workspace | run commands across all repos of a ticket in dep order |
+| `helix`    | the DNA of a single repo      | instantiate configs, docs, scripts and skills from DNA packages |
 
 `gg` detects where you run it:
 
@@ -33,6 +34,7 @@ After installation the `gg` executable is available globally.
 ```
 gg
 ├── one  <subcommand>      Single-repo mode (gg_one)
+├── dna  <subcommand>      DNA engine (helix)
 ├── can  <commit|push|publish|review>
 ├── did  <commit|push|review>
 └── do   <commit|push|review|publish|claude|code|
@@ -76,6 +78,22 @@ message asking you to use `gg one` instead.
 This also works inside a ticket workspace when you want to run
 `gg_one` against a single repo (where `gg can`/`gg do` runs
 `gg multi`).
+
+## When to use `gg dna`
+
+`gg dna` is a re-export of the [`helix`](https://github.com/ggsuite/helix)
+package — the DNA engine. It resolves the DNA packages a repo declares as
+dev-dependencies (`dna_base`, `dna_dart`, `dna-ts`, …) and instantiates
+their content — configs, docs, scripts and agent skills — into the repo:
+
+| Command         | Purpose                                                        |
+| --------------- | -------------------------------------------------------------- |
+| `gg dna init`   | place the DNA test into the project; the test instantiates the DNA on every test run |
+
+Like `gg one`, `gg dna` works on a single repo, and it therefore runs in
+both modes: inside a ticket workspace and in a standalone project.
+`helix` remains available as its own executable — `gg dna <cmd>` and
+`helix <cmd>` do the same thing.
 
 ## Workspace commands (`gg_multi`)
 

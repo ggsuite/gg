@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Add helix as »gg dna«
+
 ## 17.1.1 - 2026-08-15
 
 ### Changed
