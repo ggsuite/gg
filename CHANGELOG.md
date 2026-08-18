@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Use ggwsm in pipelines
 ## 17.2.0 - 2026-08-18
 
 ### Added
