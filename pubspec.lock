@@ -284,18 +284,16 @@ packages:
   gg_multi:
     dependency: "direct main"
     description:
-      name: gg_multi
-      sha256: "5f86105461c70b68233c2c5bb2c7a588de83d8f7197d4055231d2b9f50730ede"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi"
+      relative: true
+    source: path
     version: "10.1.1"
   gg_multi_commit:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_multi_commit
-      sha256: "53bb55b6ac9f5a48a2500c449f638c1d7625a59143fa8213f4df0a2516d97d71"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi_commit"
+      relative: true
+    source: path
     version: "4.1.0"
   gg_multi_core:
     dependency: transitive
@@ -306,12 +304,11 @@ packages:
     source: hosted
     version: "4.1.1"
   gg_multi_do_publish:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: gg_multi_do_publish
-      sha256: e59e77a50da3483d2a6e10c4962fbadb37c4221d661c0e1b76976800861f14bb
-      url: "https://pub.dev"
-    source: hosted
+      path: "../gg_multi_do_publish"
+      relative: true
+    source: path
     version: "4.1.0"
   gg_multi_workspace:
     dependency: transitive
