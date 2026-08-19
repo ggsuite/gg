@@ -158,16 +158,20 @@ void main() {
           'emit',
           'early',
         ]);
-        await Future<void>.delayed(const Duration(milliseconds: 400));
+
+        // Wait for the exit instead of a fixed delay: it is reported only
+        // once both output streams have run dry, so by then everything the
+        // program wrote sits in the buffer — on a slow Windows process
+        // start just as much as on a fast one.
+        final exited = Completer<int>();
+        started.onExit(exited.complete);
+        expect(await exited.future, 0);
 
         final out = StringBuffer();
         final err = StringBuffer();
-        final exited = Completer<int>();
         started.onStdout((chunk) => out.write(utf8.decode(chunk)));
         started.onStderr((chunk) => err.write(utf8.decode(chunk)));
-        started.onExit(exited.complete);
 
-        expect(await exited.future, 0);
         expect(out.toString(), 'early');
         expect(err.toString(), isEmpty);
         expect(started.pid, greaterThan(0));
@@ -179,15 +183,15 @@ void main() {
           'fail',
           'problem',
         ]);
-        await Future<void>.delayed(const Duration(milliseconds: 400));
+
+        final exited = Completer<int>();
+        started.onExit(exited.complete);
+        expect(await exited.future, 3);
 
         final err = StringBuffer();
-        final exited = Completer<int>();
         started.onStdout((_) {});
         started.onStderr((chunk) => err.write(utf8.decode(chunk)));
-        started.onExit(exited.complete);
 
-        expect(await exited.future, 3);
         expect(err.toString(), 'problem');
       });
 

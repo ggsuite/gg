@@ -22,6 +22,17 @@ import 'package:gg/gg.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
+/// Matches a path no matter which separator the platform spells it with.
+///
+/// The suite builds its paths with `/` because every platform accepts that
+/// as input. What comes back is normalized — `dart:io` answers with `\` on
+/// Windows — so the comparison has to be about the path, not the string.
+Matcher samePath(String expected) => predicate<Object?>((actual) {
+  final s = actual is Uri ? actual.toFilePath() : '$actual';
+  return p.equals(s, expected);
+}, 'is the path $expected');
+
+// .............................................................................
 /// Runs the conformance suite. Call from a `main()`.
 void dartIoConformanceTests() {
   late Directory tmp;
@@ -143,9 +154,9 @@ void dartIoConformanceTests() {
       test('exposes path, uri, absolute and parent', () {
         final file = File('$tmpPath/p.txt');
         expect(file.path, '$tmpPath/p.txt');
-        expect(file.uri, Uri.file('$tmpPath/p.txt'));
-        expect(file.absolute.path, '$tmpPath/p.txt');
-        expect(file.parent.path, tmpPath);
+        expect(file.uri, samePath('$tmpPath/p.txt'));
+        expect(file.absolute.path, samePath('$tmpPath/p.txt'));
+        expect(file.parent.path, samePath(tmpPath));
         expect(file.toString(), contains('p.txt'));
       });
 
@@ -177,10 +188,16 @@ void dartIoConformanceTests() {
         File('$tmpPath/d/file.txt').writeAsStringSync('x');
 
         final flat = dir.listSync().map((e) => e.path).toList();
-        expect(flat, containsAll(['$tmpPath/d/sub', '$tmpPath/d/file.txt']));
+        expect(
+          flat,
+          containsAll([
+            samePath('$tmpPath/d/sub'),
+            samePath('$tmpPath/d/file.txt'),
+          ]),
+        );
 
         final deep = dir.listSync(recursive: true).map((e) => e.path).toList();
-        expect(deep, contains('$tmpPath/d/sub/deep'));
+        expect(deep, contains(samePath('$tmpPath/d/sub/deep')));
 
         expect(dir.listSync().whereType<Directory>(), isNotEmpty);
         expect(dir.listSync().whereType<File>(), isNotEmpty);
@@ -210,7 +227,8 @@ void dartIoConformanceTests() {
       test('creates temp directories', () async {
         final temp = Directory(tmpPath).createTempSync('pre');
         expect(temp.existsSync(), isTrue);
-        expect(temp.path, startsWith('$tmpPath/pre'));
+        expect(p.dirname(temp.path), samePath(tmpPath));
+        expect(p.basename(temp.path), startsWith('pre'));
 
         final temp2 = await Directory(tmpPath).createTemp('other');
         expect(temp2.existsSync(), isTrue);
@@ -230,15 +248,15 @@ void dartIoConformanceTests() {
         Directory('$tmpPath/real-dir').createSync();
         expect(
           await Directory('$tmpPath/real-dir').resolveSymbolicLinks(),
-          '$tmpPath/real-dir',
+          samePath('$tmpPath/real-dir'),
         );
       });
 
       test('exposes path, uri, absolute and parent', () {
         final dir = Directory('$tmpPath/d2');
-        expect(dir.uri, Uri.directory('$tmpPath/d2'));
-        expect(dir.absolute.path, '$tmpPath/d2');
-        expect(dir.parent.path, tmpPath);
+        expect(dir.uri, samePath('$tmpPath/d2'));
+        expect(dir.absolute.path, samePath('$tmpPath/d2'));
+        expect(dir.parent.path, samePath(tmpPath));
         expect(dir.toString(), contains('d2'));
       });
 
@@ -271,7 +289,15 @@ void dartIoConformanceTests() {
         final absolute = Directory('$tmpPath/rel')
             .listSync()
             .map((e) => e.path);
-        expect(absolute, everyElement(startsWith('$tmpPath/rel/')));
+        expect(
+          absolute,
+          everyElement(
+            predicate<String>(
+              (e) => p.equals(p.dirname(e), '$tmpPath/rel'),
+              'sits directly in $tmpPath/rel',
+            ),
+          ),
+        );
       });
 
       test('keeps the spelling in parent as well', () {
@@ -301,15 +327,21 @@ void dartIoConformanceTests() {
         final link = Link('$tmpPath/link.txt')
           ..createSync('$tmpPath/target.txt');
         expect(link.existsSync(), isTrue);
-        expect(link.targetSync(), '$tmpPath/target.txt');
-        expect(await link.target(), '$tmpPath/target.txt');
+        expect(link.targetSync(), samePath('$tmpPath/target.txt'));
+        expect(await link.target(), samePath('$tmpPath/target.txt'));
         expect(await link.exists(), isTrue);
-        expect(link.absolute.path, '$tmpPath/link.txt');
-        expect(link.parent.path, tmpPath);
-        expect(link.uri, Uri.file('$tmpPath/link.txt'));
+        expect(link.absolute.path, samePath('$tmpPath/link.txt'));
+        expect(link.parent.path, samePath(tmpPath));
+        expect(link.uri, samePath('$tmpPath/link.txt'));
         expect(link.toString(), contains('link.txt'));
-        expect(link.resolveSymbolicLinksSync(), '$tmpPath/target.txt');
-        expect(await link.resolveSymbolicLinks(), '$tmpPath/target.txt');
+        expect(
+          link.resolveSymbolicLinksSync(),
+          samePath('$tmpPath/target.txt'),
+        );
+        expect(
+          await link.resolveSymbolicLinks(),
+          samePath('$tmpPath/target.txt'),
+        );
 
         link.deleteSync();
         expect(link.existsSync(), isFalse);
@@ -376,11 +408,11 @@ void dartIoConformanceTests() {
         File('$tmpPath/r.txt').writeAsStringSync('x');
         expect(
           File('$tmpPath/r.txt').resolveSymbolicLinksSync(),
-          '$tmpPath/r.txt',
+          samePath('$tmpPath/r.txt'),
         );
         expect(
           await File('$tmpPath/r.txt').resolveSymbolicLinks(),
-          '$tmpPath/r.txt',
+          samePath('$tmpPath/r.txt'),
         );
       });
 
