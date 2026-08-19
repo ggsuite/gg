@@ -22,6 +22,12 @@ import 'package:test/test.dart';
 
 import 'dart_io_conformance.dart';
 
+/// The working directory of the fake file system, spelled the way the
+/// platform spells an absolute path — `/work` on posix, `\work` on
+/// Windows. The subject normalizes what it is given, so a hard coded
+/// `/work` would only match on one of them.
+final String _workDir = p.join(p.separator, 'work');
+
 // .............................................................................
 /// The smallest file system that answers at all.
 GgFileSystemCallbacks _emptyFs() => GgFileSystemCallbacks(
@@ -34,7 +40,7 @@ GgFileSystemCallbacks _emptyFs() => GgFileSystemCallbacks(
   listDirectory: (_, _) => const [],
   rename: (_, _) {},
   copyFile: (_, _) {},
-  currentDirectory: () => '/work',
+  currentDirectory: () => _workDir,
   setCurrentDirectory: (_) {},
   systemTempDirectory: () => '/tmp',
   createTempDirectory: (_, _) => '/tmp/x',
@@ -109,9 +115,10 @@ void main() {
       );
 
       GgHostFile(probing, 'relative.txt').existsSync();
-      GgHostFile(probing, '/absolute.txt').existsSync();
+      final absolute = p.join(p.separator, 'absolute.txt');
+      GgHostFile(probing, absolute).existsSync();
 
-      expect(seen, [p.join('/work', 'relative.txt'), '/absolute.txt']);
+      expect(seen, [p.join(_workDir, 'relative.txt'), absolute]);
     });
 
     test('spells absolute and parent the way dart:io does', () {
@@ -122,12 +129,15 @@ void main() {
       // the two makes those comparisons match nothing.
       expect(
         GgHostFile(fs, 'rel.txt').absolute.path,
-        p.join('/work', 'rel.txt'),
+        p.join(_workDir, 'rel.txt'),
       );
       expect(GgHostFile(fs, 'a/b.txt').parent.path, 'a');
-      expect(GgHostDirectory(fs, 'a/b').absolute.path, p.join('/work', 'a/b'));
+      expect(
+        GgHostDirectory(fs, 'a/b').absolute.path,
+        p.join(_workDir, 'a', 'b'),
+      );
       expect(GgHostDirectory(fs, 'a/b').parent.path, 'a');
-      expect(GgHostLink(fs, 'a/l').absolute.path, p.join('/work', 'a/l'));
+      expect(GgHostLink(fs, 'a/l').absolute.path, p.join(_workDir, 'a', 'l'));
       expect(GgHostLink(fs, 'a/l').parent.path, 'a');
 
       expect(GgHostFile(fs, '/a.txt').uri, Uri.file('/a.txt'));
@@ -136,7 +146,7 @@ void main() {
     });
 
     test('answers the current and temporary directories', () {
-      expect(overrides.getCurrentDirectory().path, '/work');
+      expect(overrides.getCurrentDirectory().path, _workDir);
       expect(overrides.getSystemTempDirectory().path, '/tmp');
       expect(
         () => overrides.setCurrentDirectory('/elsewhere'),
