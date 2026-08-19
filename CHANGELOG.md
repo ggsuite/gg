@@ -1,5 +1,15 @@
 # Changelog
 
+## 17.2.2 - 2026-08-19
+
+### Fixed
+
+- `gg dna` now works on Windows. It shipped helix 0.2.0, which resolved a
+  hosted package to `/C:/…` — a leading slash before the drive letter that
+  `dart:io` rejects, so `gg dna init` aborted with
+  `FileSystemExists failed … errno = 123` on the first dev dependency it
+  probed. Raised to helix 1.0.1, where that is fixed.
+
 ## 17.2.1 - 2026-08-18
 
 ### Changed
