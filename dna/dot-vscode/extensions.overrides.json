@@ -1,0 +1,10 @@
+{
+  // gg documents its command tree with graphviz, so these come back on
+  // top of the shared recommendations instead of replacing them.
+  "recommendations+": [
+    "stephanvs.dot",
+    "tintinweb.graphviz-interactive-preview",
+    "geeklearningio.graphviz-markdown-preview",
+    "bmlsolutions.dotuml"
+  ]
+}

@@ -5,6 +5,7 @@
 ### Changed
 
 - Make the host conformance tests pass on windows too
+- Roll out the dna_ggsuite DNA
 
 ## 17.2.2 - 2026-08-19
 
