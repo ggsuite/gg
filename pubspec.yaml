@@ -18,6 +18,7 @@ dependencies:
   gg_multi: ^10.1.1
   helix: ^1.0.1
 dev_dependencies:
+  dna_ggsuite: ^0.2.0
   lints: ^6.1.0
   test: ^1.31.2
 
