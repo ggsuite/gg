@@ -85,9 +85,9 @@
       "name": "dna-gg",
       "package": "dna_gg",
       "ecosystem": "pub",
-      "resolvedVersion": "0.1.1",
+      "resolvedVersion": "0.1.2",
       "via": "dna-ggsuite",
-      "hash": "0xb7b292a1a91dd05f"
+      "hash": "0xd5744033dd70c6a3"
     },
     {
       "name": "dna-ggsuite",
@@ -103,7 +103,7 @@
       "ecosystem": null,
       "resolvedVersion": null,
       "via": null,
-      "hash": "0x32b3537fa5495175"
+      "hash": "0x890d6d93567dc533"
     }
   ],
   "claude": {
@@ -182,11 +182,11 @@
     },
     {
       "path": ".github/workflows/quick_check.yaml",
-      "hash": "0xa61b5062f48e430c"
+      "hash": "0xf3320fb8f530a565"
     },
     {
       "path": ".vscode/extensions.json",
-      "hash": "0x42dbd078830bdf05"
+      "hash": "0x1324ed92e10d9476"
     },
     {
       "path": ".vscode/settings.json",

@@ -1,4 +1,4 @@
-# Runs the gg-js quick check on every push and pull request against main.
+# Runs the gg quick check on every push and pull request against main.
 
 name: Tests
 
@@ -17,4 +17,4 @@ jobs:
       - uses: actions/checkout@v5
 
       # Uses the Node.js preinstalled on the runner image.
-      - run: npx @tssuite/gg-js one did commit
+      - run: npx @tssuite/ggwsm one did commit
