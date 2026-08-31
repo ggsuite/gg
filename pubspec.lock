@@ -255,7 +255,7 @@ packages:
       path: "../gg_args"
       relative: true
     source: path
-    version: "3.1.0"
+    version: "3.1.1"
   gg_capture_print:
     dependency: transitive
     description:
@@ -270,7 +270,7 @@ packages:
       path: "../gg_changelog"
       relative: true
     source: path
-    version: "2.1.0"
+    version: "2.1.1"
   gg_console_colors:
     dependency: "direct main"
     description:
@@ -300,7 +300,7 @@ packages:
       path: "../gg_hash"
       relative: true
     source: path
-    version: "1.2.0"
+    version: "1.3.0"
   gg_is_flutter:
     dependency: "direct overridden"
     description:
@@ -338,7 +338,7 @@ packages:
       path: "../gg_local_package_dependencies"
       relative: true
     source: path
-    version: "4.1.1"
+    version: "4.1.2"
   gg_localize_refs:
     dependency: "direct overridden"
     description:
@@ -352,7 +352,7 @@ packages:
       path: "../gg_log"
       relative: true
     source: path
-    version: "1.1.0"
+    version: "1.2.0"
   gg_merge:
     dependency: "direct overridden"
     description:

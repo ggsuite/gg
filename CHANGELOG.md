@@ -6,6 +6,7 @@
 
 - Make the host conformance tests pass on windows too
 - Roll out the dna_ggsuite DNA
+- Never use /tmp as test dir base on Windows - Dart and git resolve it to different paths
 
 ### Fixed
 
