@@ -7,6 +7,10 @@
 - Make the host conformance tests pass on windows too
 - Roll out the dna_ggsuite DNA
 
+### Fixed
+
+- Fix Windows-specific test failures that blocked the review
+
 ## 17.2.2 - 2026-08-19
 
 ### Fixed
