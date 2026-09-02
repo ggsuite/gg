@@ -1,10 +1,16 @@
 # Changelog
 
-## Unreleased
+## 17.3.0 - 2026-09-02
 
 ### Changed
 
 - Make the host conformance tests pass on windows too
+- Roll out the dna_ggsuite DNA
+- Never use /tmp as test dir base on Windows - Dart and git resolve it to different paths
+
+### Fixed
+
+- Fix Windows-specific test failures that blocked the review
 
 ## 17.2.2 - 2026-08-19
 
