@@ -15,8 +15,8 @@ dependencies:
   gg_process: ^1.2.0
   gg_is_github: ^1.1.0
   path: ^1.9.1
-  gg_multi: ^10.1.1
-  helix: ^1.2.0
+  gg_multi: ^10.1.2
+  helix: ^1.2.1
 dev_dependencies:
   dna_ggsuite: ^0.2.0
   lints: ^6.1.0
