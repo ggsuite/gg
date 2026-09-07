@@ -5,9 +5,9 @@
       "name": "base",
       "package": "helix",
       "ecosystem": null,
-      "resolvedVersion": "1.4.0",
+      "resolvedVersion": "1.5.0",
       "via": null,
-      "hash": "0x705e486e88a93125"
+      "hash": "0x6883da335b415f9d"
     },
     {
       "name": "dna-readme",
@@ -103,14 +103,14 @@
       "ecosystem": null,
       "resolvedVersion": null,
       "via": null,
-      "hash": "0x890d6d93567dc533"
+      "hash": "0x5daf505a3ff273cb"
     }
   ],
   "claude": {
     "claudeMdInclude": null
   },
-  "baseVersion": "1.4.0",
-  "baseHash": "0x705e486e88a93125",
+  "baseVersion": "1.5.0",
+  "baseHash": "0x6883da335b415f9d",
   "instances": [
     {
       "path": ".claude/skills/blog/SKILL.md",
@@ -319,10 +319,6 @@
     {
       "path": "doc/guides/vscode-guide.md",
       "hash": "0x6776b27c7cbedb98"
-    },
-    {
-      "path": "doc/hello_world.md",
-      "hash": "0x0903f7fc5224f6f1"
     },
     {
       "path": "doc/templates/blog-template-de.md",
