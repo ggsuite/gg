@@ -509,10 +509,10 @@ packages:
     dependency: "direct main"
     description:
       name: helix
-      sha256: "626f5a23addbc6f7dfdbf676e8034b21d1fe0333f81cd382c802cf8bd0260f90"
+      sha256: "34f8977dd3d2130a26b36e226e737fe4181699b42b8303512be0bbabb10905ae"
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "1.5.0"
   http:
     dependency: transitive
     description:

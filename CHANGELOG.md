@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Use helix 1.5.0 and drop the generated doc/hello_world.md
+
 ## 17.4.0 - 2026-09-07
 
 ### Changed
