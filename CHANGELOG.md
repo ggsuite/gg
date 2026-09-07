@@ -5,8 +5,7 @@
 ### Changed
 
 - `gg dna init` asks with the gg menu whether a folder without manifest is
-a Dart or a TypeScript project
-- Ask for Dart or TypeScript when gg dna init runs in a folder without manifest
+  a Dart or a TypeScript project
 
 ## 17.3.0 - 2026-09-02
 
