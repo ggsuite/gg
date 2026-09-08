@@ -6,6 +6,10 @@
 
 - Point the DNA examples at the ggdna layers, not the retired dna_base
 
+### Removed
+
+- Remove the stray ticket.json from the repository root
+
 ## 17.4.1 - 2026-09-07
 
 ### Changed
