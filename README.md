@@ -81,9 +81,9 @@ This also works inside a ticket workspace when you want to run
 
 ## When to use `gg dna`
 
-`gg dna` is a re-export of the [`helix`](https://github.com/ggsuite/helix)
+`gg dna` is a re-export of the [`helix`](https://github.com/ggdna/helix)
 package — the DNA engine. It resolves the DNA packages a repo declares as
-dev-dependencies (`dna_base`, `dna_dart`, `dna-ts`, …) and instantiates
+dev-dependencies (`dna_dart`, `dna-ts`, `dna_readme`, …) and instantiates
 their content — configs, docs, scripts and agent skills — into the repo:
 
 | Command         | Purpose                                                        |

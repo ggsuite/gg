@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Point the DNA examples at the ggdna layers, not the retired dna_base
+
 ## 17.4.1 - 2026-09-07
 
 ### Changed
