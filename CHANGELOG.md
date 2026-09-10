@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## 17.4.2 - 2026-09-11
 
 ### Changed
 
 - Point the DNA examples at the ggdna layers, not the retired dna_base
+
+### Fixed
+
+- Update the dependencies to the fixes of ticket 137
 
 ### Removed
 
