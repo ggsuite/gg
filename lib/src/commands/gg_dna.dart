@@ -6,10 +6,12 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_one/gg_one.dart'
-    show GgPrompts, GgPromptsUnsupportedError, HasTerminal, defaultHasTerminal;
+    show GgPrompts, GgPromptsUnsupportedError, HasTerminal;
 import 'package:helix/helix.dart' as helix;
 
 /// Answers the questions of helix through the prompts of the gg suite —
@@ -23,7 +25,7 @@ import 'package:helix/helix.dart' as helix;
 Future<int> helixSelectPrompt({
   required String prompt,
   required List<String> options,
-  HasTerminal hasTerminal = defaultHasTerminal,
+  HasTerminal hasTerminal = _stdioHasTerminal,
   GgPrompts? ownPrompts,
 }) => _ask(
   (prompts) => prompts.select(prompt: prompt, options: options),
@@ -33,25 +35,32 @@ Future<int> helixSelectPrompt({
 
 /// Asks helix's text questions — the variables a layer marks
 /// `mustOverride` — through the input prompt of the gg suite. An empty
-/// answer takes [defaultValue] and is asked again when there is none:
-/// helix expects a value, never an empty string.
+/// answer takes [defaultValue]; without one, gg's own prompts ask again
+/// and say a value is required: helix expects a value, never an empty
+/// string. An embedder answering empty without a default has nobody
+/// behind it to ask again — at the end of its input, say.
 ///
 /// Throws [helix.PromptUnavailableException] when there is nobody to ask,
 /// like [helixSelectPrompt].
 Future<String> helixTextPrompt({
   required String prompt,
   String? defaultValue,
-  HasTerminal hasTerminal = defaultHasTerminal,
+  HasTerminal hasTerminal = _stdioHasTerminal,
   GgPrompts? ownPrompts,
 }) async {
+  var question = prompt;
   while (true) {
     final answer = (await _ask(
-      (prompts) => prompts.input(prompt: prompt, defaultValue: defaultValue),
+      (prompts) => prompts.input(prompt: question, defaultValue: defaultValue),
       hasTerminal: hasTerminal,
       ownPrompts: ownPrompts,
     )).trim();
     if (answer.isNotEmpty) return answer;
     if (defaultValue != null) return defaultValue;
+    if (!_isOwn(GgPrompts.current, ownPrompts)) {
+      throw const helix.PromptUnavailableException('the answer was empty');
+    }
+    question = '$prompt — a value is required';
   }
 }
 
@@ -60,8 +69,9 @@ Future<String> helixTextPrompt({
 ///
 /// - a platform that cannot draw prompts (Wasm without an embedder),
 /// - gg's own prompts — [ownPrompts], by default
-///   [GgPrompts.defaultPrompts] — on a stdin that is no terminal: they
-///   would wait forever in CI, in a pipe or behind a null device,
+///   [GgPrompts.defaultPrompts] — where stdin or stdout is no terminal:
+///   they would wait forever in CI, in a pipe or behind a null device, or
+///   draw into a redirected output where nobody sees them,
 /// - gg's own prompts failing to read the terminal: Git Bash on Windows
 ///   reports a terminal for redirected input, and reading it then fails.
 ///
@@ -73,7 +83,7 @@ Future<T> _ask<T>(
   required GgPrompts? ownPrompts,
 }) async {
   final prompts = GgPrompts.current;
-  final isOwn = identical(prompts, ownPrompts ?? GgPrompts.defaultPrompts);
+  final isOwn = _isOwn(prompts, ownPrompts);
   if (isOwn) _ensureTerminal(hasTerminal);
   try {
     return await question(prompts);
@@ -85,8 +95,19 @@ Future<T> _ask<T>(
   }
 }
 
+/// Whether [prompts] are the ones gg draws itself — [ownPrompts], by
+/// default [GgPrompts.defaultPrompts] — rather than an embedder's.
+bool _isOwn(GgPrompts prompts, GgPrompts? ownPrompts) =>
+    identical(prompts, ownPrompts ?? GgPrompts.defaultPrompts);
+
+/// Whether gg's own prompts can be seen and answered: they read stdin and
+/// draw on stdout.
+// coverage:ignore-start
+bool _stdioHasTerminal() => stdin.hasTerminal && stdout.hasTerminal;
+// coverage:ignore-end
+
 /// Throws [helix.PromptUnavailableException] unless [hasTerminal] says
-/// stdin is a terminal.
+/// the prompts have a terminal.
 void _ensureTerminal(HasTerminal hasTerminal) {
   final bool isTerminal;
   try {
@@ -96,7 +117,9 @@ void _ensureTerminal(HasTerminal hasTerminal) {
     throw const helix.PromptUnavailableException('stdin cannot be read');
   }
   if (!isTerminal) {
-    throw const helix.PromptUnavailableException('stdin is not a terminal');
+    throw const helix.PromptUnavailableException(
+      'stdin or stdout is not a terminal',
+    );
   }
 }
 

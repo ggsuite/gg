@@ -236,13 +236,27 @@ void main() {
     });
 
     test('asks again for an empty answer without a default', () async {
-      final prompts = _FakePrompts(0, inputs: ['', 'acme']);
+      final prompts = _FakePrompts(0, inputs: ['', '', 'acme']);
       GgPrompts.current = prompts;
 
-      final answer = await helixTextPrompt(prompt: 'Org');
+      final answer = await helixTextPrompt(
+        prompt: 'Org',
+        hasTerminal: () => true,
+        ownPrompts: prompts,
+      );
 
       expect(answer, 'acme');
-      expect(prompts.inputsAsked, hasLength(2));
+      expect(prompts.inputsAsked.map((q) => q.prompt), [
+        'Org',
+        'Org — a value is required',
+        'Org — a value is required',
+      ]);
+    });
+
+    test('has nobody to ask when an embedder answers empty', () {
+      GgPrompts.current = _FakePrompts(0, inputs: ['']);
+
+      expect(helixTextPrompt(prompt: 'Org'), _unavailable);
     });
 
     test('has nobody to ask without a terminal', () {
