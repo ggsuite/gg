@@ -1,5 +1,11 @@
 # Changelog
 
+## 17.5.0 - 2026-10-16
+
+### Changed
+
+- gg dna init and gg dna add ask for the variables the DNA layers mark mustOverride through the input prompt of gg
+
 ## 17.4.2 - 2026-09-11
 
 ### Changed
