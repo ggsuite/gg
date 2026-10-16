@@ -203,6 +203,24 @@ void main() {
       );
     });
 
+    test('exempts »do create repo« in every mode, with its options', () {
+      for (final mode in ProjectMode.values) {
+        final args = ['do', 'create', 'repo', '-n', 'x'];
+        expect(checkArgsForProjectMode(args, () => mode), args);
+      }
+    });
+
+    test('does not exempt »do create ticket«', () {
+      expect(
+        () => checkArgsForProjectMode([
+          'do',
+          'create',
+          'ticket',
+        ], () => ProjectMode.single),
+        throwsA(isA<StateError>()),
+      );
+    });
+
     test('does not exempt other subcommands of an exempted command', () {
       expect(
         () =>

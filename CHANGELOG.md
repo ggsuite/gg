@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Allow gg do create repo in every folder
+
 ## 17.5.0 - 2026-10-16
 
 ### Changed
