@@ -10,7 +10,8 @@ import 'package:args/command_runner.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:gg_multi/gg_multi.dart' as gg_multi;
 
-import 'gg_dna.dart';
+import 'package:gg_create_repo/gg_create_repo.dart' show GgDna;
+
 import 'gg_multi.dart';
 import 'gg_one.dart';
 

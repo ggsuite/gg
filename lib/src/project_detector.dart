@@ -123,8 +123,7 @@ class ProjectDetector {
   }
 }
 
-/// Top-level subcommand names that run independently of the detected
-/// project mode and are therefore never guarded.
+/// Top-level commands that run in any project mode, never guarded.
 const Set<String> modeIndependentCommands = {
   'one',
   'multi',
@@ -133,9 +132,8 @@ const Set<String> modeIndependentCommands = {
   'help',
 };
 
-/// Command paths (`<command> <subcommand>`) that create or bootstrap a
-/// workspace and therefore must run outside of one as well.
-const Set<String> modeIndependentCommandPaths = {'do init'};
+/// Command paths of up to three words that run in any project mode.
+const Set<String> modeIndependentCommandPaths = {'do init', 'do create repo'};
 
 /// Checks whether [args] may run in the detected project mode.
 ///
@@ -157,11 +155,11 @@ List<String> checkArgsForProjectMode(
   final command = args[firstNonFlag];
   if (modeIndependentCommands.contains(command)) return args;
 
-  final rest = args.sublist(firstNonFlag + 1);
-  final secondNonFlag = rest.indexWhere((a) => !a.startsWith('-'));
-  if (secondNonFlag >= 0 &&
-      modeIndependentCommandPaths.contains('$command ${rest[secondNonFlag]}')) {
-    return args;
+  final words = args.where((a) => !a.startsWith('-')).take(3).toList();
+  for (var length = 2; length <= words.length; length++) {
+    if (modeIndependentCommandPaths.contains(words.take(length).join(' '))) {
+      return args;
+    }
   }
 
   switch (detectMode()) {
