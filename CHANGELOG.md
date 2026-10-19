@@ -6,6 +6,7 @@
 
 - Allow gg do create repo in every folder
 - Take the gg dna bridge from gg_create_repo
+- Test that no repository is named like a gg command
 
 ## 17.5.0 - 2026-10-16
 

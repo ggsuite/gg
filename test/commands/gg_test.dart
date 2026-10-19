@@ -39,6 +39,14 @@ void main() {
       expect(ggCommand.subcommands.containsKey('run'), isFalse);
     });
 
+    test('has no command a new repository may be named after', () {
+      // gg do create repo rejects these names; a new command must join them.
+      expect(
+        gg_multi.WorkspaceRepoHost.ggCommandNames,
+        containsAll(ggCommand.subcommands.keys),
+      );
+    });
+
     test('registers all gg_multi subcommands at the root', () {
       final expected = gg_multi.GgMulti(ggLog: ggLog).subcommands.keys;
       expect(ggCommand.subcommands.keys, containsAll(expected));

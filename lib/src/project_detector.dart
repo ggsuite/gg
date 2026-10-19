@@ -123,8 +123,7 @@ class ProjectDetector {
   }
 }
 
-/// Top-level subcommand names that run independently of the detected
-/// project mode and are therefore never guarded.
+/// Top-level commands that run in any project mode, never guarded.
 const Set<String> modeIndependentCommands = {
   'one',
   'multi',
@@ -133,9 +132,7 @@ const Set<String> modeIndependentCommands = {
   'help',
 };
 
-/// Command paths (`<command> <subcommand> [<subcommand>]`) that run in any
-/// mode: `do init` bootstraps a workspace, `do create repo` creates a
-/// repository in the ocean, in a ticket or in any other folder.
+/// Command paths of up to three words that run in any project mode.
 const Set<String> modeIndependentCommandPaths = {'do init', 'do create repo'};
 
 /// Checks whether [args] may run in the detected project mode.
