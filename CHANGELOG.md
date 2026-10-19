@@ -5,6 +5,7 @@
 ### Changed
 
 - Allow gg do create repo in every folder
+- Take the gg dna bridge from gg_create_repo
 
 ## 17.5.0 - 2026-10-16
 

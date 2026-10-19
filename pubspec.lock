@@ -298,7 +298,7 @@ packages:
     source: hosted
     version: "2.5.0"
   gg_create_repo:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../gg_create_repo"
       relative: true
