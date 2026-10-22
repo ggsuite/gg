@@ -441,6 +441,8 @@ class GgHostLink implements Link {
   @override
   Uri get uri => Uri.file(path);
 
+  // Windows tests reach the link members in Developer Mode only.
+  // coverage:ignore-start
   @override
   bool existsSync() => _fs.typeOf(_abs, false) == GgEntityType.link;
 
@@ -484,6 +486,7 @@ class GgHostLink implements Link {
 
   @override
   String toString() => "Link: '$path'";
+  // coverage:ignore-end
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>

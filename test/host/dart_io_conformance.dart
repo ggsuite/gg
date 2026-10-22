@@ -22,6 +22,8 @@ import 'package:gg/gg.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
+import '../symlinks.dart';
+
 /// Matches a path no matter which separator the platform spells it with.
 ///
 /// The suite builds its paths with `/` because every platform accepts that
@@ -345,7 +347,7 @@ void dartIoConformanceTests() {
 
         link.deleteSync();
         expect(link.existsSync(), isFalse);
-      });
+      }, skip: skipWithoutSymlinks);
 
       test('creates a link recursively and asynchronously', () async {
         File('$tmpPath/t2.txt').writeAsStringSync('x');
@@ -353,7 +355,7 @@ void dartIoConformanceTests() {
             .create('$tmpPath/t2.txt', recursive: true);
         expect(link.existsSync(), isTrue);
         await link.delete();
-      });
+      }, skip: skipWithoutSymlinks);
 
       test('throws a helpful error for unsupported members', () {
         expect(
@@ -402,7 +404,7 @@ void dartIoConformanceTests() {
           ),
           isTrue,
         );
-      });
+      }, skip: skipWithoutSymlinks);
 
       test('resolves symbolic links', () async {
         File('$tmpPath/r.txt').writeAsStringSync('x');

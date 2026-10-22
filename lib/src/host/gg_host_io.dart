@@ -57,7 +57,8 @@ abstract final class GgHostIo {
       if (type == FileSystemEntityType.directory) {
         Directory(path).deleteSync(recursive: recursive);
       } else if (type == FileSystemEntityType.link) {
-        Link(path).deleteSync();
+        // Windows tests reach it in Developer Mode only.
+        Link(path).deleteSync(); // coverage:ignore-line
       } else {
         File(path).deleteSync();
       }
@@ -94,8 +95,11 @@ abstract final class GgHostIo {
         _raw(() => Directory(parent).createTempSync(prefix).path),
     resolveSymbolicLinks: (path) =>
         _raw(() => File(path).resolveSymbolicLinksSync()),
+    // Windows tests reach the links in Developer Mode only.
+    // coverage:ignore-start
     createLink: (link, target) => _raw(() => Link(link).createSync(target)),
     linkTarget: (link) => _raw(() => Link(link).targetSync()),
+    // coverage:ignore-end
   );
 
   // ...........................................................................

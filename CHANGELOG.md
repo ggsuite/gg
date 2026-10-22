@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Run the host tests on Windows without Developer Mode
+
 ## 17.6.0 - 2026-10-19
 
 ### Changed
