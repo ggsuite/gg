@@ -5,6 +5,7 @@
 ### Changed
 
 - Run the host tests on Windows without Developer Mode
+- Document the Windows support of ticket gg-1
 
 ## 17.6.0 - 2026-10-19
 
