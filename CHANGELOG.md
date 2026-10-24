@@ -6,6 +6,9 @@
 
 - Run the host tests on Windows without Developer Mode
 - Document the Windows support of ticket gg-1
+- Lock gg_multi_core 4.11.1 and gg_multi_workspace 4.16.0
+
+The versions the merge of main brought in, which the activated gg resolves
 
 ## 17.6.0 - 2026-10-19
 

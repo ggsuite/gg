@@ -412,7 +412,7 @@ packages:
       path: "../gg_multi_core"
       relative: true
     source: path
-    version: "4.11.0"
+    version: "4.11.1"
   gg_multi_do_publish:
     dependency: "direct overridden"
     description:
@@ -426,7 +426,7 @@ packages:
       path: "../gg_multi_workspace"
       relative: true
     source: path
-    version: "4.15.0"
+    version: "4.16.0"
   gg_one:
     dependency: "direct main"
     description:
