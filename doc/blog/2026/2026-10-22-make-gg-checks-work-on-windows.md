@@ -70,6 +70,17 @@ flowchart LR
 - `install.bat` activates gg from the ticket folder
 - This lets the fixed gg run against other workspaces before it is published
 
+## Dependency updates
+
+- `gg do push` and `gg do review` upgrade the dependencies without
+  `--tighten` now. Inside a ticket the overrides point at local checkouts,
+  and pub crashed when it tightened against a sibling newer than the
+  declared constraint. Only `gg do publish` tightens, once the overrides
+  are gone
+- When pana prints no report, `gg can publish` names pana's exit code and
+  the errors pana logged, instead of only »Error parsing pana output«
+- The DNA of the suite moves to `dna_ggsuite` ^1.0.0
+
 ## Result
 
 - With the gg of this ticket, all repos of audaudio ticket 38 were

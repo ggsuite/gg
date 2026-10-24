@@ -8,6 +8,10 @@
 - Document the Windows support of ticket gg-1
 - Lock gg_multi_core 4.11.1 and gg_multi_workspace 4.16.0
 - Upgrade the dependencies
+- Name the dependency updates in the blog post
+
+Push and review no longer tighten; only publish does
+pana errors name pana's exit code and stderr
 
 ## 17.6.0 - 2026-10-19
 
