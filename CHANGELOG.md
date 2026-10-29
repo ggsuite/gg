@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 17.7.0 - 2026-10-29
 
 ### Changed
 
