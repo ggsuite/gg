@@ -7,8 +7,12 @@
 import 'dart:io';
 
 import 'package:gg/gg.dart';
+import 'package:gg_is_github/gg_is_github.dart';
 import 'package:gg_multi/gg_multi.dart' as gg_multi;
 import 'package:test/test.dart';
+
+import 'fake_windows_developer_mode.dart';
+import 'host/in_memory_host.dart';
 
 void main() {
   late Directory dRoot;
@@ -47,6 +51,64 @@ void main() {
           gg_multi.ggCliVersion = 'outdated';
           await runGg(args: ['--version'], ggLog: ggLog);
           expect(gg_multi.ggCliVersion, ggVersion);
+        });
+      });
+
+      group('- Windows developer mode', () {
+        test('stops gg with exit code 1 when it is disabled', () async {
+          fakeWindows(FakeReg.value('0x0'));
+          var detected = false;
+          final code = await runGg(
+            args: ['can', 'commit'],
+            ggLog: ggLog,
+            detectMode: () {
+              detected = true;
+              return ProjectMode.unknown;
+            },
+          );
+
+          expect(code, 1);
+          expect(detected, isFalse);
+          expect(
+            messages.join('\n'),
+            contains('gg needs the Windows developer mode'),
+          );
+        });
+
+        test('runs the command when it is enabled', () async {
+          fakeWindows(FakeReg.value('0x1'));
+          await runGg(
+            args: ['can', 'commit'],
+            ggLog: ggLog,
+            detectMode: () => ProjectMode.unknown,
+          );
+
+          expect(messages.join('\n'), contains('Not a workspace.'));
+        });
+
+        test('is not needed for --version', () async {
+          fakeWindows(FakeReg.value('0x0'));
+          final code = await runGg(args: ['--version'], ggLog: ggLog);
+
+          expect(code, 0);
+          expect(messages, [ggVersion]);
+        });
+
+        test('is skipped under an installed GgHost', () async {
+          final host = InMemoryHost(operatingSystem: 'windows');
+          GgHost.install(host.ggHost);
+          addTearDown(GgHost.uninstall);
+          testIsGitHub = false;
+          addTearDown(() => testIsGitHub = null);
+
+          await runGg(
+            args: ['can', 'commit'],
+            ggLog: ggLog,
+            detectMode: () => ProjectMode.unknown,
+          );
+
+          expect(host.processCalls, isEmpty);
+          expect(messages.join('\n'), contains('Not a workspace.'));
         });
       });
 

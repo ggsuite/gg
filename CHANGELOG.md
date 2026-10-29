@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Check on Windows that the developer mode is enabled
+
 ## 17.6.0 - 2026-10-19
 
 ### Changed
