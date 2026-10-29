@@ -171,6 +171,15 @@ void main() {
       expect(result, ['--help']);
     });
 
+    test('returns args unchanged when a command asks for its usage', () {
+      for (final args in [
+        ['do', 'commit', '--help'],
+        ['can', 'commit', '-h'],
+      ]) {
+        expect(checkArgsForProjectMode(args, () => ProjectMode.unknown), args);
+      }
+    });
+
     test('returns args unchanged for mode-independent commands', () {
       for (final command in modeIndependentCommands) {
         final result = checkArgsForProjectMode([
@@ -301,6 +310,21 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  group('isUsageOnly(args)', () {
+    test('is true without a command, for help, --help and -h', () {
+      expect(isUsageOnly([]), isTrue);
+      expect(isUsageOnly(['--verbose']), isTrue);
+      expect(isUsageOnly(['help', 'can']), isTrue);
+      expect(isUsageOnly(['do', 'commit', '--help']), isTrue);
+      expect(isUsageOnly(['can', 'commit', '-h']), isTrue);
+    });
+
+    test('is false for a command', () {
+      expect(isUsageOnly(['can', 'commit']), isFalse);
+      expect(isUsageOnly(['--verbose', 'do', 'commit']), isFalse);
     });
   });
 }

@@ -1,0 +1,42 @@
+// @license
+// Copyright (c) ggsuite
+//
+// Use of this source code is governed by terms that can be
+// found in the LICENSE file in the root of this package.
+
+{
+  // The package name, as declared in pubspec.yaml / package.json.
+  "name": "gg",
+
+  // 1-2 sentence summary about this repo.
+  "summary": "The gg CLI: routes to workspace (gg_multi), standalone (gg one) and DNA (helix) commands; embeddable via GgHost (WASM/Node).",
+
+  // 1-3 bullet points: the problem space.
+  "domain": [
+    "CLI entry: runGg, project mode detection, command routing",
+    "Host abstraction: GgHost callbacks for file system, processes, platform, console, prompts",
+    "Preconditions: Windows developer mode check (symlinks)"
+  ],
+
+  // The repos this one depends on and the repos depending on it.
+  // Keep the reason or the API behind each entry, not just the name.
+  "interfaces": {
+    // "<repo-a>": "why / API"
+    "uses": {
+      "gg_multi": "workspace/ticket commands, ggCliVersion",
+      "gg_one": "standalone commands (gg one), GgPrompts",
+      "helix": "DNA commands (gg dna)",
+      "gg_create_repo": "gg do create repo",
+      "gg_process": "GgProcessDelegate, GgPlatformDelegate, ggRunProcess",
+      "gg_args": "GgCommandRunner",
+      "gg_console_colors": "colored output, ggColorsEnabled",
+      "gg_log": "GgLog",
+      "gg_is_github": "testIsGitHub override"
+    },
+
+    // "<repo-b>": "why / API"
+    "usedBy": {
+      "@tssuite/gg-js": "embeds gg as WASM via GgHost"
+    }
+  }
+}

@@ -135,23 +135,33 @@ const Set<String> modeIndependentCommands = {
 /// Command paths of up to three words that run in any project mode.
 const Set<String> modeIndependentCommandPaths = {'do init', 'do create repo'};
 
+/// True when [args] only ask gg for its usage: no command, the `help`
+/// command, `--help` or `-h`.
+bool isUsageOnly(List<String> args) {
+  final firstNonFlag = args.indexWhere((a) => !a.startsWith('-'));
+  return firstNonFlag < 0 ||
+      args[firstNonFlag] == 'help' ||
+      args.contains('--help') ||
+      args.contains('-h');
+}
+
 /// Checks whether [args] may run in the detected project mode.
 ///
 /// All gg_multi subcommands are registered at the root of `gg`, so inside
 /// a gg ticket workspace the args pass through unchanged and gg multi runs
 /// by default. Inside a standalone project a [StateError] asks the user to
 /// call `gg one ...` explicitly; when no project is detected at all, a
-/// [StateError] points to `gg do init`. Empty args, pure flags (`--help`)
-/// and [modeIndependentCommands] always pass through, and so do the
+/// [StateError] points to `gg do init`. [isUsageOnly] args and
+/// [modeIndependentCommands] always pass through, and so do the
 /// `<command> <subcommand>` combinations listed in
 /// [modeIndependentCommandPaths].
 List<String> checkArgsForProjectMode(
   List<String> args,
   ProjectMode Function() detectMode,
 ) {
-  final firstNonFlag = args.indexWhere((a) => !a.startsWith('-'));
-  if (firstNonFlag < 0) return args;
+  if (isUsageOnly(args)) return args;
 
+  final firstNonFlag = args.indexWhere((a) => !a.startsWith('-'));
   final command = args[firstNonFlag];
   if (modeIndependentCommands.contains(command)) return args;
 

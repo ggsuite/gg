@@ -13,6 +13,7 @@ import 'commands/gg.dart';
 import 'gg_version.dart';
 import 'host/gg_host.dart';
 import 'project_detector.dart';
+import 'windows_developer_mode.dart';
 
 /// Runs the `gg` command line with [args] and returns the exit code.
 ///
@@ -23,6 +24,9 @@ import 'project_detector.dart';
 /// Errors are reported through [ggLog] rather than thrown, and a non-zero
 /// exit code is returned instead of terminating the process, so an embedder
 /// stays in control of both.
+///
+/// On Windows, gg refuses to run without the developer mode, see
+/// [checkWindowsDeveloperMode].
 Future<int> runGg({
   required List<String> args,
   required GgLog ggLog,
@@ -39,6 +43,10 @@ Future<int> runGg({
   }
 
   try {
+    if (!await checkWindowsDeveloperMode(args: args, ggLog: ggLog)) {
+      return 1;
+    }
+
     final checked = checkArgsForProjectMode(
       args,
       detectMode ?? ProjectDetector.detect,

@@ -29,6 +29,10 @@ dart pub global activate gg
 
 After installation the `gg` executable is available globally.
 
+On Windows, gg needs the **developer mode**, because it creates symbolic
+links. Enable it under Settings → System → For developers → Developer Mode
+(or run `start ms-settings:developers`). Without it, gg stops with a hint.
+
 ## Command Overview
 
 ```
