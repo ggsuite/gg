@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Add a blog post about requiring gg_multi 10.5.1
+
 ### Changed
 
 - Require gg_multi 10.5.1
