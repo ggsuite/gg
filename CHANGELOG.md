@@ -1,5 +1,15 @@
 # Changelog
 
+## 17.7.1 - 2026-11-10
+
+### Added
+
+- Add a blog post about requiring gg_multi 10.5.1
+
+### Changed
+
+- Require gg_multi 10.5.1
+
 ## 17.7.0 - 2026-10-29
 
 ### Changed
