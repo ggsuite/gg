@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Require gg_multi 10.5.1
+
 ## 17.7.0 - 2026-10-29
 
 ### Changed
