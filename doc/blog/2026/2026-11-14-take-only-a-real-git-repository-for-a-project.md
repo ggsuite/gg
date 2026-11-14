@@ -70,9 +70,12 @@ found in the LICENSE file in the root of this package.
 
 ## Open Points
 
-- A real repository above the temp folder still makes those two tests
-  fail: the search has no upper end. Nothing known sets a machine up
-  that way
+- Whether the repository that was found is the one the working directory
+  belongs to is not checked yet. A real repository far above — dotfiles
+  kept in a home directory — still makes every folder below it a
+  standalone project, and the two tests fail on such a machine. Two ways
+  are open: take a `.git` only in the folder gg is started in, or ask
+  git whether that folder is part of the repository
 - A `.git` file is trusted without a look at the folder it names
 - A stray `.git` folder is still on the disk. `gg` only stops taking it
   for a repository; git itself may still stumble over it
