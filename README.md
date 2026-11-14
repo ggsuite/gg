@@ -18,8 +18,11 @@ It is a thin CLI shell that combines three backend packages:
 - Inside a **gg ticket workspace** (a directory tree containing
   `.ocean/` — or the legacy `.master/`, renamed automatically — or `tickets/`) → `gg <command>` runs `gg_multi` by default.
 - Inside a **standalone Dart or TypeScript project** (a directory tree
-  with `pubspec.yaml`, `package.json` or `tsconfig.json`) → `gg` prints
-  a message asking you to use `gg one <command> …` explicitly.
+  with `pubspec.yaml`, `package.json` or `tsconfig.json`) or any git
+  repository → `gg` prints a message asking you to use
+  `gg one <command> …` explicitly. A git repository is a folder with a
+  `.git` folder that holds a `HEAD`, or with a `.git` file (worktree,
+  submodule); a folder that is merely called `.git` does not count.
 
 ## Installation
 

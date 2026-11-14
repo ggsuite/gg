@@ -1,5 +1,11 @@
 # Changelog
 
+## 17.7.2 - 2026-11-14
+
+### Changed
+
+- Take only a real git repository for a project
+
 ## 17.7.1 - 2026-11-10
 
 ### Added
