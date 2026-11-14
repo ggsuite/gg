@@ -475,7 +475,7 @@ packages:
       path: "../gg_process"
       relative: true
     source: path
-    version: "1.4.1"
+    version: "1.5.0"
   gg_project_root:
     dependency: "direct overridden"
     description:
