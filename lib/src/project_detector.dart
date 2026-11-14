@@ -17,8 +17,8 @@ enum ProjectMode {
   workspace,
 
   /// A single project: a Dart or TypeScript project (`pubspec.yaml`,
-  /// `package.json`, or `tsconfig.json`) or any git repository (`.git`)
-  /// found while walking up the directory tree.
+  /// `package.json`, or `tsconfig.json`) or any git repository found while
+  /// walking up the directory tree.
   single,
 
   /// Neither a workspace nor a recognized single project.
@@ -50,7 +50,7 @@ class ProjectDetector {
     }
     // A plain git repository - possibly still empty, without any pubspec.yaml
     // or package.json - is a standalone project too.
-    if (_walkUpFor(workingDir, _repoMarkers, isDirectory: null)) {
+    if (_walkUp(workingDir, _isRepository)) {
       return ProjectMode.single;
     }
     return ProjectMode.unknown;
@@ -75,9 +75,19 @@ class ProjectDetector {
     'tsconfig.json',
   ];
 
-  /// `.git` is a directory in a normal clone and a file in a git worktree or
-  /// submodule, so both entity types count.
-  static const _repoMarkers = <String>['.git'];
+  /// Whether [dir] is the root of a git repository: it holds a `.git` folder
+  /// with a `HEAD`, as every clone has it, or a `.git` file, as a worktree
+  /// or a submodule has it.
+  ///
+  /// A folder that is merely called `.git` — what an interrupted clone or
+  /// another tool leaves behind — is no repository. Taken for one, it turns
+  /// every folder below it into a standalone project: a stray `.git` in a
+  /// home directory did that to everything in the home directory.
+  static bool _isRepository(String dir) {
+    final dotGit = path.join(dir, '.git');
+    return File(dotGit).existsSync() ||
+        File(path.join(dotGit, 'HEAD')).existsSync();
+  }
 
   static bool _isInsideDir(String startPath, String dirName) {
     var dir = Directory(startPath).absolute;
@@ -94,25 +104,27 @@ class ProjectDetector {
   }
 
   /// Walks up from [startPath] looking for any of [markers]. [isDirectory]
-  /// selects the expected entity type; `null` accepts a file or a directory.
+  /// selects the expected entity type.
   static bool _walkUpFor(
     String startPath,
     List<String> markers, {
-    required bool? isDirectory,
-  }) {
+    required bool isDirectory,
+  }) => _walkUp(
+    startPath,
+    (dir) => markers.any((marker) {
+      final markerPath = path.join(dir, marker);
+      return isDirectory
+          ? Directory(markerPath).existsSync()
+          : File(markerPath).existsSync();
+    }),
+  );
+
+  /// Walks up from [startPath] until [isFound] says yes for a folder.
+  static bool _walkUp(String startPath, bool Function(String dir) isFound) {
     var dir = Directory(startPath).absolute;
     while (true) {
-      for (final marker in markers) {
-        final markerPath = path.join(dir.path, marker);
-        final exists = switch (isDirectory) {
-          true => Directory(markerPath).existsSync(),
-          false => File(markerPath).existsSync(),
-          null =>
-            Directory(markerPath).existsSync() || File(markerPath).existsSync(),
-        };
-        if (exists) {
-          return true;
-        }
+      if (isFound(dir.path)) {
+        return true;
       }
       final parent = dir.parent;
       if (parent.path == dir.path) {

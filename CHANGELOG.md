@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Take only a real git repository for a project
+
+A .git folder counts as a repository only with a HEAD in it, a .git file as before. A folder that is merely called .git made every folder below it a standalone project
+Add the blog post of the change
+README: what counts as a git repository
+
 ## 17.7.1 - 2026-11-10
 
 ### Added

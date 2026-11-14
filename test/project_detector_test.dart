@@ -24,6 +24,10 @@ void main() {
     }
   });
 
+  /// Makes [dir] look like a git repository: a `.git` folder with a `HEAD`.
+  void initRepo(Directory dir) =>
+      File(path.join(dir.path, '.git', 'HEAD'))..createSync(recursive: true);
+
   group('ProjectDetector.detect', () {
     test('returns workspace when .ocean folder is found at root', () {
       Directory(path.join(root.path, '.ocean')).createSync();
@@ -113,7 +117,7 @@ void main() {
     test('returns single for a git repo without any project markers', () {
       // An empty repo has no pubspec.yaml/package.json yet, but it is still a
       // standalone project - so gg must point the user to "gg one".
-      Directory(path.join(root.path, '.git')).createSync();
+      initRepo(root);
       expect(ProjectDetector.detect(workingDir: root.path), ProjectMode.single);
     });
 
@@ -124,7 +128,7 @@ void main() {
     });
 
     test('returns single when .git is in an ancestor', () {
-      Directory(path.join(root.path, '.git')).createSync();
+      initRepo(root);
       final sub = Directory(path.join(root.path, 'a', 'b'))
         ..createSync(recursive: true);
       expect(ProjectDetector.detect(workingDir: sub.path), ProjectMode.single);
@@ -132,11 +136,23 @@ void main() {
 
     test('workspace takes precedence over a .git folder', () {
       Directory(path.join(root.path, 'tickets')).createSync();
-      Directory(path.join(root.path, '.git')).createSync();
+      initRepo(root);
       expect(
         ProjectDetector.detect(workingDir: root.path),
         ProjectMode.workspace,
       );
+    });
+
+    test('ignores a folder that is called .git but is no repository', () {
+      // What an interrupted clone or another tool leaves behind: no HEAD.
+      // Taken for a repository, it would make every folder below it a
+      // standalone project.
+      Directory(path.join(root.path, '.git', 'objects'))
+          .createSync(recursive: true);
+      final sub = Directory(path.join(root.path, 'a', 'b'))
+        ..createSync(recursive: true);
+
+      expect(ProjectDetector.detect(workingDir: sub.path), ProjectMode.unknown);
     });
 
     test('returns unknown inside .ocean without project markers', () {
